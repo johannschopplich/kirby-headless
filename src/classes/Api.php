@@ -93,7 +93,7 @@ class Api
      *
      * @return \Kirby\Http\Response
      */
-    public static function createPreflightResponse(): \Kirby\Http\Response
+    public static function createPreflightResponse(): Response
     {
         return new Response('', null, 204, [
             'Access-Control-Allow-Origin' => env('KIRBY_HEADLESS_ALLOW_ORIGIN', '*'),
