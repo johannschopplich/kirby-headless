@@ -5,7 +5,7 @@ load([
     'KirbyHeadless\\Api\\Middlewares' => 'src/classes/Middlewares.php'
 ], __DIR__);
 
-\Kirby\Cms\App::plugin('johannschopplich/kirby-headless', [
+\Kirby\Cms\App::plugin('johannschopplich/headless', [
     'hooks' => [
         // Explicitly register catch-all routes only when Kirby and all plugins
         // have been loaded to ensure no other routes are overwritten
