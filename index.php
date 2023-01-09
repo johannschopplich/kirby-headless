@@ -15,7 +15,7 @@ load([
                     'api' => require __DIR__ . '/src/extensions/api.php',
                     'routes' => require __DIR__ . '/src/extensions/routes.php'
                 ],
-                kirby()->plugin('johannschopplich/kirby-headless')
+                kirby()->plugin('johannschopplich/headless')
             );
         }
     ],
