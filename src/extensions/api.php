@@ -44,7 +44,7 @@ return [
                     },
                     // Middleware to run queries and cache their results
                     function (array $context, array $args) use (&$kirby) {
-                        $input = get();
+                        $input = $kirby->request()->get();
                         $cache = $cacheKey = $data = null;
                         $languageCode = $kirby->request()->header('X-Language');
 
