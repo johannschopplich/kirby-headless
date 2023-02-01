@@ -36,7 +36,7 @@ class Middlewares
             return $page->file($filename);
         }
 
-        // Try to resolve site files at least
+        // Try to resolve site files at last
         if ($file = $kirby->site()->file($filename)) {
             return $file;
         }
