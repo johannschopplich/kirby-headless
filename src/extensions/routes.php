@@ -1,7 +1,7 @@
 <?php
 
-use KirbyHeadless\Api\Api;
-use KirbyHeadless\Api\Middlewares;
+use JohannSchopplich\Headless\Api\Api;
+use JohannSchopplich\Headless\Api\Middlewares;
 
 return [
     /**

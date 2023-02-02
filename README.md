@@ -245,7 +245,7 @@ return [
 
 ### API Builder
 
-This headless starter includes an Express-esque API builder, defined in the [`KirbyHeadless\Api\Api` class](./src/classes/Api.php). You can use it to re-use logic like handling a token or verifying some other incoming data.
+This headless starter includes an Express-esque API builder, defined in the [`JohannSchopplich\Headless\Api\Api` class](./src/classes/Api.php). You can use it to re-use logic like handling a token or verifying some other incoming data.
 
 Take a look at the [built-in routes](./src/extensions/routes.php) to get an idea how you can use the API builder to chain complex route logic.
 
@@ -262,8 +262,8 @@ return [
             'pattern' => 'post-example',
             'method' => 'POST',
             'action' => Api::createHandler(
-                [\KirbyHeadless\Api\Middlewares::class, 'hasBearerToken'],
-                [\KirbyHeadless\Api\Middlewares::class, 'hasBody'],
+                [\JohannSchopplich\Headless\Api\Middlewares::class, 'hasBearerToken'],
+                [\JohannSchopplich\Headless\Api\Middlewares::class, 'hasBody'],
                 function ($context) {
                     // Get the data of the POST request
                     $data = $context['body'];

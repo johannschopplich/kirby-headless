@@ -1,6 +1,6 @@
 <?php
 
-namespace KirbyHeadless\Api;
+namespace JohannSchopplich\Headless\Api;
 
 use Exception;
 use Kirby\Cms\File;

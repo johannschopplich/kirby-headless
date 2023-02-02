@@ -1,8 +1,8 @@
 <?php
 
 load([
-    'KirbyHeadless\\Api\\Api' => 'src/classes/Api.php',
-    'KirbyHeadless\\Api\\Middlewares' => 'src/classes/Middlewares.php'
+    'JohannSchopplich\\Headless\\Api\\Api' => 'src/classes/Api.php',
+    'JohannSchopplich\\Headless\\Api\\Middlewares' => 'src/classes/Middlewares.php'
 ], __DIR__);
 
 \Kirby\Cms\App::plugin('johannschopplich/headless', [

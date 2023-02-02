@@ -1,8 +1,8 @@
 <?php
 
+use JohannSchopplich\Headless\Api\Api;
 use Kirby\Data\Json;
 use Kirby\Kql\Kql;
-use KirbyHeadless\Api\Api;
 
 return [
     'routes' => function (\Kirby\Cms\App $kirby) {

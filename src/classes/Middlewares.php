@@ -1,6 +1,6 @@
 <?php
 
-namespace KirbyHeadless\Api;
+namespace JohannSchopplich\Headless\Api;
 
 use Kirby\Exception\NotFoundException;
 use Kirby\Filesystem\F;
