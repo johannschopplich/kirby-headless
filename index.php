@@ -1,8 +1,9 @@
 <?php
 
 load([
-    'JohannSchopplich\\Headless\\Api\\Api' => 'src/classes/Api.php',
-    'JohannSchopplich\\Headless\\Api\\Middlewares' => 'src/classes/Middlewares.php'
+    'JohannSchopplich\\Headless\\Api\\Api' => 'src/classes/Api/Api.php',
+    'JohannSchopplich\\Headless\\Api\\Middlewares' => 'src/classes/Api/Middlewares.php',
+    'JohannSchopplich\\Headless\\Block\\Image' => 'src/classes/Block/Image.php'
 ], __DIR__);
 
 \Kirby\Cms\App::plugin('johannschopplich/headless', [
@@ -19,7 +20,9 @@ load([
             );
         }
     ],
-    'fieldMethods' => require __DIR__ . '/src/extensions/fieldMethods.php',
+    'blockModels' => [
+        'image' => \JohannSchopplich\Headless\Block\Image::class
+    ],
     'pageMethods' => require __DIR__ . '/src/extensions/pageMethods.php',
     'siteMethods' => require __DIR__ . '/src/extensions/siteMethods.php'
 ]);
