@@ -7,8 +7,8 @@ return [
         /** @var \Kirby\Cms\Site $this */
         $url = $this->kirby()->option('headless.panel.frontendUrl');
 
-        if (empty($url) || !$this->kirby()->multilang()) {
-            return $url;
+        if (empty($url)) {
+            return null;
         }
 
         return Str::replace(
