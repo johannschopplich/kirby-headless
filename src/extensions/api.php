@@ -47,6 +47,7 @@ return [
                         $input = $kirby->request()->get();
                         $cache = $cacheKey = $data = null;
                         $languageCode = $kirby->request()->header('X-Language');
+                        $isCacheable = $kirby->request()->header('X-Cacheable');
 
                         // Set the Kirby language in multilanguage sites
                         if ($kirby->multilang() && $languageCode) {
@@ -57,7 +58,10 @@ return [
                             $hash = sha1(Json::encode($input));
                             $cache = $kirby->cache('pages');
                             $cacheKey = 'query-' . $hash . (!empty($languageCode) ? '-' . $languageCode : '') . '.json';
-                            $data = $cache->get($cacheKey);
+
+                            if ($isCacheable !== 'false') {
+                                $data = $cache->get($cacheKey);
+                            }
                         }
 
                         if ($data === null) {
