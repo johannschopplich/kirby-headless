@@ -5,6 +5,7 @@ namespace JohannSchopplich\Headless\Api;
 use Kirby\Exception\NotFoundException;
 use Kirby\Filesystem\F;
 use Kirby\Http\Response;
+use Kirby\Http\Uri;
 use Kirby\Toolkit\Str;
 
 class Middlewares
@@ -133,6 +134,81 @@ class Middlewares
         }
 
         return Response::json($data);
+    }
+
+    /**
+     * Try to resolve the sitemap tree
+     *
+     * @return \Kirby\Http\Response|void
+     */
+    public static function tryResolveSitemap(array $context, array $args)
+    {
+        // The `$args` array contains the route parameters
+        [$path] = $args;
+
+        if ($path !== '_sitemap') {
+            return;
+        }
+
+        $kirby = kirby();
+        $sitemap = [];
+        $cache = $kirby->cache('pages');
+        $cacheKey = 'sitemap.json';
+        $sitemap = $cache->get($cacheKey);
+        $withoutBase = fn (string $url) => '/' . (new Uri($url))->path();
+
+        if ($sitemap === null) {
+            $excludeTemplates = option('headless.sitemap.exclude.templates', []);
+            $excludePages = option('headless.sitemap.exclude.pages', []);
+
+            if (is_callable($excludePages)) {
+                $excludePages = $excludePages();
+            }
+
+            foreach (site()->index() as $item) {
+                /** @var \Kirby\Cms\Page $item */
+                if (in_array($item->intendedTemplate()->name(), $excludeTemplates)) {
+                    continue;
+                }
+
+                if (preg_match('!^(?:' . implode('|', $excludePages) . ')$!i', $item->id())) {
+                    continue;
+                }
+
+                $options = $item->blueprint()->options();
+                if (isset($options['sitemap']) && $options['sitemap'] === false) {
+                    continue;
+                }
+
+                $meta = $item->meta();
+
+                $url = [
+                    'url'        => $withoutBase($item->url()),
+                    'modified'   => $item->modified('Y-m-d', 'date'),
+                    'priority'   => number_format($meta->priority(), 1, '.', ''),
+                    'changefreq' => $meta->changefreq()->value(),
+                ];
+
+                if ($kirby->multilang()) {
+                    $url['links'] = $kirby->languages()->map(fn ($lang) => [
+                        // Support ISO 3166-1 Alpha 2 and ISO 639-1
+                        'lang' => Str::slug(Str::rtrim($lang->locale(LC_ALL) ?? $lang->code(), '.utf8')),
+                        'url' => $withoutBase($item->url($lang->code()))
+                    ])->values();
+
+                    $url['links'][] = [
+                        'lang' => 'x-default',
+                        'url' => $withoutBase($item->url())
+                    ];
+                }
+
+                $sitemap[] = $url;
+            }
+
+            $cache?->set($cacheKey, $sitemap);
+        }
+
+        return Response::json($sitemap);
     }
 
     /**

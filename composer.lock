@@ -638,16 +638,16 @@
         },
         {
             "name": "getkirby/cms",
-            "version": "3.9.1",
+            "version": "3.9.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/getkirby/kirby.git",
-                "reference": "617a07aa0151aa4b1a3735b3b5e1a41ccc244a43"
+                "reference": "9ecd11cd5b7d4875d4212f767a2b3ad3e52b3528"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/getkirby/kirby/zipball/617a07aa0151aa4b1a3735b3b5e1a41ccc244a43",
-                "reference": "617a07aa0151aa4b1a3735b3b5e1a41ccc244a43",
+                "url": "https://api.github.com/repos/getkirby/kirby/zipball/9ecd11cd5b7d4875d4212f767a2b3ad3e52b3528",
+                "reference": "9ecd11cd5b7d4875d4212f767a2b3ad3e52b3528",
                 "shasum": ""
             },
             "require": {
@@ -734,7 +734,7 @@
                     "type": "custom"
                 }
             ],
-            "time": "2023-01-31T10:07:31+00:00"
+            "time": "2023-03-08T11:15:05+00:00"
         },
         {
             "name": "laminas/laminas-escaper",

@@ -24,6 +24,7 @@ return [
             [Middlewares::class, 'tryResolveFiles'],
             [Middlewares::class, 'hasBearerToken'],
             [Middlewares::class, 'tryResolveSite'],
+            [Middlewares::class, 'tryResolveSitemap'],
             [Middlewares::class, 'tryResolvePage']
         )
     ]
