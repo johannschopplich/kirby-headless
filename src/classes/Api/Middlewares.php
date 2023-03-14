@@ -143,17 +143,22 @@ class Middlewares
      */
     public static function tryResolveSitemap(array $context, array $args)
     {
+        $kirby = kirby();
+
         // The `$args` array contains the route parameters
-        [$path] = $args;
+        if ($kirby->multilang()) {
+            [$languageCode, $path] = $args;
+        } else {
+            [$path] = $args;
+        }
 
         if ($path !== '_sitemap') {
             return;
         }
 
-        $kirby = kirby();
         $sitemap = [];
         $cache = $kirby->cache('pages');
-        $cacheKey = 'sitemap.json';
+        $cacheKey = '_sitemap.headless.json';
         $sitemap = $cache->get($cacheKey);
         $withoutBase = fn (string $url) => '/' . (new Uri($url))->path();
 
@@ -180,13 +185,9 @@ class Middlewares
                     continue;
                 }
 
-                $meta = $item->meta();
-
                 $url = [
-                    'url'        => $withoutBase($item->url()),
-                    'modified'   => $item->modified('Y-m-d', 'date'),
-                    'priority'   => number_format($meta->priority(), 1, '.', ''),
-                    'changefreq' => $meta->changefreq()->value(),
+                    'url' => $withoutBase($item->url()),
+                    'modified' => $item->modified('Y-m-d', 'date')
                 ];
 
                 if ($kirby->multilang()) {
