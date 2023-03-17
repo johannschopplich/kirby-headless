@@ -26,16 +26,37 @@ $imageBlockResolver = function (\Kirby\Cms\Block $block) {
     return $block;
 };
 
+$nestedBlocksResolver = function (\Kirby\Cms\Block $block) use ($imageBlockResolver) {
+    /** @var \Kirby\Cms\Block $block */
+    $nestedBlocks = option('headless.blocks.nested', ['prose']);
+    $blocksKeys = array_filter(
+        $block->content()->keys(),
+        fn ($i) => in_array($i, $nestedBlocks, true)
+    );
+
+    foreach ($blocksKeys as $key) {
+        /** @var \Kirby\Cms\Field $ktField */
+        $field = $block->content()->get($key);
+
+        $block->content()->update([
+            'prose' => $field->toBlocks()->map($imageBlockResolver)->toArray()
+        ]);
+    }
+
+    return $block;
+};
+
 return [
     /**
      * Enhances the `toBlocks()` method to resolve images
      *
      * @kql-allowed
      */
-    'toResolvedBlocks' => function (\Kirby\Cms\Field $field) use ($imageBlockResolver) {
+    'toResolvedBlocks' => function (\Kirby\Cms\Field $field) use ($imageBlockResolver, $nestedBlocksResolver) {
         return $field
             ->toBlocks()
-            ->map($imageBlockResolver);
+            ->map($imageBlockResolver)
+            ->map($nestedBlocksResolver);
     },
 
     /**
