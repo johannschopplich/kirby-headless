@@ -12,7 +12,7 @@ Kirby's global routing will be overwritten by the plugin's [global routes](./src
 - 🔒 **public** or **private** API
 - 🧩 [KQL](https://github.com/getkirby/kql) with bearer token support via new `/api/kql` route
 - ⚡️ Cached KQL queries
-- 🌐 Multilang support for KQL queries
+- 🌐 Multi-lang support for KQL queries
 - 🗂 [Templates](#templates) present JSON instead of HTML
 - 😵‍💫 No CORS issues!
 - 🍢 Build your own [API chain](./src/extensions/routes.php)
@@ -220,7 +220,7 @@ return [
 ];
 ```
 
-A middleware checks if an `Authentication` header is set, which is not the case in the browser context.
+A middleware checks if a `Authentication` header is set, which is not the case in the browser context.
 
 ### Cross Origin Resource Sharing (CORS)
 
@@ -280,7 +280,7 @@ return [
 
 </details>
 
-You you use one of the [built-in middlewares](./src/classes/Middlewares.php) or write custom ones in by extending the middleware class or creating a custom class defining your custom middleware functions:
+You can use one of the [built-in middlewares](./src/classes/Middlewares.php) or write custom ones in by extending the middleware class or creating a custom class defining your custom middleware functions:
 
 <details>
 <summary>👉 Example custom middleware</summary>
