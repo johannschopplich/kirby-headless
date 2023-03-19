@@ -39,7 +39,7 @@ $nestedBlocksResolver = function (\Kirby\Cms\Block $block) use ($imageBlockResol
         $field = $block->content()->get($key);
 
         $block->content()->update([
-            'prose' => $field->toBlocks()->map($imageBlockResolver)->toArray()
+            $key => $field->toBlocks()->map($imageBlockResolver)->toArray()
         ]);
     }
 
