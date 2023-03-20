@@ -256,7 +256,7 @@ This field method will resolve the UUIDs to the actual file or page objects, so 
 return [
     'blocksResolver' => [
         // Blocks that contain files fields
-        'images' => [
+        'files' => [
           // Block name as key, field name as value
           // Resolve the built-in `image` field of the `image` block
             'image' => 'image'

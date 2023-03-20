@@ -1,7 +1,7 @@
 <?php
 
 $imageResolver = function (\Kirby\Cms\Block $item) {
-    foreach (array_values(option('blocksResolver.images', ['image' => 'image'])) as $key) {
+    foreach (array_values(option('blocksResolver.files', ['image' => 'image'])) as $key) {
         /** @var \Kirby\Cms\File|null $image */
         $image = $item->content()->get($key)->toFile();
 
@@ -29,7 +29,7 @@ $imageResolver = function (\Kirby\Cms\Block $item) {
 $imageFieldResolver = function (\Kirby\Cms\Block $block) use ($imageResolver) {
     if (in_array(
         $block->type(),
-        array_keys(option('blocksResolver.images', ['image' => 'image'])),
+        array_keys(option('blocksResolver.files', ['image' => 'image'])),
         true
     )) {
         return $imageResolver($block);
