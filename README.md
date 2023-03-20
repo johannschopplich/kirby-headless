@@ -241,6 +241,32 @@ return [
 ];
 ```
 
+## Field Methods
+
+### `toResolvedBlocks()`
+
+The `toResolvedBlocks()` method is a wrapper around the `toBlocks()` method. It's primarily intended for usage with KQL queries, because the `toBlocks()` method returns only UUIDs for the `files` and `pages` fields.
+
+This field method will resolve the UUIDs to the actual file or page objects, so you can access their properties directly in your frontend.
+
+> ℹ️ At the moment, only image references are resolved. If you need to resolve other references, please open an issue.
+
+```php
+# /site/config/config.php
+return [
+    'blocksResolver' => [
+        // Blocks that contain files fields
+        'images' => [
+          // Block name as key, field name as value
+          // Resolve the built-in `image` field of the `image` block
+            'image' => 'image'
+        ]
+    ]
+];
+```
+
+For an example, take a look at the 🍫 [Cacao Kit frontend](https://github.com/johannschopplich/cacao-kit-frontend).
+
 ## Advanced
 
 ### API Builder
