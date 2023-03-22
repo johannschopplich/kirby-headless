@@ -256,8 +256,8 @@ return [
         // Blocks that contain files fields
         'files' => [
             // Block name as key, field name as value
-            // Resolve the built-in `image` field of the `image` block
-            'image' => 'image'
+            // Resolve the `image` field of the built-in `image` block
+            'image' => ['image']
         ]
     ]
 ];

@@ -1,7 +1,16 @@
 <?php
 
 $filesResolver = function (\Kirby\Cms\Block $item) {
-    foreach (array_values(option('blocksResolver.files', ['image' => 'image'])) as $key) {
+    $keys = array_values(option('blocksResolver.files', ['image' => 'image']));
+
+    // Flatten keys, since the option values can be arrays
+    $keys = array_reduce(
+        $keys,
+        fn ($acc, $i) => array_merge($acc, is_array($i) ? $i : [$i]),
+        []
+    );
+
+    foreach ($keys as $key) {
         /** @var \Kirby\Cms\Files $images */
         $images = $item->content()->get($key)->toFiles();
 
