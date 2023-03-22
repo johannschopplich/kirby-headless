@@ -2,7 +2,7 @@
   "name": "johannschopplich/kirby-headless",
   "description": "Kirby, but headless only – KQL with bearer token, Express-esque middlewares & more",
   "type": "kirby-plugin",
-  "version": "1.5.0",
+  "version": "1.5.1",
   "keywords": [
     "kirby",
     "headless"
