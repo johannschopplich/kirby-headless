@@ -21,7 +21,7 @@ return [
     /**
      * @kql-allowed
      */
-    'translatedMeta' => function () {
+    'i18nMeta' => function () {
         /** @var \Kirby\Cms\Page $this */
         $locales = $this->kirby()->languages()->codes();
 

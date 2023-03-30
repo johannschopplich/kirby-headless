@@ -269,9 +269,9 @@ For an example, take a look at the 🍫 [Cacao Kit frontend](https://github.com/
 
 ## Page Methods
 
-### `translatedMeta()`
+### `i18nMeta()`
 
-The `translatedMeta()` method returns an array including the title and URI for the current page in all available languages. This is useful for the frontend to build a language switcher.
+The `i18nMeta()` method returns an array including the title and URI for the current page in all available languages. This is useful for the frontend to build a language switcher.
 
 ## Advanced
 
