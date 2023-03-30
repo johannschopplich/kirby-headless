@@ -267,6 +267,12 @@ For an example, take a look at the 🍫 [Cacao Kit frontend](https://github.com/
 
 > ℹ️ At the moment, only image references are resolved. If you need to resolve other references, please open an issue.
 
+## Page Methods
+
+### `translatedMeta()`
+
+The `translatedMeta()` method returns an array including the title and URI for the current page in all available languages. This is useful for the frontend to build a language switcher.
+
 ## Advanced
 
 ### API Builder

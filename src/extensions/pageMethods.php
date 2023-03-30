@@ -16,5 +16,24 @@ return [
             $this->kirby()->url(),
             $url
         );
+    },
+
+    /**
+     * @kql-allowed
+     */
+    'translatedMeta' => function () {
+        /** @var \Kirby\Cms\Page $this */
+        $locales = $this->kirby()->languages()->codes();
+
+        $meta = [];
+
+        foreach ($locales as $locale) {
+            $meta[$locale] = [
+                'title' => $this->content($locale)->title()->value(),
+                'uri' => $this->uri($locale)
+            ];
+        }
+
+        return $meta;
     }
 ];
