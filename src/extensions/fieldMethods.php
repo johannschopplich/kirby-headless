@@ -1,7 +1,8 @@
 <?php
 
 $filesResolver = function (\Kirby\Cms\Block $item) {
-    $keys = array_values(option('blocksResolver.files', ['image' => 'image']));
+    $kirby = $item->kirby();
+    $keys = array_values($kirby->option('blocksResolver.files', ['image' => 'image']));
 
     // Flatten keys, since the option values can be arrays
     $keys = array_reduce(
@@ -9,6 +10,15 @@ $filesResolver = function (\Kirby\Cms\Block $item) {
         fn ($acc, $i) => array_merge($acc, is_array($i) ? $i : [$i]),
         []
     );
+
+    // Get the resolver method
+    $resolver = $kirby->option('resolvers.files', fn ($image) => [
+        'url' => $image->url(),
+        'width' => $image->width(),
+        'height' => $image->height(),
+        'srcset' => $image->srcset(),
+        'alt' => $image->alt()->value()
+    ]);
 
     foreach ($keys as $key) {
         /** @var \Kirby\Cms\Files $images */
@@ -24,13 +34,7 @@ $filesResolver = function (\Kirby\Cms\Block $item) {
         // Replace the image field with the resolved image
         $item->content()->update([
             'resolved' => array_merge($resolved, [
-                $key => $images->map(fn ($image) => [
-                    'url'    => $image->url(),
-                    'width'  => $image->width(),
-                    'height' => $image->height(),
-                    'srcset' => $image->srcset(),
-                    'alt'    => $image->alt()->value()
-                ])->values()
+                $key => $images->map($resolver)->values()
             ])
         ]);
     }
@@ -39,11 +43,9 @@ $filesResolver = function (\Kirby\Cms\Block $item) {
 };
 
 $filesFieldResolver = function (\Kirby\Cms\Block $block) use ($filesResolver) {
-    if (in_array(
-        $block->type(),
-        array_keys(option('blocksResolver.files', ['image' => 'image'])),
-        true
-    )) {
+    $kirby = $block->kirby();
+    $resolvers = $kirby->option('blocksResolver.files', ['image' => 'image']);
+    if (isset($resolvers[$block->type()])) {
         return $filesResolver($block);
     }
 
@@ -52,11 +54,9 @@ $filesFieldResolver = function (\Kirby\Cms\Block $block) use ($filesResolver) {
 
 $nestedBlocksFieldResolver = function (\Kirby\Cms\Block $block) use ($filesFieldResolver) {
     /** @var \Kirby\Cms\Block $block */
-    $nestedBlocks = option('blocksResolver.nested', ['prose']);
-    $blocksKeys = array_filter(
-        $block->content()->keys(),
-        fn ($i) => in_array($i, $nestedBlocks, true)
-    );
+    $kirby = $block->kirby();
+    $nestedBlocks = $kirby->option('blocksResolver.nested', ['prose']);
+    $blocksKeys = array_intersect($block->content()->keys(), $nestedBlocks);
 
     foreach ($blocksKeys as $key) {
         /** @var \Kirby\Cms\Field $ktField */
@@ -92,9 +92,7 @@ return [
         return $field
             ->toLayouts()
             ->map(function (\Kirby\Cms\Layout $layout) use ($filesFieldResolver) {
-                $columns = $layout->columns();
-
-                foreach ($columns as $column) {
+                foreach ($layout->columns() as $column) {
                     $column->blocks()->map($filesFieldResolver);
                 }
 
