@@ -113,17 +113,16 @@ echo \Kirby\Data\Json::encode($data);
 <summary>👉 Fetch that data in the frontend</summary>
 
 ```js
-import { $fetch } from "ofetch";
-
 const API_TOKEN = "test";
 
-const response = await $fetch("<website-url>/about", {
+const response = await fetch("<website-url>/about", {
   headers: {
     Authentication: `Bearer ${API_TOKEN}`,
   },
 });
 
-console.log(response);
+const data = await response.json();
+console.log(data);
 ```
 
 </details>
@@ -138,11 +137,9 @@ Fetch KQL query results like you normally would, but provide an `Authentication`
 <summary>👉 Fetch example</summary>
 
 ```js
-import { $fetch } from "ofetch";
-
 const API_TOKEN = "test";
 
-const response = await $fetch("<website-url>/api/kql", {
+const response = await fetch("<website-url>/api/kql", {
   method: "POST",
   body: {
     query: "page('notes').children",
@@ -158,7 +155,8 @@ const response = await $fetch("<website-url>/api/kql", {
   },
 });
 
-console.log(response);
+const data = await response.json();
+console.log(data);
 ```
 
 </details>
