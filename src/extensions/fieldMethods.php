@@ -12,7 +12,7 @@ $filesResolver = function (\Kirby\Cms\Block $item) {
     );
 
     // Get the resolver method
-    $resolver = $kirby->option('resolvers.files', fn ($image) => [
+    $resolver = $kirby->option('blocksResolver.resolvers.files', fn ($image) => [
         'url' => $image->url(),
         'width' => $image->width(),
         'height' => $image->height(),
