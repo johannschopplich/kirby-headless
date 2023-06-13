@@ -1,6 +1,6 @@
 {
   "private": true,
-  "version": "1.5.5",
+  "version": "1.5.6",
   "scripts": {
     "release": "npx -y bumpp --all"
   }
