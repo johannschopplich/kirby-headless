@@ -10,13 +10,17 @@ load([
         // Explicitly register catch-all routes only when Kirby and all plugins
         // have been loaded to ensure no other routes are overwritten
         'system.loadPlugins:after' => function () {
-            kirby()->extend(
-                [
-                    'api' => require __DIR__ . '/src/extensions/api.php',
-                    'routes' => require __DIR__ . '/src/extensions/routes.php'
-                ],
-                kirby()->plugin('johannschopplich/headless')
-            );
+            $kirby = kirby();
+
+            $extensions = [
+                'api' => require __DIR__ . '/src/extensions/api.php'
+            ];
+
+            if ($kirby->option('headless.routes', true)) {
+                $extensions['routes'] = require __DIR__ . '/src/extensions/routes.php';
+            }
+
+            $kirby->extend($extensions, $kirby->plugin('johannschopplich/headless'));
         }
     ],
     'fieldMethods' => require __DIR__ . '/src/extensions/fieldMethods.php',
