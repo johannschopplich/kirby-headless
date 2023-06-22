@@ -3,6 +3,7 @@
 namespace JohannSchopplich\Headless\Api;
 
 use Exception;
+use Kirby\Cms\App;
 use Kirby\Cms\File;
 use Kirby\Http\Response;
 use Kirby\Toolkit\A;
@@ -37,6 +38,8 @@ class Api
      */
     public static function createResponse(int $code, $data = null): Response
     {
+        $kirby = App::instance();
+
         $body = [
             'code' => $code,
             'status' => static::getStatusMessage($code)
@@ -47,7 +50,7 @@ class Api
         }
 
         return Response::json($body, $code, null, [
-            'Access-Control-Allow-Origin' => kirby()->option('headless.cors.allowOrigin', '*')
+            'Access-Control-Allow-Origin' => $kirby->option('headless.cors.allowOrigin', '*')
         ]);
     }
 
@@ -84,7 +87,7 @@ class Api
      */
     public static function createPreflightResponse(): Response
     {
-        $kirby = kirby();
+        $kirby = App::instance();
 
         return new Response('', null, 204, [
             'Access-Control-Allow-Origin' => $kirby->option('headless.cors.allowOrigin', '*'),

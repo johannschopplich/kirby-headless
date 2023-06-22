@@ -2,6 +2,7 @@
 
 namespace JohannSchopplich\Headless\Api;
 
+use Kirby\Cms\App;
 use Kirby\Exception\NotFoundException;
 use Kirby\Filesystem\F;
 use Kirby\Http\Response;
@@ -17,7 +18,7 @@ class Middlewares
     {
         // The `$args` array contains the route parameters
         [$path] = $args;
-        $kirby = kirby();
+        $kirby = App::instance();
 
         if (empty($path)) {
             return;
@@ -48,7 +49,7 @@ class Middlewares
      */
     public static function tryResolveSite(array $context, array $args)
     {
-        $kirby = kirby();
+        $kirby = App::instance();
 
         // The `$args` array contains the route parameters
         if ($kirby->multilang()) {
@@ -87,7 +88,7 @@ class Middlewares
      */
     public static function tryResolvePage(array $context, array $args)
     {
-        $kirby = kirby();
+        $kirby = App::instance();
         $cache = $cacheKey = $data = null;
 
         // The `$args` array contains the route parameters
@@ -143,7 +144,7 @@ class Middlewares
      */
     public static function tryResolveSitemap(array $context, array $args)
     {
-        $kirby = kirby();
+        $kirby = App::instance();
 
         // The `$args` array contains the route parameters
         if ($kirby->multilang()) {
@@ -218,7 +219,7 @@ class Middlewares
      */
     public static function hasBearerToken()
     {
-        $kirby = kirby();
+        $kirby = App::instance();
         $token = $kirby->option('headless.token');
         $authorization = $kirby->request()->header('Authorization');
 
@@ -239,7 +240,7 @@ class Middlewares
      */
     public static function hasBody(array $context)
     {
-        $request = kirby()->request();
+        $request = App::instance()->request();
 
         if (empty($request->body())) {
             return Api::createResponse(400, [
