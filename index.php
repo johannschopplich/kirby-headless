@@ -1,8 +1,9 @@
 <?php
 
 use Kirby\Cms\App;
+use Kirby\Filesystem\F;
 
-load([
+F::loadClasses([
     'JohannSchopplich\\Headless\\Api\\Api' => 'src/classes/Api/Api.php',
     'JohannSchopplich\\Headless\\Api\\Middlewares' => 'src/classes/Api/Middlewares.php'
 ], __DIR__);
