@@ -52,7 +52,8 @@ If you're not using the [Kirby Headless Starter](https://github.com/johannschopp
 ```php
 # /site/config/config.php
 return [
-    // Enable basic authentication for the API and thus KQL
+    // Enable basic authentication for the Kirby API
+    // Only needed, if you prefer basic auth over bearer tokens
     'api' => [
         'basicAuth' => true
     ],
