@@ -242,7 +242,7 @@ class Middlewares
     {
         $request = App::instance()->request();
 
-        if (empty($request->body())) {
+        if (empty($request->body()->data())) {
             return Api::createResponse(400, [
                 'error' => 'No body was sent with the request'
             ]);
