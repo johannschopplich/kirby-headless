@@ -12,7 +12,7 @@ $filesResolver = function (\Kirby\Cms\Block $item) {
     );
 
     // Get the resolver method
-    $resolver = $kirby->option('blocksResolver.resolvers.files', fn ($image) => [
+    $resolver = $kirby->option('blocksResolver.resolvers.files', fn (\Kirby\Cms\File $image) => [
         'url' => $image->url(),
         'width' => $image->width(),
         'height' => $image->height(),
@@ -45,8 +45,56 @@ $filesResolver = function (\Kirby\Cms\Block $item) {
 $filesFieldResolver = function (\Kirby\Cms\Block $block) use ($filesResolver) {
     $kirby = $block->kirby();
     $resolvers = $kirby->option('blocksResolver.files', ['image' => 'image']);
+
     if (isset($resolvers[$block->type()])) {
         return $filesResolver($block);
+    }
+
+    return $block;
+};
+
+$pagesResolver = function (\Kirby\Cms\Block $item) {
+    $kirby = $item->kirby();
+    $keys = array_values($kirby->option('blocksResolver.pages', []));
+
+    $keys = array_reduce(
+        $keys,
+        fn ($acc, $i) => array_merge($acc, is_array($i) ? $i : [$i]),
+        []
+    );
+
+    // Get the resolver method
+    $resolver = $kirby->option('blocksResolver.resolvers.pages', fn (\Kirby\Cms\Page $page) => [
+        'uri' => $page->uri(),
+        'title' => $page->title()->value()
+    ]);
+
+    foreach ($keys as $key) {
+        /** @var \Kirby\Cms\Pages $pages */
+        $pages = $item->content()->get($key)->toPages();
+
+        if ($pages->count() === 0) {
+            continue;
+        }
+
+        $resolved = $item->content()->get('resolved')->or([])->value();
+
+        $item->content()->update([
+            'resolved' => array_merge($resolved, [
+                $key => $pages->map($resolver)->values()
+            ])
+        ]);
+    }
+
+    return $item;
+};
+
+$pagesFieldResolver = function (\Kirby\Cms\Block $block) use ($pagesResolver) {
+    $kirby = $block->kirby();
+    $resolvers = $kirby->option('blocksResolver.pages', []);
+
+    if (isset($resolvers[$block->type()])) {
+        return $pagesResolver($block);
     }
 
     return $block;
@@ -72,28 +120,32 @@ $nestedBlocksFieldResolver = function (\Kirby\Cms\Block $block) use ($filesField
 
 return [
     /**
-     * Enhances the `toBlocks()` method to resolve images
+     * Enhances the `toBlocks()` method to resolve files and pages
      *
      * @kql-allowed
      */
-    'toResolvedBlocks' => function (\Kirby\Cms\Field $field) use ($filesFieldResolver, $nestedBlocksFieldResolver) {
+    'toResolvedBlocks' => function (\Kirby\Cms\Field $field) use ($pagesFieldResolver, $filesFieldResolver, $nestedBlocksFieldResolver) {
         return $field
             ->toBlocks()
             ->map($nestedBlocksFieldResolver)
+            ->map($pagesFieldResolver)
             ->map($filesFieldResolver);
     },
 
     /**
-     * Enhances the `toLayouts()` method to resolve images
+     * Enhances the `toLayouts()` method to resolve files and pages
      *
      * @kql-allowed
      */
-    'toResolvedLayouts' => function (\Kirby\Cms\Field $field) use ($filesFieldResolver) {
+    'toResolvedLayouts' => function (\Kirby\Cms\Field $field) use ($filesFieldResolver, $pagesFieldResolver) {
         return $field
             ->toLayouts()
-            ->map(function (\Kirby\Cms\Layout $layout) use ($filesFieldResolver) {
+            ->map(function (\Kirby\Cms\Layout $layout) use ($filesFieldResolver, $pagesFieldResolver) {
                 foreach ($layout->columns() as $column) {
-                    $column->blocks()->map($filesFieldResolver);
+                    $column
+                        ->blocks()
+                        ->map($filesFieldResolver)
+                        ->map($pagesFieldResolver);
                 }
 
                 return $layout;
