@@ -257,6 +257,10 @@ return [
             // Block name as key, field name as value
             // Resolve the `image` field of the built-in `image` block
             'image' => ['image']
+        ],
+        // Blocks that contain pages fields
+        'pages' => [
+            'customBlock' => ['link']
         ]
     ]
 ];
