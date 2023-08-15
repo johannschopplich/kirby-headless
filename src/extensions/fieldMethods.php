@@ -34,7 +34,7 @@ $filesResolver = function (\Kirby\Cms\Block $item) {
         // Replace the image field with the resolved image
         $item->content()->update([
             'resolved' => array_merge($resolved, [
-                $key => $images->map($resolver)->values()
+                strtolower($key) => $images->map($resolver)->values()
             ])
         ]);
     }
@@ -81,7 +81,7 @@ $pagesResolver = function (\Kirby\Cms\Block $item) {
 
         $item->content()->update([
             'resolved' => array_merge($resolved, [
-                $key => $pages->map($resolver)->values()
+                strtolower($key) => $pages->map($resolver)->values()
             ])
         ]);
     }
