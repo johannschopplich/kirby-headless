@@ -23,6 +23,11 @@
     "friendsofphp/php-cs-fixer": "@stable",
     "getkirby/cms": "^3.9"
   },
+  "autoload": {
+    "psr-4": {
+        "JohannSchopplich\\Headless\\": "src/classes/"
+    }
+  },
   "scripts": {
     "fix": "php-cs-fixer fix",
     "dist": "composer install --no-dev --optimize-autoloader"
