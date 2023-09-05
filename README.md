@@ -293,19 +293,38 @@ return [
         [
             'pattern' => 'post-example',
             'method' => 'POST',
-            'auth' => false,
             'action' => Api::createHandler(
                 [\JohannSchopplich\Headless\Api\Middlewares::class, 'hasBearerToken'],
-                [\JohannSchopplich\Headless\Api\Middlewares::class, 'hasBody'],
                 function (array $context) {
-                    // Get the data of the POST request
-                    $data = $context['body'];
+                    $user = kirby()->request()->body()->get('user');
 
-                    // Do something with `$data` here
+                    // Do something with `$user` here
 
                     return Api::createResponse(201);
                 }
             )
+        ]
+    ],
+
+    // Or use the `api` option to define API routes
+    'api' => [
+        'routes' => [
+            [
+                'pattern' => 'post-example',
+                'method' => 'POST',
+                // Let the `hasBearerToken` middleware handle the authentication
+                'auth' => false,
+                'action' => Api::createHandler(
+                    [\JohannSchopplich\Headless\Api\Middlewares::class, 'hasBearerToken'],
+                    function (array $context) {
+                        $user = kirby()->request()->body()->get('user');
+
+                        // Do something with `$user` here
+
+                        return Api::createResponse(201);
+                    }
+                )
+            ]
         ]
     ]
 ];
