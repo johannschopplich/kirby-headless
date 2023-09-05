@@ -286,9 +286,6 @@ Take a look at the [built-in routes](./src/extensions/routes.php) to get an idea
 
 It is also useful to consume POST requests including JSON data:
 
-<details>
-<summary>👉 Example custom route</summary>
-
 ```php
 # /site/config/config.php
 return [
@@ -296,6 +293,7 @@ return [
         [
             'pattern' => 'post-example',
             'method' => 'POST',
+            'auth' => false,
             'action' => Api::createHandler(
                 [\JohannSchopplich\Headless\Api\Middlewares::class, 'hasBearerToken'],
                 [\JohannSchopplich\Headless\Api\Middlewares::class, 'hasBody'],
@@ -312,8 +310,6 @@ return [
     ]
 ];
 ```
-
-</details>
 
 You can use one of the [built-in middlewares](./src/classes/Middlewares.php) or write custom ones in by extending the middleware class or creating a custom class defining your custom middleware functions:
 
