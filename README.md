@@ -280,7 +280,7 @@ The `i18nMeta()` method returns an array including the title and URI for the cur
 
 ### API Builder
 
-This headless starter includes an Express-esque API builder, defined in the [`JohannSchopplich\Headless\Api\Api` class](./src/classes/Api.php). You can use it to re-use logic like handling a token or verifying some other incoming data.
+This headless starter includes an Express-esque API builder, defined in the [`JohannSchopplich\Headless\Api\Api` class](./src/classes/Api/Api.php). You can use it to re-use logic like handling a token or verifying some other incoming data.
 
 Take a look at the [built-in routes](./src/extensions/routes.php) to get an idea how you can use the API builder to chain complex route logic.
 
