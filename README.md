@@ -299,7 +299,7 @@ return [
             'action' => Api::createHandler(
                 [\JohannSchopplich\Headless\Api\Middlewares::class, 'hasBearerToken'],
                 [\JohannSchopplich\Headless\Api\Middlewares::class, 'hasBody'],
-                function ($context) {
+                function (array $context) {
                     // Get the data of the POST request
                     $data = $context['body'];
 
