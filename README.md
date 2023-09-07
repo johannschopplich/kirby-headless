@@ -268,8 +268,6 @@ return [
 
 For an example, take a look at the 🍫 [Cacao Kit frontend](https://github.com/johannschopplich/cacao-kit-frontend).
 
-> ℹ️ At the moment, only image references are resolved. If you need to resolve other references, please open an issue.
-
 ## Page Methods
 
 ### `i18nMeta()`
@@ -296,9 +294,9 @@ return [
             'action' => Api::createHandler(
                 [\JohannSchopplich\Headless\Api\Middlewares::class, 'hasBearerToken'],
                 function (array $context) {
-                    $user = kirby()->request()->body()->get('user');
+                    $foo = kirby()->request()->body()->get('foo');
 
-                    // Do something with `$user` here
+                    // Do something with `$foo` here
 
                     return Api::createResponse(201);
                 }
@@ -307,19 +305,21 @@ return [
     ],
 
     // Or use the `api` option to define API routes
+    // Accessible under `/api/post-example`
     'api' => [
         'routes' => [
             [
                 'pattern' => 'post-example',
                 'method' => 'POST',
-                // Let the `hasBearerToken` middleware handle the authentication
+                // Disable auth for this route to let the `hasBearerToken`
+                // middleware handle the authentication
                 'auth' => false,
                 'action' => Api::createHandler(
                     [\JohannSchopplich\Headless\Api\Middlewares::class, 'hasBearerToken'],
                     function (array $context) {
-                        $user = kirby()->request()->body()->get('user');
+                        $foo = kirby()->request()->body()->get('foo');
 
-                        // Do something with `$user` here
+                        // Do something with `$foo` here
 
                         return Api::createResponse(201);
                     }
