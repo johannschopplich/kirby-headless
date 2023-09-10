@@ -125,7 +125,7 @@ $nestedBlocksFieldResolver = function (\Kirby\Cms\Block $block) use ($filesField
     $blocksKeys = array_intersect($block->content()->keys(), $nestedBlocks);
 
     foreach ($blocksKeys as $key) {
-        /** @var \Kirby\Cms\Field $ktField */
+        /** @var \Kirby\Content\Field $ktField */
         $field = $block->content()->get($key);
 
         $block->content()->update([
@@ -142,7 +142,7 @@ return [
      *
      * @kql-allowed
      */
-    'toResolvedBlocks' => function (\Kirby\Cms\Field $field) use ($pagesFieldResolver, $filesFieldResolver, $customResolvers, $nestedBlocksFieldResolver) {
+    'toResolvedBlocks' => function (\Kirby\Content\Field $field) use ($pagesFieldResolver, $filesFieldResolver, $customResolvers, $nestedBlocksFieldResolver) {
         return $field
             ->toBlocks()
             ->map($nestedBlocksFieldResolver)
@@ -156,7 +156,7 @@ return [
      *
      * @kql-allowed
      */
-    'toResolvedLayouts' => function (\Kirby\Cms\Field $field) use ($filesFieldResolver, $pagesFieldResolver, $customResolvers) {
+    'toResolvedLayouts' => function (\Kirby\Content\Field $field) use ($filesFieldResolver, $pagesFieldResolver, $customResolvers) {
         return $field
             ->toLayouts()
             ->map(function (\Kirby\Cms\Layout $layout) use ($filesFieldResolver, $pagesFieldResolver, $customResolvers) {
