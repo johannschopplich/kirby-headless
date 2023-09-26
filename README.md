@@ -268,6 +268,76 @@ return [
 
 For an example, take a look at the 🍫 [Cacao Kit frontend](https://github.com/johannschopplich/cacao-kit-frontend).
 
+#### Custom Files Resolver
+
+To resolve image UUIDs to image objects, you can define a custom resolver in your `config.php`. By default, the following resolver is used:
+
+```php
+$defaultResolver = fn (\Kirby\Cms\File $image) => [
+    'url' => $image->url(),
+    'width' => $image->width(),
+    'height' => $image->height(),
+    'srcset' => $image->srcset(),
+    'alt' => $image->alt()->value()
+];
+```
+
+To adapt a resolved image's properties, you can define a custom resolver in your `config.php`:
+
+- Either for a specific block and field
+- Or for all blocks and fields
+
+If you just need one custom resolver for all files fields, you can use the `blocksResolver.resolvers.files` options key. It accepts a closure that receives the file object as its first argument and returns an array of properties, just like the default resolver:
+
+```php
+# /site/config/config.php
+return [
+    'blocksResolver' => [
+        'files' => [
+            // Resolve images in the `image` field inside the `intro` block
+            'intro' => ['image'],
+        ],
+        'resolvers' => [
+            // Custom image resolver for all files fields
+            'files' => fn (\Kirby\Cms\File $image) => [
+                'url' => $image->crop(1024)->url(),
+                'alt' => $image->alt()->value()
+            ]
+        ]
+    ]
+];
+```
+
+If you need a custom resolver for a specific block and field, you can use the `blocksResolver.files` options key. It accepts an array of blocks as keys and an array of fields as values. Each field can be resolved by a custom resolver, just like the default resolver.
+
+```php
+# /site/config/config.php
+return [
+    'blocksResolver' => [
+        'files' => [
+            // Resolve images in the `image` field inside the `intro` block
+            'intro' => ['image'],
+        ],
+        'resolvers' => [
+            'files' => [
+                // Custom image resolver for the `image` field
+                'intro' => [
+                    'image' => fn (\Kirby\Cms\File $image) => [
+                        'url' => $image->crop(1024)->url(),
+                        'alt' => $image->alt()->value()
+                    ]
+                ],
+                // Fallback resolver for all other fields
+                '_default' => fn (\Kirby\Cms\File $image) => [
+                    'url' => $image->url(),
+                    'alt' => $image->alt()->value()
+                ]
+            ]
+        ]
+    ]
+];
+```
+
 ## Page Methods
 
 ### `i18nMeta()`
