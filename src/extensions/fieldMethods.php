@@ -8,13 +8,6 @@ $filesFieldResolver = function (\Kirby\Cms\Block $block) {
         return $block;
     }
 
-    // Flatten keys, since the option values can be arrays
-    $keys = array_reduce(
-        $blocks[$block->type()],
-        fn ($acc, $i) => array_merge($acc, is_array($i) ? $i : [$i]),
-        []
-    );
-
     // Get the resolvers config
     $resolvers = $kirby->option('blocksResolver.resolvers.files');
     $defaultResolver = fn (\Kirby\Cms\File $image) => [
@@ -25,7 +18,10 @@ $filesFieldResolver = function (\Kirby\Cms\Block $block) {
         'alt' => $image->alt()->value()
     ];
 
-    foreach ($keys as $key) {
+    $fieldKeys = $blocks[$block->type()];
+    $fieldKeys = is_array($fieldKeys) ? $fieldKeys : [$fieldKeys];
+
+    foreach ($fieldKeys as $key) {
         /** @var \Kirby\Cms\Files $images */
         $images = $block->content()->get($key)->toFiles();
 
@@ -60,19 +56,16 @@ $pagesFieldResolver = function (\Kirby\Cms\Block $block) {
         return $block;
     }
 
-    $keys = array_reduce(
-        $blocks[$block->type()],
-        fn ($acc, $i) => array_merge($acc, is_array($i) ? $i : [$i]),
-        []
-    );
-
     // Get the resolver method
     $resolver = $kirby->option('blocksResolver.resolvers.pages', fn (\Kirby\Cms\Page $page) => [
         'uri' => $page->uri(),
         'title' => $page->title()->value()
     ]);
 
-    foreach ($keys as $key) {
+    $fieldKeys = $blocks[$block->type()];
+    $fieldKeys = is_array($fieldKeys) ? $fieldKeys : [$fieldKeys];
+
+    foreach ($fieldKeys as $key) {
         /** @var \Kirby\Cms\Pages $pages */
         $pages = $block->content()->get($key)->toPages();
 
