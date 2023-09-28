@@ -4,19 +4,20 @@ $filesFieldResolver = function (\Kirby\Cms\Block $block) {
     $kirby = $block->kirby();
     $blocks = $kirby->option('blocksResolver.files', ['image' => 'image']);
 
+    // If the block type isn't one to be resolved, return early
     if (!isset($blocks[$block->type()])) {
         return $block;
     }
 
     // Get the resolvers config
-    $resolvers = $kirby->option('blocksResolver.resolvers.files');
-    $defaultResolver = fn (\Kirby\Cms\File $image) => [
+    $resolvers = $kirby->option('blocksResolver.resolvers', []);
+    $defaultResolver = $kirby->option('blocksResolver.defaultResolvers.files', fn (\Kirby\Cms\File $image) => [
         'url' => $image->url(),
         'width' => $image->width(),
         'height' => $image->height(),
         'srcset' => $image->srcset(),
         'alt' => $image->alt()->value()
-    ];
+    ]);
 
     $fieldKeys = $blocks[$block->type()];
     $fieldKeys = is_array($fieldKeys) ? $fieldKeys : [$fieldKeys];
@@ -29,18 +30,17 @@ $filesFieldResolver = function (\Kirby\Cms\Block $block) {
             continue;
         }
 
+        // If part of custom resolver, skip
+        if (isset($resolvers[$block->type() . ':' . $key])) {
+            continue;
+        }
+
         // Get already resolved images
         $resolved = $block->content()->get('resolved')->or([])->value();
 
-        // Get specific resolver for the current block and key or fallback to default
-        $resolver = is_callable($resolvers)
-            ? $resolvers
-            : $resolvers[$block->type()][$key] ?? $resolvers['_default'] ?? $defaultResolver;
-
-        // Replace the image field with the resolved image
         $block->content()->update([
             'resolved' => array_merge($resolved, [
-                strtolower($key) => $images->map($resolver)->values()
+                strtolower($key) => $images->map($defaultResolver)->values()
             ])
         ]);
     }
@@ -52,12 +52,14 @@ $pagesFieldResolver = function (\Kirby\Cms\Block $block) {
     $kirby = $block->kirby();
     $blocks = $kirby->option('blocksResolver.pages', []);
 
+    // If the block type isn't one to be resolved, return early
     if (!isset($blocks[$block->type()])) {
         return $block;
     }
 
     // Get the resolver method
-    $resolver = $kirby->option('blocksResolver.resolvers.pages', fn (\Kirby\Cms\Page $page) => [
+    $resolvers = $kirby->option('blocksResolver.resolvers', []);
+    $defaultResolver = $kirby->option('blocksResolver.defaultResolvers.pages', fn (\Kirby\Cms\Page $page) => [
         'uri' => $page->uri(),
         'title' => $page->title()->value()
     ]);
@@ -73,11 +75,42 @@ $pagesFieldResolver = function (\Kirby\Cms\Block $block) {
             continue;
         }
 
+        // If part of custom resolver, skip
+        if (isset($resolvers[$block->type() . ':' . $key])) {
+            continue;
+        }
+
+        // Get already resolved images
         $resolved = $block->content()->get('resolved')->or([])->value();
 
         $block->content()->update([
             'resolved' => array_merge($resolved, [
-                strtolower($key) => $pages->map($resolver)->values()
+                strtolower($key) => $pages->map($defaultResolver)->values()
+            ])
+        ]);
+    }
+
+    return $block;
+};
+
+// Custom Resolvers
+$customResolvers = function (\Kirby\Cms\Block $block) {
+    $kirby = $block->kirby();
+    $resolvers = $kirby->option('blocksResolver.resolvers', []);
+
+    foreach ($resolvers as $identifier => $resolver) {
+        [$blockType, $key] = explode(':', $identifier);
+
+        if ($block->type() !== $blockType) {
+            continue;
+        }
+
+        $resolved = $block->content()->get('resolved')->or([])->value();
+        $field = $block->content()->get($key);
+
+        $block->content()->update([
+            'resolved' => array_merge($resolved, [
+                strtolower($key) => $resolver($field)
             ])
         ]);
     }
@@ -109,12 +142,13 @@ return [
      *
      * @kql-allowed
      */
-    'toResolvedBlocks' => function (\Kirby\Cms\Field $field) use ($pagesFieldResolver, $filesFieldResolver, $nestedBlocksFieldResolver) {
+    'toResolvedBlocks' => function (\Kirby\Cms\Field $field) use ($pagesFieldResolver, $filesFieldResolver, $customResolvers, $nestedBlocksFieldResolver) {
         return $field
             ->toBlocks()
             ->map($nestedBlocksFieldResolver)
             ->map($pagesFieldResolver)
-            ->map($filesFieldResolver);
+            ->map($filesFieldResolver)
+            ->map($customResolvers);
     },
 
     /**
@@ -122,15 +156,16 @@ return [
      *
      * @kql-allowed
      */
-    'toResolvedLayouts' => function (\Kirby\Cms\Field $field) use ($filesFieldResolver, $pagesFieldResolver) {
+    'toResolvedLayouts' => function (\Kirby\Cms\Field $field) use ($filesFieldResolver, $pagesFieldResolver, $customResolvers) {
         return $field
             ->toLayouts()
-            ->map(function (\Kirby\Cms\Layout $layout) use ($filesFieldResolver, $pagesFieldResolver) {
+            ->map(function (\Kirby\Cms\Layout $layout) use ($filesFieldResolver, $pagesFieldResolver, $customResolvers) {
                 foreach ($layout->columns() as $column) {
                     $column
                         ->blocks()
                         ->map($filesFieldResolver)
-                        ->map($pagesFieldResolver);
+                        ->map($pagesFieldResolver)
+                        ->map($customResolvers);
                 }
 
                 return $layout;

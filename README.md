@@ -252,14 +252,15 @@ This field method will resolve the UUIDs to the actual file or page objects, so 
 # /site/config/config.php
 return [
     'blocksResolver' => [
-        // Blocks that contain files fields
+        // Define which fields of which blocks need resolving
         'files' => [
-            // Block name as key, field name as value
-            // Resolve the `image` field of the built-in `image` block
-            'image' => ['image']
+            // Resolve the `image` field in the `image` block as a file
+            'image' => ['image'],
+            // Resolve the `image` field in the `intro` block as a file
+            'intro' => ['image']
         ],
-        // Blocks that contain pages fields
         'pages' => [
+            // Resolve the `link` field in the `customBlock` block as a page
             'customBlock' => ['link']
         ]
     ]
@@ -268,7 +269,7 @@ return [
 
 For an example, take a look at the 🍫 [Cacao Kit frontend](https://github.com/johannschopplich/cacao-kit-frontend).
 
-#### Custom Files Resolver
+#### Custom Files or Pages Resolver
 
 To resolve image UUIDs to image objects, you can define a custom resolver in your `config.php`. By default, the following resolver is used:
 
@@ -282,56 +283,39 @@ $defaultResolver = fn (\Kirby\Cms\File $image) => [
 ];
 ```
 
-To adapt a resolved image's properties, you can define a custom resolver in your `config.php`:
+If you just need one custom resolver for all files fields, you can use the `blocksResolver.defaultResolvers.files` options key. Respectively, you can use the `blocksResolver.defaultResolvers.pages` options key for all pages fields.
 
-- Either for a specific block and field
-- Or for all blocks and fields
-
-If you just need one custom resolver for all files fields, you can use the `blocksResolver.resolvers.files` options key. It accepts a closure that receives the file object as its first argument and returns an array of properties, just like the default resolver:
+Both options accept a closure that receives the file/page object as its first argument and returns an array of properties, just like the default resolver:
 
 ```php
 # /site/config/config.php
 return [
     'blocksResolver' => [
-        'files' => [
-            // Resolve images in the `image` field inside the `intro` block
-            'intro' => ['image'],
-        ],
-        'resolvers' => [
-            // Custom image resolver for all files fields
+        // Default Resolvers
+        'defaultResolvers' => [
             'files' => fn (\Kirby\Cms\File $image) => [
-                'url' => $image->crop(1024)->url(),
+                'url' => $image->url(),
                 'alt' => $image->alt()->value()
+            ],
+            'pages' => fn (\Kirby\Cms\Page $page) => [
+                // Default resolver for pages
             ]
         ]
     ]
 ];
 ```
 
-If you need a custom resolver for a specific block and field, you can use the `blocksResolver.files` options key. It accepts an array of blocks as keys and an array of fields as values. Each field can be resolved by a custom resolver, just like the default resolver.
+#### Custom Resolver for a Specific Block and Field
+
+If you need a custom resolver for images, links, or any other field in a specific block, you can use the `blocksResolver.resolvers` options key. It accepts an array of resolvers, where the key is the block name and the value is a closure that receives the field object as its first argument and returns an array of properties:
 
 ```php
 # /site/config/config.php
 return [
     'blocksResolver' => [
-        'files' => [
-            // Resolve images in the `image` field inside the `intro` block
-            'intro' => ['image'],
-        ],
         'resolvers' => [
-            'files' => [
-                // Custom image resolver for the `image` field
-                'intro' => [
-                    'image' => fn (\Kirby\Cms\File $image) => [
-                        'url' => $image->crop(1024)->url(),
-                        'alt' => $image->alt()->value()
-                    ]
-                ],
-                // Fallback resolver for all other fields
-                '_default' => fn (\Kirby\Cms\File $image) => [
-                    'url' => $image->url(),
-                    'alt' => $image->alt()->value()
-                ]
+            'intro:link' => fn (\Kirby\Cms\Field $field) => [
+                'value' => $field->value()
             ]
         ]
     ]
@@ -439,4 +423,4 @@ To simplify this approach, we use the standard template structure, but encode ea
 
 ## License
 
-[MIT](./LICENSE) License © 2022-2023 [Johann Schopplich](https://github.com/johannschopplich)
+[MIT](./LICENSE) License © 2022-PRESENT [Johann Schopplich](https://github.com/johannschopplich)
