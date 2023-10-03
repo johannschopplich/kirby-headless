@@ -18,11 +18,6 @@ Kirby's global routing will be overwritten by the plugin's [global routes](./src
 - 🍢 Build your own [API chain](./src/extensions/routes.php)
 - 🦾 Express-esque [API builder](#api-builder) with middleware support
 
-## Requirements
-
-> [!NOTE]
-> This plugin is compatible with Kirby 3 and Kirby 4.
-
 ## Use Cases
 
 If you intend to fetch data from a headless Kirby instance, you have two options with this plugin:
@@ -34,9 +29,10 @@ Head over to the [usage](#usage) section for instructions.
 
 ## Requirements
 
-- Kirby 3.8+
+> [!NOTE]
+> This plugin is compatible with Kirby 3 and Kirby 4.
 
-> Kirby is not a free software. You can try it for free on your local machine but in order to run Kirby on a public server you must purchase a [valid license](https://getkirby.com/buy).
+Kirby is not a free software. You can try it for free on your local machine but in order to run Kirby on a public server you must purchase a [valid license](https://getkirby.com/buy).
 
 ## Installation
 
