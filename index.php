@@ -9,8 +9,8 @@ F::loadClasses([
 ], __DIR__);
 
 // Add backwards compatibility for Kirby 3
-if (!class_exists('Kirby\Content\Field')) {
-    class_alias('Kirby\Cms\Field', 'Kirby\Content\Field');
+if (!class_exists(\Kirby\Content\Field::class)) {
+    class_alias(\Kirby\Cms\Field::class, \Kirby\Content\Field::class);
 }
 
 App::plugin('johannschopplich/headless', [
