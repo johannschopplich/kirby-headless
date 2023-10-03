@@ -8,6 +8,11 @@ F::loadClasses([
     'JohannSchopplich\\Headless\\Api\\Middlewares' => 'src/classes/Api/Middlewares.php'
 ], __DIR__);
 
+// Add backwards compatibility for Kirby 3
+if (!class_exists('Kirby\Content\Field')) {
+    class_alias('Kirby\Cms\Field', 'Kirby\Content\Field');
+}
+
 App::plugin('johannschopplich/headless', [
     'hooks' => [
         // Explicitly register catch-all routes only when Kirby and all plugins

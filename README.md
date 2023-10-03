@@ -18,6 +18,11 @@ Kirby's global routing will be overwritten by the plugin's [global routes](./src
 - 🍢 Build your own [API chain](./src/extensions/routes.php)
 - 🦾 Express-esque [API builder](#api-builder) with middleware support
 
+## Requirements
+
+> [!NOTE]
+> This plugin is compatible with Kirby 3 and Kirby 4.
+
 ## Use Cases
 
 If you intend to fetch data from a headless Kirby instance, you have two options with this plugin:
@@ -314,7 +319,7 @@ If you need a custom resolver for images, links, or any other field in a specifi
 return [
     'blocksResolver' => [
         'resolvers' => [
-            'intro:link' => fn (\Kirby\Cms\Field $field) => [
+            'intro:link' => fn (\Kirby\Content\Field $field) => [
                 'value' => $field->value()
             ]
         ]

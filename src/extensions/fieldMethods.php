@@ -93,8 +93,8 @@ $pagesFieldResolver = function (\Kirby\Cms\Block $block) {
     return $block;
 };
 
-// Custom Resolvers
-$customResolvers = function (\Kirby\Cms\Block $block) {
+// Support any field type
+$customFieldResolver = function (\Kirby\Cms\Block $block) {
     $kirby = $block->kirby();
     $resolvers = $kirby->option('blocksResolver.resolvers', []);
 
@@ -125,7 +125,7 @@ $nestedBlocksFieldResolver = function (\Kirby\Cms\Block $block) use ($filesField
     $blocksKeys = array_intersect($block->content()->keys(), $nestedBlocks);
 
     foreach ($blocksKeys as $key) {
-        /** @var \Kirby\Cms\Field $ktField */
+        /** @var \Kirby\Content\Field $ktField */
         $field = $block->content()->get($key);
 
         $block->content()->update([
@@ -142,13 +142,13 @@ return [
      *
      * @kql-allowed
      */
-    'toResolvedBlocks' => function (\Kirby\Cms\Field $field) use ($pagesFieldResolver, $filesFieldResolver, $customResolvers, $nestedBlocksFieldResolver) {
+    'toResolvedBlocks' => function (\Kirby\Content\Field $field) use ($pagesFieldResolver, $filesFieldResolver, $customFieldResolver, $nestedBlocksFieldResolver) {
         return $field
             ->toBlocks()
             ->map($nestedBlocksFieldResolver)
             ->map($pagesFieldResolver)
             ->map($filesFieldResolver)
-            ->map($customResolvers);
+            ->map($customFieldResolver);
     },
 
     /**
@@ -156,16 +156,16 @@ return [
      *
      * @kql-allowed
      */
-    'toResolvedLayouts' => function (\Kirby\Cms\Field $field) use ($filesFieldResolver, $pagesFieldResolver, $customResolvers) {
+    'toResolvedLayouts' => function (\Kirby\Content\Field $field) use ($filesFieldResolver, $pagesFieldResolver, $customFieldResolver) {
         return $field
             ->toLayouts()
-            ->map(function (\Kirby\Cms\Layout $layout) use ($filesFieldResolver, $pagesFieldResolver, $customResolvers) {
+            ->map(function (\Kirby\Cms\Layout $layout) use ($filesFieldResolver, $pagesFieldResolver, $customFieldResolver) {
                 foreach ($layout->columns() as $column) {
                     $column
                         ->blocks()
                         ->map($filesFieldResolver)
                         ->map($pagesFieldResolver)
-                        ->map($customResolvers);
+                        ->map($customFieldResolver);
                 }
 
                 return $layout;
