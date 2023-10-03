@@ -36,15 +36,15 @@ Kirby is not a free software. You can try it for free on your local machine but 
 
 ## Installation
 
-### Download
-
-Download and copy this repository to `/site/plugins/kirby-headless`.
-
 ### Composer
 
 ```bash
 composer require johannschopplich/kirby-headless
 ```
+
+### Download
+
+Download and copy this repository to `/site/plugins/kirby-headless`.
 
 ## Setup
 
