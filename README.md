@@ -29,8 +29,10 @@ Head over to the [usage](#usage) section for instructions.
 
 ## Requirements
 
+- Kirby 3 or higher
+
 > [!NOTE]
-> This plugin is compatible with Kirby 3 and Kirby 4.
+> Yes, that includes Kirby 4!
 
 Kirby is not a free software. You can try it for free on your local machine but in order to run Kirby on a public server you must purchase a [valid license](https://getkirby.com/buy).
 
@@ -83,9 +85,11 @@ return [
 
 You will then have to provide the HTTP header `Authentication: Bearer ${token}` with each request.
 
-> ⚠️ Without a token your page content will be publicly accessible to everyone.
+> [!WARNING]
+> Without a token your page content will be publicly accessible to everyone.
 
-> ℹ️ The internal `/api/kql` route will always enforce bearer authentication, unless you explicitly disable it in your config (see below).
+> [!NOTE]
+> The internal `/api/kql` route will always enforce bearer authentication, unless you explicitly disable it in your config (see below).
 
 ### Templates
 
@@ -173,7 +177,8 @@ To **disable** the bearer token authentication for your Kirby instance and inste
 ]
 ```
 
-> ℹ️ The KQL default endpoint `/api/query` remains using basic authentication and also infers the `kql.auth` config option.
+> [!NOTE]
+> The KQL default endpoint `/api/query` remains using basic authentication and also infers the `kql.auth` config option.
 
 ### Panel Settings
 
