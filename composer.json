@@ -21,7 +21,7 @@
   },
   "require-dev": {
     "friendsofphp/php-cs-fixer": "@stable",
-    "getkirby/cms": "^3.9"
+    "getkirby/cms": "^4.0-beta.2"
   },
   "autoload": {
     "psr-4": {

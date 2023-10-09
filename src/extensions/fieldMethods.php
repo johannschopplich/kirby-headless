@@ -138,6 +138,31 @@ $nestedBlocksFieldResolver = function (\Kirby\Cms\Block $block) use ($filesField
 
 return [
     /**
+     * Resolves page and file permalinks in anchor tags
+     *
+     * @kql-allowed
+     */
+    'toResolvedWriter' => function (\Kirby\Content\Field $field) {
+        return preg_replace_callback(
+            '!href="\/@\/(page|file)\/([^"]+)"!',
+            function ($matches) {
+                $type = $matches[1]; // Either `page` or `file`
+                $id = $matches[2]; // The UUID
+
+                // Resolve the UUID to the actual model URL
+                if ($model = \Kirby\Uuid\Uuid::for($type . '://' . $id)?->model(true)) {
+                    $parsedUrl = parse_url($model->url());
+                    return 'href="' . ($parsedUrl['path'] ?? '/') . '"';
+                }
+
+                // If not resolvable, return the original match
+                return $matches[0];
+            },
+            $field->value
+        );
+    },
+
+    /**
      * Enhances the `toBlocks()` method to resolve files and pages
      *
      * @kql-allowed

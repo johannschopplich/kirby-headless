@@ -248,6 +248,10 @@ return [
 
 ## Field Methods
 
+### `toResolvedWriter()`
+
+This field method resolves page and file permalinks to their respective URLs. It's primarily intended for usage with KQL queries, because the value of `writer` fields contain permalink URLs like `/@/page/nDvVIAwDBph4uOpm`.
+
 ### `toResolvedBlocks()`
 
 The `toResolvedBlocks()` method is a wrapper around the `toBlocks()` method. It's primarily intended for usage with KQL queries, because the `toBlocks()` method returns only UUIDs for the `files` and `pages` fields.
