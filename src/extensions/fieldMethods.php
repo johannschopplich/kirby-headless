@@ -143,16 +143,22 @@ return [
      * @kql-allowed
      */
     'toResolvedWriter' => function (\Kirby\Content\Field $field) {
+        $kirby = $field->parent()->kirby();
+        $prefixFn = $kirby->option('writerResolver.pathPrefix');
+        $prefix = $prefixFn
+            ? (is_callable($prefixFn) ? $prefixFn($kirby) : $prefixFn)
+            : '';
+
         return preg_replace_callback(
             '!href="\/@\/(page|file)\/([^"]+)"!',
-            function ($matches) {
+            function ($matches) use ($prefix) {
                 $type = $matches[1]; // Either `page` or `file`
                 $id = $matches[2]; // The UUID
 
                 // Resolve the UUID to the actual model URL
                 if ($model = \Kirby\Uuid\Uuid::for($type . '://' . $id)?->model(true)) {
                     $parsedUrl = parse_url($model->url());
-                    return 'href="' . ($parsedUrl['path'] ?? '/') . '"';
+                    return 'href="' . $prefix . ($parsedUrl['path'] ?? '/') . '"';
                 }
 
                 // If not resolvable, return the original match

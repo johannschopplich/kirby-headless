@@ -252,6 +252,18 @@ return [
 
 This field method resolves page and file permalinks to their respective URLs. It's primarily intended for usage with KQL queries, because the value of `writer` fields contain permalink URLs like `/@/page/nDvVIAwDBph4uOpm`.
 
+In multilanguage setups, you may want to add a prefix to the URL, e.g. `/en` or `/de`. You can do so by defining a custom `writerResolver.pathPrefix` option in your `config.php`:
+
+```php
+# /site/config/config.php
+return [
+    'writerResolver' => [
+        // Add the language code as a prefix to the URL
+        'pathPrefix' => fn (\Kirby\Cms\App $kirby) => '/' . $kirby->language()->code()
+    ]
+];
+```
+
 ### `toResolvedBlocks()`
 
 The `toResolvedBlocks()` method is a wrapper around the `toBlocks()` method. It's primarily intended for usage with KQL queries, because the `toBlocks()` method returns only UUIDs for the `files` and `pages` fields.
