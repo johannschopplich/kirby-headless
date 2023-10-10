@@ -248,16 +248,16 @@ return [
 
 ## Field Methods
 
-### `toResolvedWriter()`
+### `resolvePermalinks()`
 
-This field method resolves page and file permalinks to their respective URLs. It's primarily intended for usage with KQL queries, because the value of `writer` fields contain permalink URLs like `/@/page/nDvVIAwDBph4uOpm`.
+This field method resolves page and file permalinks to their respective URLs. It's primarily intended for usage with KQL queries, because the value of `writer` fields contain permalink URLs like `/@/page/nDvVIAwDBph4uOpm`. But the method works with any field that contains permalinks in `href` attributes.
 
 In multilanguage setups, you may want to remove a language prefix like `/de` from the URL. You can do so by defining a custom path parser in your `config.php`:
 
 ```php
 # /site/config/config.php
 return [
-    'writerResolver' => [
+    'permalinksResolver' => [
         // Strip the language code prefix from the URL for German
         'pathParser' => function (string $path, \Kirby\Cms\App $kirby) {
             if (str_starts_with($path, '/de')) {

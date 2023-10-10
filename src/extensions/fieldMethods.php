@@ -142,9 +142,9 @@ return [
      *
      * @kql-allowed
      */
-    'toResolvedWriter' => function (\Kirby\Content\Field $field) {
+    'resolvePermalinks' => function (\Kirby\Content\Field $field) {
         $kirby = $field->parent()->kirby();
-        $pathParser = $kirby->option('writerResolver.pathParser', fn (string $path) => $path);
+        $pathParser = $kirby->option('permalinksResolver.pathParser', fn (string $path) => $path);
 
         return preg_replace_callback(
             '!href="\/@\/(page|file)\/([^"]+)"!',
