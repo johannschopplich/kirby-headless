@@ -259,7 +259,7 @@ In multilanguage setups, you may want to add a prefix to the URL, e.g. `/en` or 
 return [
     'writerResolver' => [
         // Add the language code as a prefix to the URL
-        'pathPrefix' => fn (\Kirby\Cms\App $kirby) => '/' . $kirby->language()->code()
+        'pathPrefix' => fn (\Kirby\Cms\App $kirby) => '/' . $kirby->language()->code() . '/'
     ]
 ];
 ```
