@@ -146,7 +146,11 @@ return [
         $kirby = $field->parent()->kirby();
         $pathParser = $kirby->option('permalinksResolver.pathParser', fn (string $path) => $path);
 
-        return preg_replace_callback(
+        if (!is_string($field->value)) {
+            return $field;
+        }
+
+        $field->value = preg_replace_callback(
             '!href="\/@\/(page|file)\/([^"]+)"!',
             function ($matches) use ($kirby, $pathParser) {
                 $type = $matches[1]; // Either `page` or `file`
@@ -163,6 +167,8 @@ return [
             },
             $field->value
         );
+
+        return $field;
     },
 
     /**
