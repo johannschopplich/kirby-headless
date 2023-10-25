@@ -239,7 +239,7 @@ return [
         'cors' => [
             'allowOrigin' => '*',
             'allowMethods' => 'GET, POST, OPTIONS',
-            'allowHeaders' => '*',
+            'allowHeaders' => 'Accept, Content-Type, Authorization',
             'maxAge' => '86400',
         ]
     ]
