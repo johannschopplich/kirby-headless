@@ -1,31 +1,35 @@
 # Kirby Headless
 
-> 👉 Head over to the [Kirby Headless Starter](https://github.com/johannschopplich/kirby-headless-starter) repository for a complete setup ready to be used in production!
+Add headless functionality to your Kirby site with the Kirby Headless plugin. It can either add headless capabilities to your existing Kirby site while keeping the traditional Kirby frontend or be used as a headless-first and heasless-only CMS.
 
-This plugin converts your Kirby site into a truly headless-first CMS. No visual data shall be presented. You will only be able to fetch JSON-encoded data – either by using Kirby's default template system or use KQL to fetch data in your consuming application.
+This plugin lets you fetch JSON-encoded data from your Kirby site using either KQL or Kirby's default template system.
 
-Kirby's global routing will be overwritten by the plugin's [global routes](./src/extensions/routes.php) and [API routes](./src/extensions/api.php) for KQL.
+> [!NOTE]
+> Head over to the [Kirby Headless Starter](https://github.com/johannschopplich/kirby-headless-starter) repository for a ready-to-use headless-only setup!
 
 ## Key Features
 
 - 🦭 Optional bearer token for authentication
-- 🔒 **public** or **private** API
-- 🧩 [KQL](https://github.com/getkirby/kql) with bearer token support via new `/api/kql` route
+- 🔒 Choose between **public** or **private** API
+- 🧩 Extends [KQL](https://github.com/getkirby/kql) with bearer token support (new `/api/kql` route)
+- 🧱 [Resolves UUIDs](#field-methods) to actual file and page objects
 - ⚡️ Cached KQL queries
-- 🌐 Multi-lang support for KQL queries
-- 🗂 [Templates](#templates) present JSON instead of HTML
-- 😵‍💫 No CORS issues!
+- 🌐 Multi-language support for KQL queries
+- 🗂 [Kirby templates](#templates) that output JSON instead of HTML
+- 😵‍💫 Seamless experience free from CORS issues
 - 🍢 Build your own [API chain](./src/extensions/routes.php)
 - 🦾 Express-esque [API builder](#api-builder) with middleware support
 
 ## Use Cases
 
-If you intend to fetch data from a headless Kirby instance, you have two options with this plugin:
+This plugin is designed for developers who want to leverage Kirby's backend to serve content to a frontend application, static site generator, or mobile app. You can either opt-in to headless functionality for your existing Kirby site or use this plugin to build a headless-first CMS from scratch.
 
-- 1️⃣ use [Kirby's default template system](#templates)
-- 2️⃣ use [KQL](#kirbyql)
+Here are scenarios where the Kirby Headless plugin is particularly useful:
 
-Head over to the [usage](#usage) section for instructions.
+- 1️⃣ If you prefer querying data with [Kirby Query Language](#kirbyql).
+- 2️⃣ When you wish to utilize [Kirby's default template system](#templates) to output JSON.
+
+Detailed instructions on how to use these features can be found in the [usage](#usage) section.
 
 ## Requirements
 
@@ -50,7 +54,27 @@ Download and copy this repository to `/site/plugins/kirby-headless`.
 
 ## Setup
 
-If you're not using the [Kirby Headless Starter](https://github.com/johannschopplich/kirby-headless-starter) but adding the plugin to an existing Kirby project, you have to make sure that the following configuration options are set in your `config.php`:
+By default, the plugin will override the global Kirby routes and add its [own global routes](./src/extensions/routes.php) and [API routes for KQL](./src/extensions/api.php).
+
+If you prefer the traditional Kirby frontend and only need headless functionality like KQL, you can disable the global routes in your `config.php`:
+
+```php
+# /site/config/config.php
+return [
+    'headless' => [
+        // Disable overriding the global routes
+        'routes' => false
+    ]
+];
+```
+
+## Usage
+
+### KirbyQL
+
+It is common to authenticate API requests with a token, which is not possible with the default KQL endpoint. Thus, this plugin adds a new KQL endpoint under `/api/kql` that supports bearer token authentication and query response caching.
+
+To enable the bearer token authentication, set the following option in your `config.php`:
 
 ```php
 # /site/config/config.php
@@ -67,75 +91,6 @@ return [
     ]
 ];
 ```
-
-## Usage
-
-### Private vs. Public API
-
-It's recommended to secure your API with a token. To do so, set the `headless.token` Kirby configuration option:
-
-```php
-# /site/config/config.php
-return [
-    'headless' => [
-        'token' => 'test'
-    ]
-];
-```
-
-You will then have to provide the HTTP header `Authentication: Bearer ${token}` with each request.
-
-> [!WARNING]
-> Without a token your page content will be publicly accessible to everyone.
-
-> [!NOTE]
-> The internal `/api/kql` route will always enforce bearer authentication, unless you explicitly disable it in your config (see below).
-
-### Templates
-
-Create templates just like you normally would in any Kirby project. Instead of writing HTML, we build arrays and encode them to JSON. The internal route handler will add the correct content type and also handles caching (if enabled).
-
-<details>
-<summary>👉 Example template</summary>
-
-```php
-# /site/templates/about.php
-
-$data = [
-  'title' => $page->title()->value(),
-  'layout' => $page->layout()->toLayouts()->toArray(),
-  'address' => $page->address()->value(),
-  'email' => $page->email()->value(),
-  'phone' => $page->phone()->value(),
-  'social' => $page->social()->toStructure()->toArray()
-];
-
-echo \Kirby\Data\Json::encode($data);
-```
-
-</details>
-
-<details>
-<summary>👉 Fetch that data in the frontend</summary>
-
-```js
-const API_TOKEN = "test";
-
-const response = await fetch("<website-url>/about", {
-  headers: {
-    Authentication: `Bearer ${API_TOKEN}`,
-  },
-});
-
-const data = await response.json();
-console.log(data);
-```
-
-</details>
-
-### KirbyQL
-
-A new KQL endpoint supporting caching and bearer token authentication is implemented under `/api/kql`.
 
 Fetch KQL query results like you normally would, but provide an `Authentication` header with your request:
 
@@ -179,6 +134,91 @@ To **disable** the bearer token authentication for your Kirby instance and inste
 
 > [!NOTE]
 > The KQL default endpoint `/api/query` remains using basic authentication and also infers the `kql.auth` config option.
+
+### Private vs. Public API
+
+It is recommended to secure your API with a token. To do so, set the `headless.token` Kirby configuration option:
+
+```php
+# /site/config/config.php
+return [
+    'headless' => [
+        'token' => 'test'
+    ]
+];
+```
+
+You will then have to provide the HTTP header `Authentication: Bearer ${token}` with each request.
+
+> [!WARNING]
+> Without a token your page content will be publicly accessible to everyone.
+
+> [!NOTE]
+> The internal `/api/kql` route will always enforce bearer authentication, unless you explicitly disable it in your config (see below).
+
+### Cross Origin Resource Sharing (CORS)
+
+CORS is enabled by default. You can enhance the default CORS configuration by setting the following options in your `config.php`:
+
+```php
+# /site/config/config.php
+return [
+    'headless' => [
+        // Default CORS configuration
+        'cors' => [
+            'allowOrigin' => '*',
+            'allowMethods' => 'GET, POST, OPTIONS',
+            'allowHeaders' => 'Accept, Content-Type, Authorization',
+            'maxAge' => '86400',
+        ]
+    ]
+];
+```
+
+### Templates
+
+Create templates just like you normally would in any Kirby project. Instead of writing HTML, we build arrays and encode them to JSON. The internal route handler will add the correct content type and also handles caching (if enabled).
+
+> [!NOTE]
+> Kirby Headless overrides the global Kirby routes for this feature. To opt-out, set the `headless.routes` option to `false` in your `config.php`.
+
+<details>
+<summary>👉 Example template</summary>
+
+```php
+# /site/templates/about.php
+
+$data = [
+  'title' => $page->title()->value(),
+  'layout' => $page->layout()->toLayouts()->toArray(),
+  'address' => $page->address()->value(),
+  'email' => $page->email()->value(),
+  'phone' => $page->phone()->value(),
+  'social' => $page->social()->toStructure()->toArray()
+];
+
+echo \Kirby\Data\Json::encode($data);
+```
+
+</details>
+
+<details>
+<summary>👉 Fetch that data in the frontend</summary>
+
+```js
+const API_TOKEN = "test";
+
+const response = await fetch("<website-url>/about", {
+  headers: {
+    Authentication: `Bearer ${API_TOKEN}`,
+  },
+});
+
+const data = await response.json();
+console.log(data);
+```
+
+</details>
 
 ### Panel Settings
 
@@ -227,30 +267,11 @@ return [
 
 A middleware checks if a `Authentication` header is set, which is not the case in the browser context.
 
-### Cross Origin Resource Sharing (CORS)
-
-CORS is enabled by default. You can enhance the default CORS configuration by setting the following options in your `config.php`:
-
-```php
-# /site/config/config.php
-return [
-    'headless' => [
-        // Default CORS configuration
-        'cors' => [
-            'allowOrigin' => '*',
-            'allowMethods' => 'GET, POST, OPTIONS',
-            'allowHeaders' => 'Accept, Content-Type, Authorization',
-            'maxAge' => '86400',
-        ]
-    ]
-];
-```
-
 ## Field Methods
 
 ### `resolvePermalinks()`
 
-This field method resolves page and file permalinks to their respective URLs. It's primarily intended for usage with KQL queries, because the value of `writer` fields contain permalink URLs like `/@/page/nDvVIAwDBph4uOpm`. But the method works with any field that contains permalinks in `href` attributes.
+This field method resolves page and file permalinks to their respective URLs. It is primarily intended for usage with KQL queries, because the value of `writer` fields contain permalink URLs like `/@/page/nDvVIAwDBph4uOpm`. But the method works with any field that contains permalinks in `href` attributes.
 
 In multilanguage setups, you may want to remove a language prefix like `/de` from the URL. You can do so by defining a custom path parser in your `config.php`:
 
@@ -272,7 +293,7 @@ return [
 
 ### `toResolvedBlocks()`
 
-The `toResolvedBlocks()` method is a wrapper around the `toBlocks()` method. It's primarily intended for usage with KQL queries, because the `toBlocks()` method returns only UUIDs for the `files` and `pages` fields.
+The `toResolvedBlocks()` method is a wrapper around the `toBlocks()` method. It is primarily intended for usage with KQL queries, because the `toBlocks()` method returns only UUIDs for the `files` and `pages` fields.
 
 This field method will resolve the UUIDs to the actual file or page objects, so you can access their properties directly in your frontend.
 
