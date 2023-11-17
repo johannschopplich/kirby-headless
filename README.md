@@ -363,7 +363,7 @@ If you need a custom resolver for images, links, or any other field in a specifi
 return [
     'blocksResolver' => [
         'resolvers' => [
-            'intro:link' => fn (\Kirby\Content\Field $field) => [
+            'intro:link' => fn (\Kirby\Content\Field $field, \Kirby\Cms\Block $block) => [
                 'value' => $field->value()
             ]
         ]

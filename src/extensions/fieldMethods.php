@@ -110,7 +110,7 @@ $customFieldResolver = function (\Kirby\Cms\Block $block) {
 
         $block->content()->update([
             'resolved' => array_merge($resolved, [
-                strtolower($key) => $resolver($field)
+                strtolower($key) => $resolver($field, $block)
             ])
         ]);
     }
