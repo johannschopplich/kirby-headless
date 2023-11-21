@@ -271,21 +271,38 @@ A middleware checks if a `Authentication` header is set, which is not the case i
 
 ### `resolvePermalinks()`
 
-This field method resolves page and file permalinks to their respective URLs. It is primarily intended for usage with KQL queries, because the value of `writer` fields contain permalink URLs like `/@/page/nDvVIAwDBph4uOpm`. But the method works with any field that contains permalinks in `href` attributes.
+This field method resolves page and file permalinks to their respective URLs. It is primarily intended for usage with KQL queries, because the value of `writer` fields contain permalink URLs like `/@/page/nDvVIAwDBph4uOpm`. But the method works with any field values that contains permalinks in `href` or `src` attributes.
 
-In multilanguage setups, you may want to remove a language prefix like `/de` from the URL. You can do so by defining a custom path parser in your `config.php`:
+For headless usage, you may want to remove the origin from the URL and just return the path. You can do so by defining a custom URL parser in your `config.php`:
 
 ```php
 # /site/config/config.php
 return [
     'permalinksResolver' => [
-        // Strip the language code prefix from the URL for German
-        'pathParser' => function (string $path, \Kirby\Cms\App $kirby) {
+        // Strip the origin from the URL
+        'urlParser' => function (string $url, \Kirby\Cms\App $kirby) {
+            $path = parse_url($url, PHP_URL_PATH);
+            return $path;
+        }
+    ]
+];
+```
+
+Or in multilanguage setups, you may want to remove a language prefix like `/de` from the URL:
+
+```php
+# /site/config/config.php
+return [
+    'permalinksResolver' => [
+        // Strip the language code prefix from German URLs
+        'urlParser' => function (string $url, \Kirby\Cms\App $kirby) {
+            $path = parse_url($url, PHP_URL_PATH);
+
             if (str_starts_with($path, '/de')) {
                 return substr($path, 3);
             }
 
-            return '';
+            return $path;
         }
     ]
 ];

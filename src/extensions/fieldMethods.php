@@ -1,6 +1,12 @@
 <?php
 
-$filesFieldResolver = function (\Kirby\Cms\Block $block) {
+use Kirby\Cms\Block;
+use Kirby\Content\Field;
+use Kirby\Toolkit\A;
+use Kirby\Toolkit\Dom;
+use Kirby\Uuid\Uuid;
+
+$filesFieldResolver = function (Block $block) {
     $kirby = $block->kirby();
     $blocks = $kirby->option('blocksResolver.files', ['image' => 'image']);
 
@@ -48,7 +54,7 @@ $filesFieldResolver = function (\Kirby\Cms\Block $block) {
     return $block;
 };
 
-$pagesFieldResolver = function (\Kirby\Cms\Block $block) {
+$pagesFieldResolver = function (Block $block) {
     $kirby = $block->kirby();
     $blocks = $kirby->option('blocksResolver.pages', []);
 
@@ -94,7 +100,7 @@ $pagesFieldResolver = function (\Kirby\Cms\Block $block) {
 };
 
 // Support any field type
-$customFieldResolver = function (\Kirby\Cms\Block $block) {
+$customFieldResolver = function (Block $block) {
     $kirby = $block->kirby();
     $resolvers = $kirby->option('blocksResolver.resolvers', []);
 
@@ -118,14 +124,13 @@ $customFieldResolver = function (\Kirby\Cms\Block $block) {
     return $block;
 };
 
-$nestedBlocksFieldResolver = function (\Kirby\Cms\Block $block) use ($filesFieldResolver) {
-    /** @var \Kirby\Cms\Block $block */
+$nestedBlocksFieldResolver = function (Block $block) use ($filesFieldResolver) {
+    /** @var Block $block */
     $kirby = $block->kirby();
     $nestedBlocks = $kirby->option('blocksResolver.nested', ['prose']);
     $blocksKeys = array_intersect($block->content()->keys(), $nestedBlocks);
 
     foreach ($blocksKeys as $key) {
-        /** @var \Kirby\Content\Field $ktField */
         $field = $block->content()->get($key);
 
         $block->content()->update([
@@ -142,31 +147,33 @@ return [
      *
      * @kql-allowed
      */
-    'resolvePermalinks' => function (\Kirby\Content\Field $field) {
+    'resolvePermalinks' => function (Field $field) {
         $kirby = $field->parent()->kirby();
-        $pathParser = $kirby->option('permalinksResolver.pathParser', fn (string $path) => $path);
+        $urlParser = $kirby->option('permalinksResolver.urlParser', fn (string $url, \Kirby\Cms\App $kirby) => $url);
 
-        if (!is_string($field->value)) {
-            return $field;
-        }
+        if ($field->isNotEmpty()) {
+            $dom = new Dom($field->value);
+            $attributes = ['href', 'src'];
+            $elements = $dom->query('//*[' . implode(' | ', A::map($attributes, fn ($attribute) => '@' . $attribute)) . ']');
 
-        $field->value = preg_replace_callback(
-            '!href="\/@\/(page|file)\/([^"]+)"!',
-            function ($matches) use ($kirby, $pathParser) {
-                $type = $matches[1]; // Either `page` or `file`
-                $id = $matches[2]; // The UUID
-
-                // Resolve the UUID to the actual model URL
-                if ($model = \Kirby\Uuid\Uuid::for($type . '://' . $id)?->model()) {
-                    $parsedUrl = parse_url($model->url());
-                    return 'href="' . $pathParser($parsedUrl['path'] ?? '/', $kirby) . '"';
+            foreach ($elements as $element) {
+                foreach ($attributes as $attribute) {
+                    if ($element->hasAttribute($attribute) && $url = $element->getAttribute($attribute)) {
+                        try {
+                            if ($uuid = Uuid::for($url)) {
+                                $url = $uuid->model()?->url();
+                                $parsedUrl = $url ? $urlParser($url, $kirby) : null;
+                                $element->setAttribute($attribute, $parsedUrl);
+                            }
+                        } catch (InvalidArgumentException) {
+                            // Ignore anything else than permalinks
+                        }
+                    }
                 }
+            }
 
-                // If not resolvable, return the original match
-                return $matches[0];
-            },
-            $field->value
-        );
+            $field->value = $dom->toString();
+        }
 
         return $field;
     },
@@ -176,7 +183,7 @@ return [
      *
      * @kql-allowed
      */
-    'toResolvedBlocks' => function (\Kirby\Content\Field $field) use ($pagesFieldResolver, $filesFieldResolver, $customFieldResolver, $nestedBlocksFieldResolver) {
+    'toResolvedBlocks' => function (Field $field) use ($pagesFieldResolver, $filesFieldResolver, $customFieldResolver, $nestedBlocksFieldResolver) {
         return $field
             ->toBlocks()
             ->map($nestedBlocksFieldResolver)
@@ -190,7 +197,7 @@ return [
      *
      * @kql-allowed
      */
-    'toResolvedLayouts' => function (\Kirby\Content\Field $field) use ($filesFieldResolver, $pagesFieldResolver, $customFieldResolver) {
+    'toResolvedLayouts' => function (Field $field) use ($filesFieldResolver, $pagesFieldResolver, $customFieldResolver) {
         return $field
             ->toLayouts()
             ->map(function (\Kirby\Cms\Layout $layout) use ($filesFieldResolver, $pagesFieldResolver, $customFieldResolver) {
