@@ -1,3 +1,5 @@
+![Kirby Headless Preview](./.github/og.png)
+
 # Kirby Headless
 
 Add headless functionality to your Kirby site with the Kirby Headless plugin. It can either add headless capabilities to your existing Kirby site while keeping the traditional Kirby frontend or be used as a headless-first and heasless-only CMS.
