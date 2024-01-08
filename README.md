@@ -273,6 +273,9 @@ A middleware checks if a `Authentication` header is set, which is not the case i
 
 ### `resolvePermalinks()`
 
+> [!TIP]
+> Act the same as Kirby's built-in `permalinksToUrls()` method, but supports a custom URL parser.
+
 This field method resolves page and file permalinks to their respective URLs. It is primarily intended for usage with KQL queries, because the value of `writer` fields contain permalink URLs like `/@/page/nDvVIAwDBph4uOpm`. But the method works with any field values that contains permalinks in `href` or `src` attributes.
 
 For headless usage, you may want to remove the origin from the URL and just return the path. You can do so by defining a custom URL parser in your `config.php`:

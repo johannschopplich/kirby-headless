@@ -2,6 +2,7 @@
 
 use Kirby\Cms\Block;
 use Kirby\Content\Field;
+use Kirby\Exception\InvalidArgumentException;
 use Kirby\Toolkit\A;
 use Kirby\Toolkit\Dom;
 use Kirby\Uuid\Uuid;
