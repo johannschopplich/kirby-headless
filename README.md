@@ -339,6 +339,9 @@ return [
 ];
 ```
 
+> [!TIP]
+> Use [custom resolvers](#custom-resolver-for-a-specific-block-and-field) to resolve fields in a specific block.
+
 For an example, take a look at the 🍫 [Cacao Kit frontend](https://github.com/johannschopplich/cacao-kit-frontend).
 
 #### Custom Files or Pages Resolver
