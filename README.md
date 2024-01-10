@@ -33,12 +33,13 @@ Here are scenarios where the Kirby Headless plugin is particularly useful:
 
 Detailed instructions on how to use these features can be found in the [usage](#usage) section.
 
+> [!TIP]
+> Kirby Headless overrides the global Kirby routes for the [templates](#templates) feature. To opt-out, head over to the [setup](#setup) section.
+
 ## Requirements
 
-- Kirby 3 or higher
-
-> [!NOTE]
-> Yes, that includes Kirby 4!
+- Kirby 3 or
+- Kirby 4
 
 Kirby is not a free software. You can try it for free on your local machine but in order to run Kirby on a public server you must purchase a [valid license](https://getkirby.com/buy).
 
@@ -181,7 +182,7 @@ return [
 
 Create templates just like you normally would in any Kirby project. Instead of writing HTML, we build arrays and encode them to JSON. The internal route handler will add the correct content type and also handles caching (if enabled).
 
-> [!NOTE]
+> [!TIP]
 > Kirby Headless overrides the global Kirby routes for this feature. To opt-out, set the `headless.routes` option to `false` in your `config.php`.
 
 <details>
@@ -274,7 +275,7 @@ A middleware checks if a `Authentication` header is set, which is not the case i
 ### `resolvePermalinks()`
 
 > [!TIP]
-> Act the same as Kirby's built-in `permalinksToUrls()` method, but supports a custom URL parser.
+> Acts the same as Kirby's built-in `permalinksToUrls()` method, but supports a custom URL parser.
 
 This field method resolves page and file permalinks to their respective URLs. It is primarily intended for usage with KQL queries, because the value of `writer` fields contain permalink URLs like `/@/page/nDvVIAwDBph4uOpm`. But the method works with any field values that contains permalinks in `href` or `src` attributes.
 
