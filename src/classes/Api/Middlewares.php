@@ -3,6 +3,7 @@
 namespace JohannSchopplich\Headless\Api;
 
 use Kirby\Cms\App;
+use Kirby\Panel\Panel;
 use Kirby\Exception\NotFoundException;
 use Kirby\Filesystem\F;
 use Kirby\Http\Response;
@@ -224,7 +225,7 @@ class Middlewares
         $authorization = $kirby->request()->header('Authorization');
 
         if ($kirby->option('headless.panel.redirect', false) && empty($authorization)) {
-            go($kirby->option('panel.slug'));
+            go(Panel::url());
         }
 
         if (

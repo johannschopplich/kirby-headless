@@ -458,16 +458,16 @@
         },
         {
             "name": "friendsofphp/php-cs-fixer",
-            "version": "v3.46.0",
+            "version": "v3.47.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHP-CS-Fixer/PHP-CS-Fixer.git",
-                "reference": "be6831c9af1740470d2a773119b9273f8ac1c3d2"
+                "reference": "184dd992fe49169a18300dba4435212db55220f7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PHP-CS-Fixer/PHP-CS-Fixer/zipball/be6831c9af1740470d2a773119b9273f8ac1c3d2",
-                "reference": "be6831c9af1740470d2a773119b9273f8ac1c3d2",
+                "url": "https://api.github.com/repos/PHP-CS-Fixer/PHP-CS-Fixer/zipball/184dd992fe49169a18300dba4435212db55220f7",
+                "reference": "184dd992fe49169a18300dba4435212db55220f7",
                 "shasum": ""
             },
             "require": {
@@ -537,7 +537,7 @@
             ],
             "support": {
                 "issues": "https://github.com/PHP-CS-Fixer/PHP-CS-Fixer/issues",
-                "source": "https://github.com/PHP-CS-Fixer/PHP-CS-Fixer/tree/v3.46.0"
+                "source": "https://github.com/PHP-CS-Fixer/PHP-CS-Fixer/tree/v3.47.0"
             },
             "funding": [
                 {
@@ -545,20 +545,20 @@
                     "type": "github"
                 }
             ],
-            "time": "2024-01-03T21:38:46+00:00"
+            "time": "2024-01-15T15:35:57+00:00"
         },
         {
             "name": "getkirby/cms",
-            "version": "4.0.2",
+            "version": "4.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/getkirby/kirby.git",
-                "reference": "ba8e9e511d797c0c2bc9278d5484020c4aa8cfce"
+                "reference": "a537a4d95c8db03ecaf3ebfd5c6a7747357fde7c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/getkirby/kirby/zipball/ba8e9e511d797c0c2bc9278d5484020c4aa8cfce",
-                "reference": "ba8e9e511d797c0c2bc9278d5484020c4aa8cfce",
+                "url": "https://api.github.com/repos/getkirby/kirby/zipball/a537a4d95c8db03ecaf3ebfd5c6a7747357fde7c",
+                "reference": "a537a4d95c8db03ecaf3ebfd5c6a7747357fde7c",
                 "shasum": ""
             },
             "require": {
@@ -648,7 +648,7 @@
                     "type": "custom"
                 }
             ],
-            "time": "2023-12-19T14:29:43+00:00"
+            "time": "2024-01-10T10:28:21+00:00"
         },
         {
             "name": "laminas/laminas-escaper",
