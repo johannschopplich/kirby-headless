@@ -3,11 +3,11 @@
 namespace JohannSchopplich\Headless\Api;
 
 use Kirby\Cms\App;
-use Kirby\Panel\Panel;
 use Kirby\Exception\NotFoundException;
 use Kirby\Filesystem\F;
 use Kirby\Http\Response;
 use Kirby\Http\Uri;
+use Kirby\Panel\Panel;
 use Kirby\Toolkit\Str;
 
 class Middlewares
