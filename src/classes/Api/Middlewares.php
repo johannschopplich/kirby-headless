@@ -225,7 +225,7 @@ class Middlewares
         $authorization = $kirby->request()->header('Authorization');
 
         if ($kirby->option('headless.panel.redirect', false) && empty($authorization)) {
-            go(Panel::url());
+            go(Panel::url('site'));
         }
 
         if (
