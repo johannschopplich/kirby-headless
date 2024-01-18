@@ -9,5 +9,6 @@
 /.cache
 /.php-cs-fixer.cache
 /.phpunit.result.cache
+/index.dev.mjs
 /tests/coverage
 /tests/*/tmp
