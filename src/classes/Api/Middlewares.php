@@ -195,7 +195,11 @@ class Middlewares
                 if ($kirby->multilang()) {
                     $url['links'] = $kirby->languages()->map(fn ($lang) => [
                         // Support ISO 3166-1 Alpha 2 and ISO 639-1
-                        'lang' => Str::slug(Str::rtrim($lang->locale(LC_ALL) ?? $lang->code(), '.utf8')),
+                        'lang' => Str::slug(preg_replace(
+                            '/\.utf-?8$/i',
+                            '',
+                            $lang->locale(LC_ALL) ?? $lang->code()
+                        )),
                         'url' => $withoutBase($item->url($lang->code()))
                     ])->values();
 
