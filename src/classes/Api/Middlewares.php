@@ -65,7 +65,7 @@ class Middlewares
 
         $data = $kirby->cache('pages')->getOrSet(
             '_site.headless.json',
-            function () use (&$kirby) {
+            function () use ($kirby) {
                 $template = $kirby->template('_site');
 
                 if (!$template->exists()) {
