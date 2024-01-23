@@ -165,6 +165,7 @@ class Middlewares
         $withoutBase = fn (string $url) => '/' . (new Uri($url))->path();
 
         if ($sitemap === null) {
+            $isIndexable = option('headless.sitemap.isIndexable');
             $excludeTemplates = option('headless.sitemap.exclude.templates', []);
             $excludePages = option('headless.sitemap.exclude.pages', []);
 
@@ -172,9 +173,9 @@ class Middlewares
                 $excludePages = $excludePages();
             }
 
-            foreach (site()->index() as $item) {
+            foreach ($kirby->site()->index() as $item) {
                 /** @var \Kirby\Cms\Page $item */
-                if (in_array($item->intendedTemplate()->name(), $excludeTemplates)) {
+                if (in_array($item->intendedTemplate()->name(), $excludeTemplates, true)) {
                     continue;
                 }
 
@@ -184,6 +185,10 @@ class Middlewares
 
                 $options = $item->blueprint()->options();
                 if (isset($options['sitemap']) && $options['sitemap'] === false) {
+                    continue;
+                }
+
+                if (is_callable($isIndexable) && $isIndexable($item) === false) {
                     continue;
                 }
 
