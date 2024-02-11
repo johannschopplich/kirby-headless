@@ -11,12 +11,12 @@ return [
 
         return [
             /**
-             * Allow preflight requests, mainly for `fetch`
+             * Allow preflight requests, mainly for `fetch` requests
              */
             [
                 'pattern' => '(:all)',
                 'method' => 'OPTIONS',
-                'auth' => $auth,
+                'auth' => false,
                 'action' => fn () => Api::createPreflightResponse()
             ],
 
