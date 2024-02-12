@@ -24,8 +24,7 @@ $validateOptionalBearerToken = function (array $context, array $args) {
 
 return [
     'routes' => function (\Kirby\Cms\App $kirby) use ($validateOptionalBearerToken) {
-        $authMethod = $kirby->option('kql.auth', true);
-        $auth = $authMethod !== false && $authMethod !== 'bearer';
+        $kqlAuthMethod = $kirby->option('kql.auth', true);
 
         return [
             /**
@@ -44,11 +43,11 @@ return [
             [
                 'pattern' => 'kql',
                 'method' => 'GET|POST',
-                'auth' => $auth,
+                'auth' => !in_array($kqlAuthMethod, [false, 'bearer'], true),
                 'action' => Api::createHandler(
                     // Middleware to validate the bearer token
-                    function (array $context, array $args) use ($kirby, $authMethod) {
-                        if ($authMethod !== 'bearer') {
+                    function (array $context, array $args) use ($kirby, $kqlAuthMethod) {
+                        if ($kqlAuthMethod !== 'bearer') {
                             return;
                         }
 
@@ -103,7 +102,7 @@ return [
                     function (array $context, array $args) use ($kirby) {
                         $sitemap = [];
                         $cache = $kirby->cache('pages');
-                        $cacheKey = '_sitemap.headless.json';
+                        $cacheKey = 'sitemap.headless.json';
                         $sitemap = $cache->get($cacheKey);
                         $withoutBase = fn (string $url) => '/' . (new Uri($url))->path();
 
@@ -160,7 +159,7 @@ return [
                                 $sitemap[] = $url;
                             }
 
-                            $cache?->set($cacheKey, $sitemap);
+                            $cache->set($cacheKey, $sitemap);
                         }
 
                         return Api::createResponse(201, $sitemap);
@@ -187,7 +186,7 @@ return [
                         }
 
                         $data = $kirby->cache('pages')->getOrSet(
-                            $templateName . '.headless.json',
+                            'template-' . $templateName . '.headless.json',
                             function () use ($args, $kirby) {
                                 $template = $kirby->template($args[0]);
 
