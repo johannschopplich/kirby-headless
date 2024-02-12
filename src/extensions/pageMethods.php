@@ -24,12 +24,11 @@ return [
     'i18nMeta' => function () {
         /** @var \Kirby\Cms\Page $this */
         $locales = $this->kirby()->languages()->codes();
-
         $meta = [];
 
         foreach ($locales as $locale) {
             $meta[$locale] = [
-                'title' => $this->content($locale)->title()->value(),
+                'title' => $this->content($locale)->get('title')->value(),
                 'uri' => $this->uri($locale)
             ];
         }

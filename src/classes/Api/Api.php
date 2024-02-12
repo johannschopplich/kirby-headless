@@ -2,9 +2,9 @@
 
 namespace JohannSchopplich\Headless\Api;
 
-use Exception;
 use Kirby\Cms\App;
 use Kirby\Cms\File;
+use Kirby\Exception\Exception;
 use Kirby\Http\Response;
 use Kirby\Toolkit\A;
 
@@ -15,7 +15,9 @@ class Api
      */
     public static function createHandler(callable ...$fns)
     {
-        $context = [];
+        $context = [
+            'kirby' => App::instance()
+        ];
 
         return function (...$args) use ($fns, $context) {
             foreach ($fns as $fn) {
@@ -34,6 +36,8 @@ class Api
 
     /**
      * Create an API response
+     *
+     * @remarks
      * Enforces consistent JSON responses by wrapping Kirby's `Response` class
      */
     public static function createResponse(int $code, $data = null): Response
@@ -57,7 +61,7 @@ class Api
     /**
      * Get the status message for the given code
      *
-     * @throws \Exception
+     * @throws \Kirby\Exception\Exception
      */
     private static function getStatusMessage(int $code): string
     {
@@ -90,12 +94,12 @@ class Api
         $kirby = App::instance();
 
         return new Response('', null, 204, [
+            // 204 responses **must not** have a `Content-Length` header
+            // (https://www.rfc-editor.org/rfc/rfc7230#section-3.3.2)
             'Access-Control-Allow-Origin' => $kirby->option('headless.cors.allowOrigin', '*'),
             'Access-Control-Allow-Methods' => $kirby->option('headless.cors.allowMethods', 'GET, POST, OPTIONS'),
             'Access-Control-Allow-Headers' => $kirby->option('headless.cors.allowHeaders', 'Accept, Content-Type, Authorization, X-Language'),
             'Access-Control-Max-Age' => $kirby->option('headless.cors.maxAge', '86400'),
-            // 204 responses **must not** have a `Content-Length` header
-            // (https://www.rfc-editor.org/rfc/rfc7230#section-3.3.2)
         ]);
     }
 }

@@ -5,7 +5,7 @@ use JohannSchopplich\Headless\Api\Middlewares;
 
 return [
     /**
-     * Allow preflight requests, mainly for `fetch`
+     * Allow preflight requests, mainly for `fetch` requests
      */
     [
         'pattern' => '(:all)',
@@ -15,7 +15,7 @@ return [
     ],
 
     /**
-     * Return JSON-encoded page data for each request
+     * Return JSON-encoded page data for every route
      */
     [
         'pattern' => '(:all)',
@@ -23,8 +23,6 @@ return [
         'action' => Api::createHandler(
             [Middlewares::class, 'tryResolveFiles'],
             [Middlewares::class, 'hasBearerToken'],
-            [Middlewares::class, 'tryResolveSite'],
-            [Middlewares::class, 'tryResolveSitemap'],
             [Middlewares::class, 'tryResolvePage']
         )
     ]
