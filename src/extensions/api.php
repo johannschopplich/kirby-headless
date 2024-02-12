@@ -157,6 +157,8 @@ return [
 
                                     $sitemap[] = $url;
                                 }
+
+                                return $sitemap;
                             }
                         );
 
