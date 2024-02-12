@@ -34,7 +34,8 @@ Here are scenarios where the Kirby Headless plugin is particularly useful:
 Detailed instructions on how to use these features can be found in the [usage](#usage) section.
 
 > [!TIP]
-> Kirby Headless overrides the global Kirby routes for the [templates](#templates) feature. To opt-out, head over to the [setup](#setup) section.
+> Kirby Headless doesn't interfere with Kirby's default routing. You can install it without affecting your existing Kirby site.
+> To use the [JSON templates](#templates) feature, opt-in to [override the gobal routing](#setup).
 
 ## Requirements
 
@@ -57,19 +58,24 @@ Download and copy this repository to `/site/plugins/kirby-headless`.
 
 ## Setup
 
-By default, the plugin will override the global Kirby routes and add its [own global routes](./src/extensions/routes.php) and [API routes for KQL](./src/extensions/api.php).
+> [!TIP]
+> If you don't intend to use the [JSON templates](#templates) feature, you can skip this section!
 
-If you prefer the traditional Kirby frontend and only need headless functionality like KQL, you can disable the global routes in your `config.php`:
+By default, the plugin doesn't interfere with Kirby's default routing, it just adds API routes like [for KQL](./src/extensions/api.php).
+
+To transform Kirby from a traditional frontend to a truly headless-only CMS, you have to opt-in to custom global routing in your `config.php`:
 
 ```php
 # /site/config/config.php
 return [
     'headless' => [
-        // Disable overriding the global routes
-        'routes' => false
+        // Enable returning Kirby templates as JSON
+        'globalRoutes' => true
     ]
 ];
 ```
+
+This will make all page templates return JSON instead of HTML by [defining global routes](./src/extensions/routes.php).
 
 ## Usage
 
@@ -180,10 +186,10 @@ return [
 
 ### Templates
 
-Create templates just like you normally would in any Kirby project. Instead of writing HTML, we build arrays and encode them to JSON. The internal route handler will add the correct content type and also handles caching (if enabled).
+Write templates as you would in any other Kirby project. But instead of returning HTML, they return JSON. The internal route handler adds the correct content type and also handles caching (if enabled).
 
-> [!TIP]
-> Kirby Headless overrides the global Kirby routes for this feature. To opt-out, set the `headless.routes` option to `false` in your `config.php`.
+> [!INFO]
+> Kirby Headless doesn't interfere with Kirby's default routing. To opt-in, follow the [setup instructions](#setup).
 
 <details>
 <summary>👉 Example template</summary>
