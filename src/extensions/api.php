@@ -3,7 +3,7 @@
 use JohannSchopplich\Headless\Api\Api;
 use Kirby\Data\Json;
 use Kirby\Exception\NotFoundException;
-use Kirby\Http\Uri;
+use Kirby\Http\Url;
 use Kirby\Kql\Kql;
 use Kirby\Toolkit\Str;
 
@@ -100,69 +100,67 @@ return [
                 'action' => Api::createHandler(
                     $validateOptionalBearerToken,
                     function (array $context, array $args) use ($kirby) {
-                        $sitemap = [];
-                        $cache = $kirby->cache('pages');
-                        $cacheKey = 'sitemap.headless.json';
-                        $sitemap = $cache->get($cacheKey);
-                        $withoutBase = fn (string $url) => '/' . (new Uri($url))->path();
+                        $data = $kirby->cache('pages')->getOrSet(
+                            'sitemap.headless.json',
+                            function () use ($kirby) {
+                                $withoutBase = fn (string $url) => Url::path($url, true);
+                                $isIndexable = $kirby->option('headless.sitemap.isIndexable');
+                                $excludeTemplates = $kirby->option('headless.sitemap.exclude.templates', []);
+                                $excludePages = $kirby->option('headless.sitemap.exclude.pages', []);
 
-                        if ($sitemap === null) {
-                            $isIndexable = option('headless.sitemap.isIndexable');
-                            $excludeTemplates = option('headless.sitemap.exclude.templates', []);
-                            $excludePages = option('headless.sitemap.exclude.pages', []);
-
-                            if (is_callable($excludePages)) {
-                                $excludePages = $excludePages();
-                            }
-
-                            foreach ($kirby->site()->index() as $item) {
-                                /** @var \Kirby\Cms\Page $item */
-                                if (in_array($item->intendedTemplate()->name(), $excludeTemplates, true)) {
-                                    continue;
+                                if (is_callable($excludePages)) {
+                                    $excludePages = $excludePages();
                                 }
 
-                                if (preg_match('!^(?:' . implode('|', $excludePages) . ')$!i', $item->id())) {
-                                    continue;
-                                }
+                                $sitemap = [];
 
-                                $options = $item->blueprint()->options();
-                                if (isset($options['sitemap']) && $options['sitemap'] === false) {
-                                    continue;
-                                }
+                                foreach ($kirby->site()->index() as $item) {
+                                    /** @var \Kirby\Cms\Page $item */
+                                    if (in_array($item->intendedTemplate()->name(), $excludeTemplates, true)) {
+                                        continue;
+                                    }
 
-                                if (is_callable($isIndexable) && $isIndexable($item) === false) {
-                                    continue;
-                                }
+                                    if (preg_match('!^(?:' . implode('|', $excludePages) . ')$!i', $item->id())) {
+                                        continue;
+                                    }
 
-                                $url = [
-                                    'url' => $withoutBase($item->url()),
-                                    'modified' => $item->modified('Y-m-d', 'date')
-                                ];
+                                    $options = $item->blueprint()->options();
+                                    if (isset($options['sitemap']) && $options['sitemap'] === false) {
+                                        continue;
+                                    }
 
-                                if ($kirby->multilang()) {
-                                    $url['links'] = $kirby->languages()->map(fn ($lang) => [
-                                        // Support ISO 3166-1 Alpha 2 and ISO 639-1
-                                        'lang' => Str::slug(preg_replace(
-                                            '/\.utf-?8$/i',
-                                            '',
-                                            $lang->locale(LC_ALL) ?? $lang->code()
-                                        )),
-                                        'url' => $withoutBase($item->url($lang->code()))
-                                    ])->values();
+                                    if (is_callable($isIndexable) && $isIndexable($item) === false) {
+                                        continue;
+                                    }
 
-                                    $url['links'][] = [
-                                        'lang' => 'x-default',
-                                        'url' => $withoutBase($item->url())
+                                    $url = [
+                                        'url' => $withoutBase($item->url()),
+                                        'modified' => $item->modified('Y-m-d', 'date')
                                     ];
+
+                                    if ($kirby->multilang()) {
+                                        $url['links'] = $kirby->languages()->map(fn ($lang) => [
+                                            // Support ISO 3166-1 Alpha 2 and ISO 639-1
+                                            'lang' => Str::slug(preg_replace(
+                                                '/\.utf-?8$/i',
+                                                '',
+                                                $lang->locale(LC_ALL) ?? $lang->code()
+                                            )),
+                                            'url' => $withoutBase($item->url($lang->code()))
+                                        ])->values();
+
+                                        $url['links'][] = [
+                                            'lang' => 'x-default',
+                                            'url' => $withoutBase($item->url())
+                                        ];
+                                    }
+
+                                    $sitemap[] = $url;
                                 }
-
-                                $sitemap[] = $url;
                             }
+                        );
 
-                            $cache->set($cacheKey, $sitemap);
-                        }
-
-                        return Api::createResponse(201, $sitemap);
+                        return Api::createResponse(201, $data);
                     }
                 )
             ],
