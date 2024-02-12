@@ -202,7 +202,10 @@ return [
                             }
                         );
 
-                        return Api::createResponse(201, $data);
+                        return Api::createResponse(
+                            201,
+                            Json::decode($data)
+                        );
                     }
                 )
             ]
