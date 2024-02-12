@@ -1,6 +1,10 @@
 <?php
 
+use Kirby\Cms\App;
 use Kirby\Cms\Block;
+use Kirby\Cms\File;
+use Kirby\Cms\Layout;
+use Kirby\Cms\Page;
 use Kirby\Content\Field;
 use Kirby\Exception\InvalidArgumentException;
 use Kirby\Toolkit\A;
@@ -18,7 +22,7 @@ $filesFieldResolver = function (Block $block) {
 
     // Get the resolvers config
     $resolvers = $kirby->option('blocksResolver.resolvers', []);
-    $defaultResolver = $kirby->option('blocksResolver.defaultResolvers.files', fn (\Kirby\Cms\File $image) => [
+    $defaultResolver = $kirby->option('blocksResolver.defaultResolvers.files', fn (File $image) => [
         'url' => $image->url(),
         'width' => $image->width(),
         'height' => $image->height(),
@@ -30,7 +34,7 @@ $filesFieldResolver = function (Block $block) {
     $fieldKeys = is_array($fieldKeys) ? $fieldKeys : [$fieldKeys];
 
     foreach ($fieldKeys as $key) {
-        /** @var \Kirby\Cms\Files $images */
+        /** @var \Kirby\Cms\Files */
         $images = $block->content()->get($key)->toFiles();
 
         if ($images->count() === 0) {
@@ -66,7 +70,7 @@ $pagesFieldResolver = function (Block $block) {
 
     // Get the resolver method
     $resolvers = $kirby->option('blocksResolver.resolvers', []);
-    $defaultResolver = $kirby->option('blocksResolver.defaultResolvers.pages', fn (\Kirby\Cms\Page $page) => [
+    $defaultResolver = $kirby->option('blocksResolver.defaultResolvers.pages', fn (Page $page) => [
         'uri' => $page->uri(),
         'title' => $page->title()->value()
     ]);
@@ -75,7 +79,7 @@ $pagesFieldResolver = function (Block $block) {
     $fieldKeys = is_array($fieldKeys) ? $fieldKeys : [$fieldKeys];
 
     foreach ($fieldKeys as $key) {
-        /** @var \Kirby\Cms\Pages $pages */
+        /** @var \Kirby\Cms\Pages */
         $pages = $block->content()->get($key)->toPages();
 
         if ($pages->count() === 0) {
@@ -125,23 +129,6 @@ $customFieldResolver = function (Block $block) {
     return $block;
 };
 
-$nestedBlocksFieldResolver = function (Block $block) use ($filesFieldResolver) {
-    /** @var Block $block */
-    $kirby = $block->kirby();
-    $nestedBlocks = $kirby->option('blocksResolver.nested', ['prose']);
-    $blocksKeys = array_intersect($block->content()->keys(), $nestedBlocks);
-
-    foreach ($blocksKeys as $key) {
-        $field = $block->content()->get($key);
-
-        $block->content()->update([
-            $key => $field->toBlocks()->map($filesFieldResolver)->toArray()
-        ]);
-    }
-
-    return $block;
-};
-
 return [
     /**
      * Resolves page and file permalinks in anchor tags
@@ -150,7 +137,7 @@ return [
      */
     'resolvePermalinks' => function (Field $field) {
         $kirby = $field->parent()->kirby();
-        $urlParser = $kirby->option('permalinksResolver.urlParser', fn (string $url, \Kirby\Cms\App $kirby) => $url);
+        $urlParser = $kirby->option('permalinksResolver.urlParser', fn (string $url, App $kirby) => $url);
 
         if ($field->isNotEmpty()) {
             $dom = new Dom($field->value);
@@ -184,10 +171,9 @@ return [
      *
      * @kql-allowed
      */
-    'toResolvedBlocks' => function (Field $field) use ($pagesFieldResolver, $filesFieldResolver, $customFieldResolver, $nestedBlocksFieldResolver) {
+    'toResolvedBlocks' => function (Field $field) use ($pagesFieldResolver, $filesFieldResolver, $customFieldResolver) {
         return $field
             ->toBlocks()
-            ->map($nestedBlocksFieldResolver)
             ->map($pagesFieldResolver)
             ->map($filesFieldResolver)
             ->map($customFieldResolver);
@@ -201,7 +187,7 @@ return [
     'toResolvedLayouts' => function (Field $field) use ($filesFieldResolver, $pagesFieldResolver, $customFieldResolver) {
         return $field
             ->toLayouts()
-            ->map(function (\Kirby\Cms\Layout $layout) use ($filesFieldResolver, $pagesFieldResolver, $customFieldResolver) {
+            ->map(function (Layout $layout) use ($filesFieldResolver, $pagesFieldResolver, $customFieldResolver) {
                 foreach ($layout->columns() as $column) {
                     $column
                         ->blocks()

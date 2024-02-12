@@ -1,6 +1,7 @@
 <?php
 
 use JohannSchopplich\Headless\Api\Api;
+use Kirby\Cms\App;
 use Kirby\Data\Json;
 use Kirby\Exception\NotFoundException;
 use Kirby\Http\Url;
@@ -8,9 +9,7 @@ use Kirby\Kql\Kql;
 use Kirby\Toolkit\Str;
 
 $validateOptionalBearerToken = function (array $context, array $args) {
-    /** @var \Kirby\Cms\App */
-    $kirby = $context['kirby'];
-
+    $kirby = App::instance();
     $token = $kirby->option('headless.token');
     $authorization = $kirby->request()->header('Authorization');
 
@@ -23,7 +22,7 @@ $validateOptionalBearerToken = function (array $context, array $args) {
 };
 
 return [
-    'routes' => function (\Kirby\Cms\App $kirby) use ($validateOptionalBearerToken) {
+    'routes' => function (App $kirby) use ($validateOptionalBearerToken) {
         $kqlAuthMethod = $kirby->option('kql.auth', true);
 
         return [
@@ -63,10 +62,10 @@ return [
                         $input = $kirby->request()->get();
                         $cache = $cacheKey = $data = null;
                         $languageCode = $kirby->request()->header('X-Language');
-                        $isCacheable = $kirby->request()->header('X-Cacheable');
+                        $isCacheable = $kirby->request()->header('X-Cacheable') !== 'false';
 
                         // Set the Kirby language in multilanguage sites
-                        if ($kirby->multilang() && $languageCode) {
+                        if ($kirby->multilang() && !empty($languageCode)) {
                             $kirby->setCurrentLanguage($languageCode);
                         }
 
@@ -75,7 +74,7 @@ return [
                             $cache = $kirby->cache('pages');
                             $cacheKey = 'query-' . $hash . (!empty($languageCode) ? '-' . $languageCode : '') . '.json';
 
-                            if ($isCacheable !== 'false') {
+                            if ($isCacheable) {
                                 $data = $cache->get($cacheKey);
                             }
                         }
@@ -179,7 +178,7 @@ return [
                     function (array $context, array $args) use ($kirby) {
                         $templateName = $args[0] ?? null;
 
-                        if (!$templateName) {
+                        if (empty($templateName)) {
                             throw new NotFoundException([
                                 'key' => 'template.default.notFound'
                             ]);
