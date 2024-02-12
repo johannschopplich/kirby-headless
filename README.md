@@ -39,7 +39,6 @@ Detailed instructions on how to use these features can be found in the [usage](#
 
 ## Requirements
 
-- Kirby 3 or
 - Kirby 4
 
 Kirby is not a free software. You can try it for free on your local machine but in order to run Kirby on a public server you must purchase a [valid license](https://getkirby.com/buy).
