@@ -137,7 +137,7 @@ return [
      */
     'resolvePermalinks' => function (Field $field) {
         $kirby = $field->parent()->kirby();
-        $urlParser = $kirby->option('permalinksResolver.urlParser', fn (string $url, App $kirby) => $url);
+        $urlParser = $kirby->option('permalinksResolver.urlParser');
 
         if ($field->isNotEmpty()) {
             $dom = new Dom($field->value);
@@ -146,12 +146,13 @@ return [
 
             foreach ($elements as $element) {
                 foreach ($attributes as $attribute) {
-                    if ($element->hasAttribute($attribute) && $url = $element->getAttribute($attribute)) {
+                    if ($element->hasAttribute($attribute) && $uuid = $element->getAttribute($attribute)) {
                         try {
-                            if ($uuid = Uuid::for($url)) {
-                                $url = $uuid->model()?->url();
-                                $parsedUrl = $url ? $urlParser($url, $kirby) : null;
-                                $element->setAttribute($attribute, $parsedUrl);
+                            if ($url = Uuid::for($uuid)?->model()?->url()) {
+                                if (is_callable($urlParser)) {
+                                    $url = $urlParser($url, $kirby);
+                                }
+                                $element->setAttribute($attribute, $url);
                             }
                         } catch (InvalidArgumentException) {
                             // Ignore anything else than permalinks
