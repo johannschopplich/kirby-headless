@@ -3,7 +3,7 @@
 use Kirby\Toolkit\Str;
 
 return [
-    'frontendUrl' => function () {
+    'frontendUrl' => function (): string|null {
         /** @var \Kirby\Cms\Page $this */
         $url = $this->kirby()->option('headless.panel.frontendUrl');
 
@@ -21,7 +21,32 @@ return [
     /**
      * @kql-allowed
      */
-    'i18nMeta' => function () {
+    'breadcrumbMeta' => function (): array {
+        /** @var \Kirby\Cms\Page $this */
+        $breadcrumb = [];
+        $parent = $this->parent();
+
+        while ($parent) {
+            $breadcrumb[] = [
+                'title' => $parent->title()->value(),
+                'uri' => $parent->uri()
+            ];
+
+            $parent = $parent->parent();
+        }
+
+        $breadcrumb[] = [
+            'title' => $this->title()->value(),
+            'uri' => $this->uri()
+        ];
+
+        return array_reverse($breadcrumb);
+    },
+
+    /**
+     * @kql-allowed
+     */
+    'i18nMeta' => function (): array {
         /** @var \Kirby\Cms\Page $this */
         $locales = $this->kirby()->languages()->codes();
         $meta = [];
