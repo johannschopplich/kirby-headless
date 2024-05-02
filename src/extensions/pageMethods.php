@@ -24,6 +24,10 @@ return [
     'breadcrumbMeta' => function (): array {
         /** @var \Kirby\Cms\Page $this */
         $breadcrumb = [];
+        $breadcrumb[] = [
+            'title' => $this->title()->value(),
+            'uri' => $this->uri()
+        ];
         $parent = $this->parent();
 
         while ($parent) {
@@ -34,11 +38,6 @@ return [
 
             $parent = $parent->parent();
         }
-
-        $breadcrumb[] = [
-            'title' => $this->title()->value(),
-            'uri' => $this->uri()
-        ];
 
         return array_reverse($breadcrumb);
     },
