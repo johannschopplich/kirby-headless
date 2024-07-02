@@ -93,9 +93,9 @@ class Api
     {
         $kirby = App::instance();
 
+        // 204 responses **must not** have a `Content-Length` header
+        // See: https://www.rfc-editor.org/rfc/rfc7230#section-3.3.2
         return new Response('', null, 204, [
-            // 204 responses **must not** have a `Content-Length` header
-            // (https://www.rfc-editor.org/rfc/rfc7230#section-3.3.2)
             'Access-Control-Allow-Origin' => $kirby->option('headless.cors.allowOrigin', '*'),
             'Access-Control-Allow-Methods' => $kirby->option('headless.cors.allowMethods', 'GET, POST, OPTIONS'),
             'Access-Control-Allow-Headers' => $kirby->option('headless.cors.allowHeaders', 'Accept, Content-Type, Authorization, X-Language'),

@@ -2,12 +2,12 @@
   "type": "module",
   "version": "3.1.4",
   "private": true,
-  "packageManager": "pnpm@9.0.6",
+  "packageManager": "pnpm@9.4.0",
   "scripts": {
     "release": "bumpp --all --execute \"npx zx scripts/pre-release.mjs\""
   },
   "devDependencies": {
     "bumpp": "^9.4.1",
-    "zx": "^8.0.2"
+    "zx": "^8.1.3"
   }
 }

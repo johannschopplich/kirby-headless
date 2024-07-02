@@ -29,7 +29,7 @@
     }
   },
   "scripts": {
-    "fix": "php-cs-fixer fix",
+    "csfix": "@php tools/phpcs/vendor/bin/php-cs-fixer fix",
     "dist": "composer install --no-dev --optimize-autoloader"
   },
   "config": {

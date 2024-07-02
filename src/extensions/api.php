@@ -5,7 +5,6 @@ use Kirby\Cms\App;
 use Kirby\Data\Json;
 use Kirby\Exception\NotFoundException;
 use Kirby\Http\Url;
-use Kirby\Kql\Kql;
 use Kirby\Toolkit\Str;
 
 $validateOptionalBearerToken = function (array $context, array $args) {
@@ -80,7 +79,7 @@ return [
                         }
 
                         if ($data === null) {
-                            $data = Kql::run($input);
+                            $data = \Kirby\Kql\Kql::run($input);
                             $cache?->set($cacheKey, $data);
                         }
 

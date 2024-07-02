@@ -1,6 +1,5 @@
 <?php
 
-use Kirby\Cms\App;
 use Kirby\Cms\Block;
 use Kirby\Cms\File;
 use Kirby\Cms\Layout;
