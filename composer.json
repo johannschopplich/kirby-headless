@@ -1,6 +1,6 @@
 {
   "name": "johannschopplich/kirby-headless",
-  "description": "Kirby, but headless only – KQL with bearer token, Express-esque middlewares & more",
+  "description": "Kirby, but headless only – with bearer token authentication and Express-esque middlewares",
   "type": "kirby-plugin",
   "version": "3.1.5",
   "keywords": [
