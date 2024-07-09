@@ -20,7 +20,6 @@
     "getkirby/composer-installer": "^1.2"
   },
   "require-dev": {
-    "friendsofphp/php-cs-fixer": "@stable",
     "getkirby/cms": "^4"
   },
   "autoload": {
