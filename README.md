@@ -19,6 +19,26 @@ This plugins enhances your Kirby site with headless capabilities. It can either 
 - 😵‍💫 Seamless experience without CORS issues
 - 🍢 Express-esque [API builder](#api-builder) with middleware support
 
+## Table of Contents
+
+- [Use Cases](#use-cases)
+- [Requirements](#requirements)
+- [Installation](#installation)
+- [Setup](#setup)
+- [Usage](#usage)
+  - [Private vs. Public API](#private-vs-public-api)
+  - [Cross Origin Resource Sharing (CORS)](#cross-origin-resource-sharing-cors)
+  - [Kirby Query Language (KQL)](#kirby-query-language-kql)
+  - [Templates](#templates)
+  - [Panel Settings](#panel-settings)
+- [Field Methods](#field-methods)
+  - [`toResolvedBlocks()`](#toresolvedblocks)
+  - [`resolvePermalinks()`](#resolvepermalinks)
+- [Page Methods](#page-methods)
+  - [`i18nMeta()`](#i18nmeta)
+- [API Builder](#api-builder)
+- [FAQ](#faq)
+
 ## Use Cases
 
 This plugin is designed for developers who want to leverage Kirby's backend to serve content to a frontend application, static site generator, or mobile app. You can either opt-in to headless functionality for your existing Kirby site or use this plugin to build a headless-first CMS from scratch.
@@ -26,7 +46,7 @@ This plugin is designed for developers who want to leverage Kirby's backend to s
 Here are scenarios where the Kirby Headless plugin is particularly useful:
 
 - 1️⃣ If you prefer to query data using the [Kirby Query Language](#kirby-query-language-kql).
-- 2️⃣ If you want to use [Kirby's default template system](#templates) to output JSON.
+- 2️⃣ If you want to use [Kirby's default template system](#templates) to output JSON instead of HTML.
 
 Detailed instructions on how to use these features can be found in the [usage](#usage) section.
 
@@ -74,6 +94,43 @@ return [
 This will make all page templates return JSON instead of HTML by [defining global routes](./src/extensions/routes.php).
 
 ## Usage
+
+### Private vs. Public API
+
+It is recommended to secure your API with a token. To do so, set the `headless.token` Kirby configuration option:
+
+```php
+# /site/config/config.php
+return [
+    'headless' => [
+        'token' => 'test'
+    ]
+];
+```
+
+You will then have to provide the HTTP header `Authentication: Bearer ${token}` with each request.
+
+> [!WARNING]
+> Without a token your page content will be publicly accessible to everyone.
+
+### Cross Origin Resource Sharing (CORS)
+
+CORS is enabled by default. You can enhance the default CORS configuration by setting the following options in your `config.php`:
+
+```php
+# /site/config/config.php
+return [
+    'headless' => [
+        // Default CORS configuration
+        'cors' => [
+            'allowOrigin' => '*',
+            'allowMethods' => 'GET, POST, OPTIONS',
+            'allowHeaders' => 'Accept, Content-Type, Authorization, X-Language',
+            'maxAge' => '86400',
+        ]
+    ]
+];
+```
 
 ### Kirby Query Language (KQL)
 
@@ -142,43 +199,6 @@ To **disable** the bearer token authentication for your Kirby instance and inste
 
 > [!NOTE]
 > The KQL default endpoint `/api/query` remains using basic authentication and also infers the `kql.auth` config option.
-
-### Private vs. Public API
-
-It is recommended to secure your API with a token. To do so, set the `headless.token` Kirby configuration option:
-
-```php
-# /site/config/config.php
-return [
-    'headless' => [
-        'token' => 'test'
-    ]
-];
-```
-
-You will then have to provide the HTTP header `Authentication: Bearer ${token}` with each request.
-
-> [!WARNING]
-> Without a token your page content will be publicly accessible to everyone.
-
-### Cross Origin Resource Sharing (CORS)
-
-CORS is enabled by default. You can enhance the default CORS configuration by setting the following options in your `config.php`:
-
-```php
-# /site/config/config.php
-return [
-    'headless' => [
-        // Default CORS configuration
-        'cors' => [
-            'allowOrigin' => '*',
-            'allowMethods' => 'GET, POST, OPTIONS',
-            'allowHeaders' => 'Accept, Content-Type, Authorization, X-Language',
-            'maxAge' => '86400',
-        ]
-    ]
-];
-```
 
 ### Templates
 
@@ -367,13 +387,13 @@ return [
 
 #### Mutate Blocks Values
 
-By default, resolved fields don't mutate source fields of the blocks array. Instead, the resolved content is stored in the `resolved` key of each block. If you want to overwrite the field value with the resolved content, you can set the `overwriteContent` option to `true`:
+By default, resolved fields don't mutate source fields of the blocks array. Instead, the resolved content is stored in the `resolved` key of each block. If you want to overwrite the field value with the resolved content, you can set the `replaceValues` option to `true`:
 
 ```php
 # /site/config/config.php
 return [
     'blocksResolver' => [
-        'overwriteContent' => true
+        'replaceValues' => true
     ]
 ];
 ```
@@ -426,9 +446,19 @@ return [
 
 The `i18nMeta()` method returns an array including the title and URI for the current page in all available languages. This is useful for the frontend to build a language switcher.
 
-## Advanced
+**Type Declaration:**
 
-### API Builder
+```ts
+type I18nMeta = Record<
+  string,
+  {
+    title: string
+    uri: string
+  }
+>
+```
+
+## API Builder
 
 This headless starter includes an Express-esque API builder, defined in the [`JohannSchopplich\Headless\Api\Api` class](./src/classes/Api/Api.php). You can use it to re-use logic like handling a token or verifying some other incoming data.
 

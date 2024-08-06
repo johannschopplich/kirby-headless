@@ -48,7 +48,7 @@ $filesFieldResolver = function (Block $block) {
         // Get already resolved images
         $resolved = $block->content()->get('resolved')->or([])->value();
 
-        if ($kirby->option('blocksResolver.overwriteContent', false)) {
+        if ($kirby->option('blocksResolver.replaceValues', false)) {
             $block->content()->update([
                 $key => $images->map($defaultResolver)->values()
             ]);
@@ -99,7 +99,7 @@ $pagesFieldResolver = function (Block $block) {
         // Get already resolved images
         $resolved = $block->content()->get('resolved')->or([])->value();
 
-        if ($kirby->option('blocksResolver.overwriteContent', false)) {
+        if ($kirby->option('blocksResolver.replaceValues', false)) {
             $block->content()->update([
                 $key => $pages->map($defaultResolver)->values()
             ]);
@@ -130,7 +130,7 @@ $customFieldResolver = function (Block $block) {
         $field = $block->content()->get($key);
         $resolved = $block->content()->get('resolved')->or([])->value();
 
-        if ($kirby->option('blocksResolver.overwriteContent', false)) {
+        if ($kirby->option('blocksResolver.replaceValues', false)) {
             $block->content()->update([
                 $key => $resolver($field, $block)
             ]);
