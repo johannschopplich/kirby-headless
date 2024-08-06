@@ -2,25 +2,22 @@
 
 # Kirby Headless
 
-Add headless functionality to your Kirby site with the Kirby Headless plugin. It can either add headless capabilities to your existing Kirby site while keeping the traditional Kirby frontend or be used as a headless-first and heasless-only CMS.
-
-This plugin lets you fetch JSON-encoded data from your Kirby site using either KQL or Kirby's default template system.
+This plugins enhances your Kirby site with headless capabilities. It can either add headless functionality to your existing Kirby site while keeping the traditional Kirby frontend or be used as a headless-first or headless-only CMS.
 
 > [!NOTE]
-> Head over to the [Kirby Headless Starter](https://github.com/johannschopplich/kirby-headless-starter) repository for a ready-to-use headless-only setup!
+> Check out to the [Kirby Headless Starter](https://github.com/johannschopplich/kirby-headless-starter) repository for a ready-to-use headless-only setup!
 
 ## Key Features
 
 - 🦭 Optional bearer token for authentication
 - 🔒 Choose between **public** or **private** API
 - 🧩 Extends [KQL](https://github.com/getkirby/kql) with bearer token support (new `/api/kql` route)
-- 🧱 [Resolves UUIDs](#field-methods) to actual file and page objects
+- 🧱 Resolves fields in blocks: [UUIDs to file and page objects](#toresolvedblocks) or [any other field](#custom-resolver-for-a-specific-block-and-field)
 - ⚡️ Cached KQL queries
 - 🌐 Multi-language support for KQL queries
 - 🗂 [Kirby templates](#templates) that output JSON instead of HTML
-- 😵‍💫 Seamless experience free from CORS issues
-- 🍢 Build your own [API chain](./src/extensions/routes.php)
-- 🦾 Express-esque [API builder](#api-builder) with middleware support
+- 😵‍💫 Seamless experience without CORS issues
+- 🍢 Express-esque [API builder](#api-builder) with middleware support
 
 ## Use Cases
 
@@ -28,8 +25,8 @@ This plugin is designed for developers who want to leverage Kirby's backend to s
 
 Here are scenarios where the Kirby Headless plugin is particularly useful:
 
-- 1️⃣ If you prefer querying data with [Kirby Query Language](#kirbyql).
-- 2️⃣ When you wish to utilize [Kirby's default template system](#templates) to output JSON.
+- 1️⃣ If you prefer to query data using the [Kirby Query Language](#kirby-query-language-kql).
+- 2️⃣ If you want to use [Kirby's default template system](#templates) to output JSON.
 
 Detailed instructions on how to use these features can be found in the [usage](#usage) section.
 
@@ -78,7 +75,7 @@ This will make all page templates return JSON instead of HTML by [defining globa
 
 ## Usage
 
-### KirbyQL
+### Kirby Query Language (KQL)
 
 It is common to authenticate API requests with a token, which is not possible with the default KQL endpoint. Thus, this plugin adds a new KQL endpoint under `/api/kql` that supports bearer token authentication and query response caching.
 
@@ -106,15 +103,15 @@ Fetch KQL query results like you normally would, but provide an `Authentication`
 <summary>👉 Fetch example</summary>
 
 ```js
-const API_TOKEN = "test";
+const API_TOKEN = 'test'
 
-const response = await fetch("<website-url>/api/kql", {
-  method: "POST",
+const response = await fetch('<website-url>/api/kql', {
+  method: 'POST',
   body: {
     query: "page('notes').children",
     select: {
       title: true,
-      text: "page.text.toBlocks",
+      text: 'page.text.toBlocks',
       slug: true,
       date: "page.date.toDate('d.m.Y')",
     },
@@ -122,10 +119,10 @@ const response = await fetch("<website-url>/api/kql", {
   headers: {
     Authentication: `Bearer ${API_TOKEN}`,
   },
-});
+})
 
-const data = await response.json();
-console.log(data);
+const data = await response.json()
+console.log(data)
 ```
 
 </details>
@@ -139,6 +136,9 @@ To **disable** the bearer token authentication for your Kirby instance and inste
     'auth' => true
 ]
 ```
+
+> [!TIP]
+> The internal `/api/kql` route will always enforce bearer authentication, unless you explicitly disable it by setting the `kql.auth` option to `false`.
 
 > [!NOTE]
 > The KQL default endpoint `/api/query` remains using basic authentication and also infers the `kql.auth` config option.
@@ -160,9 +160,6 @@ You will then have to provide the HTTP header `Authentication: Bearer ${token}` 
 
 > [!WARNING]
 > Without a token your page content will be publicly accessible to everyone.
-
-> [!NOTE]
-> The internal `/api/kql` route will always enforce bearer authentication, unless you explicitly disable it in your config (see below).
 
 ### Cross Origin Resource Sharing (CORS)
 
@@ -214,16 +211,16 @@ echo \Kirby\Data\Json::encode($data);
 <summary>👉 Fetch that data in the frontend</summary>
 
 ```js
-const API_TOKEN = "test";
+const API_TOKEN = 'test'
 
-const response = await fetch("<website-url>/about", {
+const response = await fetch('<website-url>/about', {
   headers: {
     Authentication: `Bearer ${API_TOKEN}`,
   },
-});
+})
 
-const data = await response.json();
-console.log(data);
+const data = await response.json()
+console.log(data)
 ```
 
 </details>
@@ -237,7 +234,7 @@ With the headless approach, the default preview link from the Kirby Panel won't 
 ```yaml
 options:
   # Or `site.frontendUrl` for the `site.yml`
-  preview: "{{ page.frontendUrl }}"
+  preview: '{{ page.frontendUrl }}'
 ```
 
 Set your frontend URL in your `config.php`:
@@ -277,6 +274,110 @@ A middleware checks if a `Authentication` header is set, which is not the case i
 
 ## Field Methods
 
+### `toResolvedBlocks()`
+
+The `toResolvedBlocks()` method is a wrapper around the `toBlocks()` method. It is primarily intended for usage with KQL queries, because the `toBlocks()` method returns only UUIDs for the `files` and `pages` fields.
+
+> [!TIP]
+> Use [custom resolvers](#custom-resolver-for-a-specific-block-and-field) to resolve any field of any block to the desired output.
+
+This field method will resolve the UUIDs to the actual file or page objects, so you can access their properties directly in your frontend. All resolved fields are stored in the `resolved` key of the block.
+
+```php
+# /site/config/config.php
+return [
+    'blocksResolver' => [
+        // Define which fields of which blocks need resolving
+        'files' => [
+            // Resolve the `image` field in the `image` block as a file
+            'image' => ['image'],
+            // Resolve the `image` field in the `intro` block as a file
+            'intro' => ['image']
+        ],
+        'pages' => [
+            // Resolve the `link` field in the `customBlock` block as a page
+            'customBlock' => ['link']
+        ]
+    ]
+];
+```
+
+For an example, take a look at the 🍫 [Cacao Kit frontend](https://github.com/johannschopplich/cacao-kit-frontend).
+
+#### Custom Files or Pages Resolver
+
+To resolve image UUIDs to image objects, you can define a custom resolver in your `config.php`. By default, the following resolver is used:
+
+```php
+# /site/config/config.php
+return [
+    'blocksResolver' => [
+        'defaultResolvers' => [
+            'files' => fn (\Kirby\Cms\File $image) => [
+              'url' => $image->url(),
+              'width' => $image->width(),
+              'height' => $image->height(),
+              'srcset' => $image->srcset(),
+              'alt' => $image->alt()->value()
+            ]
+        ]
+    ]
+];
+```
+
+If you just need one custom resolver for all files fields, you can use the `blocksResolver.defaultResolvers.files` options key. Respectively, you can use the `blocksResolver.defaultResolvers.pages` options key for all pages fields.
+
+Both options accept a closure that receives the file/page object as its first argument and returns an array of properties, just like the default resolver:
+
+```php
+# /site/config/config.php
+return [
+    'blocksResolver' => [
+        'defaultResolvers' => [
+            'files' => fn (\Kirby\Cms\File $image) => [
+                'srcset' => $image->srcset(),
+                'alt' => $image->alt()->value()
+            ],
+            'pages' => fn (\Kirby\Cms\Page $page) => [
+                // Default resolver for pages
+            ]
+        ]
+    ]
+];
+```
+
+#### Custom Resolver for a Specific Block and Field
+
+If you need a custom resolver for links, structures, or any other field in a specific block, you can use the `blocksResolver.resolvers` option. It accepts an array of resolvers, where the key is `{blockName}:{fieldName}` and the value is a closure that receives the field object as its first argument and returns an array of properties:
+
+```php
+# /site/config/config.php
+return [
+    'blocksResolver' => [
+        'resolvers' => [
+            // Resolve the field `link` of the block `intro` to a custom output
+            'intro:link' => fn (\Kirby\Content\Field $field, \Kirby\Cms\Block $block) => [
+                'value' => $field->value(),
+                'uri' => $field->toPage()?->uri()
+            ]
+        ]
+    ]
+];
+```
+
+#### Mutate Blocks Values
+
+By default, resolved fields don't mutate source fields of the blocks array. Instead, the resolved content is stored in the `resolved` key of each block. If you want to overwrite the field value with the resolved content, you can set the `overwriteContent` option to `true`:
+
+```php
+# /site/config/config.php
+return [
+    'blocksResolver' => [
+        'overwriteContent' => true
+    ]
+];
+```
+
 ### `resolvePermalinks()`
 
 > [!TIP]
@@ -315,102 +416,6 @@ return [
 
             return $path;
         }
-    ]
-];
-```
-
-### `toResolvedBlocks()`
-
-The `toResolvedBlocks()` method is a wrapper around the `toBlocks()` method. It is primarily intended for usage with KQL queries, because the `toBlocks()` method returns only UUIDs for the `files` and `pages` fields.
-
-This field method will resolve the UUIDs to the actual file or page objects, so you can access their properties directly in your frontend. All resolved fields are stored in the `resolved` key of the block.
-
-```php
-# /site/config/config.php
-return [
-    'blocksResolver' => [
-        // Define which fields of which blocks need resolving
-        'files' => [
-            // Resolve the `image` field in the `image` block as a file
-            'image' => ['image'],
-            // Resolve the `image` field in the `intro` block as a file
-            'intro' => ['image']
-        ],
-        'pages' => [
-            // Resolve the `link` field in the `customBlock` block as a page
-            'customBlock' => ['link']
-        ]
-    ]
-];
-```
-
-> [!TIP]
-> Use [custom resolvers](#custom-resolver-for-a-specific-block-and-field) to resolve fields in a specific block.
-
-For an example, take a look at the 🍫 [Cacao Kit frontend](https://github.com/johannschopplich/cacao-kit-frontend).
-
-#### Custom Files or Pages Resolver
-
-To resolve image UUIDs to image objects, you can define a custom resolver in your `config.php`. By default, the following resolver is used:
-
-```php
-$defaultResolver = fn (\Kirby\Cms\File $image) => [
-    'url' => $image->url(),
-    'width' => $image->width(),
-    'height' => $image->height(),
-    'srcset' => $image->srcset(),
-    'alt' => $image->alt()->value()
-];
-```
-
-If you just need one custom resolver for all files fields, you can use the `blocksResolver.defaultResolvers.files` options key. Respectively, you can use the `blocksResolver.defaultResolvers.pages` options key for all pages fields.
-
-Both options accept a closure that receives the file/page object as its first argument and returns an array of properties, just like the default resolver:
-
-```php
-# /site/config/config.php
-return [
-    'blocksResolver' => [
-        // Default Resolvers
-        'defaultResolvers' => [
-            'files' => fn (\Kirby\Cms\File $image) => [
-                'url' => $image->url(),
-                'alt' => $image->alt()->value()
-            ],
-            'pages' => fn (\Kirby\Cms\Page $page) => [
-                // Default resolver for pages
-            ]
-        ]
-    ]
-];
-```
-
-#### Custom Resolver for a Specific Block and Field
-
-If you need a custom resolver for images, links, or any other field in a specific block, you can use the `blocksResolver.resolvers` options key. It accepts an array of resolvers, where the key is the block name and the value is a closure that receives the field object as its first argument and returns an array of properties:
-
-```php
-# /site/config/config.php
-return [
-    'blocksResolver' => [
-        'resolvers' => [
-            'intro:link' => fn (\Kirby\Content\Field $field, \Kirby\Cms\Block $block) => [
-                'value' => $field->value()
-            ]
-        ]
-    ]
-];
-```
-
-#### Overwrite Blocks Content
-
-By default, resolved fields don't overwrite the original field content. Instead, they are stored in the `resolved` key of the block. If you want to overwrite the original field content with the resolved fields, you can set the `overwriteContent` option to `true`:
-
-```php
-# /site/config/config.php
-return [
-    'blocksResolver' => [
-        'overwriteContent' => true
     ]
 ];
 ```
@@ -502,7 +507,7 @@ public static function hasFooParam($context)
 
 ## FAQ
 
-## Why Not Use Content Representations?
+### Why Not Use Content Representations?
 
 [Content representations](https://getkirby.com/docs/guide/templates/content-representations) are great. But they require a non-representing template. Otherwise, the content representation template just would not be read by Kirby. This means, you would have to create the following template structure:
 
