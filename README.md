@@ -323,7 +323,7 @@ return [
 
 The `toResolvedBlocks()` method is a wrapper around the `toBlocks()` method. It is primarily intended for usage with KQL queries, because the `toBlocks()` method returns only UUIDs for the `files` and `pages` fields.
 
-This field method will resolve the UUIDs to the actual file or page objects, so you can access their properties directly in your frontend.
+This field method will resolve the UUIDs to the actual file or page objects, so you can access their properties directly in your frontend. All resolved fields are stored in the `resolved` key of the block.
 
 ```php
 # /site/config/config.php
@@ -398,6 +398,19 @@ return [
                 'value' => $field->value()
             ]
         ]
+    ]
+];
+```
+
+#### Overwrite Blocks Content
+
+By default, resolved fields don't overwrite the original field content. Instead, they are stored in the `resolved` key of the block. If you want to overwrite the original field content with the resolved fields, you can set the `overwriteContent` option to `true`:
+
+```php
+# /site/config/config.php
+return [
+    'blocksResolver' => [
+        'overwriteContent' => true
     ]
 ];
 ```

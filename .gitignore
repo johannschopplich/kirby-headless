@@ -12,3 +12,4 @@
 /index.dev.mjs
 /tests/coverage
 /tests/*/tmp
+/tools/**/vendor

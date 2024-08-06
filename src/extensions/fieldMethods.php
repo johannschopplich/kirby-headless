@@ -48,11 +48,17 @@ $filesFieldResolver = function (Block $block) {
         // Get already resolved images
         $resolved = $block->content()->get('resolved')->or([])->value();
 
-        $block->content()->update([
-            'resolved' => array_merge($resolved, [
-                strtolower($key) => $images->map($defaultResolver)->values()
-            ])
-        ]);
+        if ($kirby->option('blocksResolver.overwriteContent', false)) {
+            $block->content()->update([
+                $key => $images->map($defaultResolver)->values()
+            ]);
+        } else {
+            $block->content()->update([
+                'resolved' => array_merge($resolved, [
+                    strtolower($key) => $images->map($defaultResolver)->values()
+                ])
+            ]);
+        }
     }
 
     return $block;
@@ -93,11 +99,17 @@ $pagesFieldResolver = function (Block $block) {
         // Get already resolved images
         $resolved = $block->content()->get('resolved')->or([])->value();
 
-        $block->content()->update([
-            'resolved' => array_merge($resolved, [
-                strtolower($key) => $pages->map($defaultResolver)->values()
-            ])
-        ]);
+        if ($kirby->option('blocksResolver.overwriteContent', false)) {
+            $block->content()->update([
+                $key => $pages->map($defaultResolver)->values()
+            ]);
+        } else {
+            $block->content()->update([
+                'resolved' => array_merge($resolved, [
+                    strtolower($key) => $pages->map($defaultResolver)->values()
+                ])
+            ]);
+        }
     }
 
     return $block;
@@ -115,14 +127,20 @@ $customFieldResolver = function (Block $block) {
             continue;
         }
 
-        $resolved = $block->content()->get('resolved')->or([])->value();
         $field = $block->content()->get($key);
+        $resolved = $block->content()->get('resolved')->or([])->value();
 
-        $block->content()->update([
-            'resolved' => array_merge($resolved, [
-                strtolower($key) => $resolver($field, $block)
-            ])
-        ]);
+        if ($kirby->option('blocksResolver.overwriteContent', false)) {
+            $block->content()->update([
+                $key => $resolver($field, $block)
+            ]);
+        } else {
+            $block->content()->update([
+                'resolved' => array_merge($resolved, [
+                    strtolower($key) => $resolver($field, $block)
+                ])
+            ]);
+        }
     }
 
     return $block;
