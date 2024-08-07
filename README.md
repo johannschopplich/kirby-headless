@@ -142,12 +142,6 @@ To enable the bearer token authentication, set the following option in your `con
 ```php
 # /site/config/config.php
 return [
-    // Enable basic authentication for the Kirby API
-    // Only needed, if you prefer basic auth over bearer tokens
-    'api' => [
-        'basicAuth' => true
-    ],
-
     // Default to token-based authentication
     'kql' => [
         'auth' => 'bearer'
@@ -155,7 +149,7 @@ return [
 ];
 ```
 
-Fetch KQL query results like you normally would, but provide an `Authentication` header with your request:
+Fetch KQL query results like you normally would, but provide an `Authentication` header with the bearer token in your request:
 
 <details>
 <summary>👉 Fetch example</summary>
@@ -190,9 +184,18 @@ console.log(data)
 To **disable** the bearer token authentication for your Kirby instance and instead use the **basic authentication** method, set the following option in your `config.php`:
 
 ```php
-'kql' => [
-    'auth' => true
-]
+# /site/config/config.php
+return [
+    // Enable basic authentication for the Kirby API
+    // Only needed, if you prefer basic auth over bearer tokens
+    'api' => [
+        'basicAuth' => true
+    ],
+
+    'kql' => [
+        'auth' => true
+    ]
+];
 ```
 
 > [!TIP]
