@@ -33,6 +33,7 @@ This plugins enhances your Kirby site with headless capabilities. It can either 
   - [Panel Settings](#panel-settings)
 - [Field Methods](#field-methods)
   - [`toResolvedBlocks()`](#toresolvedblocks)
+  - [`toResolvedLayouts()`](#toresolvedlayouts)
   - [`resolvePermalinks()`](#resolvepermalinks)
 - [Page Methods](#page-methods)
   - [`i18nMeta()`](#i18nmeta)
@@ -397,6 +398,10 @@ return [
     ]
 ];
 ```
+
+### `toResolvedLayouts()`
+
+The `toResolvedLayouts()` method is a wrapper around the `toLayouts()` method. Under the hood, it uses the `toResolvedBlocks()` method to resolve fields in blocks. You can use the same [custom resolvers](#custom-resolver-for-a-specific-block-and-field) for blocks in layouts.
 
 ### `resolvePermalinks()`
 
