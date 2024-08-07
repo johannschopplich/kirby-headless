@@ -3,6 +3,7 @@
 use Kirby\Cms\Block;
 use Kirby\Cms\File;
 use Kirby\Cms\Layout;
+use Kirby\Cms\LayoutColumn;
 use Kirby\Cms\Page;
 use Kirby\Content\Field;
 use Kirby\Exception\InvalidArgumentException;
@@ -185,36 +186,53 @@ return [
     },
 
     /**
-     * Enhances the `toBlocks()` method to resolve files and pages
+     * Enhances the `toBlocks()` method to resolve files, pages, and other fields
      *
      * @kql-allowed
      */
     'toResolvedBlocks' => function (Field $field) use ($pagesFieldResolver, $filesFieldResolver, $customFieldResolver) {
-        return $field
-            ->toBlocks()
+        /** @var \Kirby\Cms\Blocks */
+        $blocks = $field->toBlocks();
+        return $blocks
             ->map($pagesFieldResolver)
             ->map($filesFieldResolver)
             ->map($customFieldResolver);
     },
 
     /**
-     * Enhances the `toLayouts()` method to resolve files and pages
+     * Enhances the `toLayouts()` method to resolve files, pages, and other fields
      *
      * @kql-allowed
      */
     'toResolvedLayouts' => function (Field $field) use ($filesFieldResolver, $pagesFieldResolver, $customFieldResolver) {
-        return $field
-            ->toLayouts()
+        /** @var \Kirby\Cms\Layouts */
+        $layouts = $field->toLayouts();
+        return $layouts
             ->map(function (Layout $layout) use ($filesFieldResolver, $pagesFieldResolver, $customFieldResolver) {
-                foreach ($layout->columns() as $column) {
-                    $column
-                        ->blocks()
-                        ->map($filesFieldResolver)
-                        ->map($pagesFieldResolver)
-                        ->map($customFieldResolver);
-                }
+                $columns = $layout
+                    ->columns()
+                    ->map(function (LayoutColumn $column) use ($filesFieldResolver, $pagesFieldResolver, $customFieldResolver) {
+                        $blocks = $column
+                            ->blocks()
+                            ->map($filesFieldResolver)
+                            ->map($pagesFieldResolver)
+                            ->map($customFieldResolver);
 
-                return $layout;
+                        return [
+                            'id' => $column->id(),
+                            'blocks' => $blocks->toArray(),
+                            'width' => $column->width()
+                        ];
+                    });
+
+                return new Layout([
+                    'id' => $layout->id(),
+                    'field' => $layout->field(),
+                    'parent' => $layout->parent(),
+                    'siblings' => $layout->siblings(),
+                    'columns' => $columns->values(),
+                    'attrs' => $layout->attrs()->toArray()
+                ]);
             });
     }
 ];
