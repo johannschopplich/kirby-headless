@@ -1,6 +1,6 @@
 {
   "name": "johannschopplich/kirby-headless",
-  "description": "Kirby, but headless only – with bearer token authentication and Express-esque middlewares",
+  "description": "Kirby, but headless first",
   "type": "kirby-plugin",
   "version": "4.0.0",
   "keywords": [

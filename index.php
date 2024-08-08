@@ -10,7 +10,7 @@ F::loadClasses([
 
 App::plugin('johannschopplich/headless', [
     'hooks' => [
-        // Explicitly register catch-all routes only when Kirby and all plugins
+        // Explicitly register catch-all routes only when Kirby and plugins
         // have been loaded to ensure no other routes are overwritten
         'system.loadPlugins:after' => function () {
             $kirby = App::instance();
