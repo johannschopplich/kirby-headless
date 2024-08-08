@@ -46,18 +46,17 @@ $filesFieldResolver = function (Block $block) {
             continue;
         }
 
-        // Get already resolved images
-        $resolved = $block->content()->get('resolved')->or([])->value();
-
-        if ($kirby->option('blocksResolver.replaceValues', false)) {
+        $resolvedKey = $kirby->option('blocksResolver.resolvedKey');
+        if (!empty($resolvedKey)) {
+            $resolvedData = $block->content()->get($resolvedKey)->or([])->value();
             $block->content()->update([
-                $key => $images->map($defaultResolver)->values()
+                $resolvedKey => array_merge($resolvedData, [
+                    strtolower($key) => $images->map($defaultResolver)->values()
+                ])
             ]);
         } else {
             $block->content()->update([
-                'resolved' => array_merge($resolved, [
-                    strtolower($key) => $images->map($defaultResolver)->values()
-                ])
+                $key => $images->map($defaultResolver)->values()
             ]);
         }
     }
@@ -97,18 +96,17 @@ $pagesFieldResolver = function (Block $block) {
             continue;
         }
 
-        // Get already resolved images
-        $resolved = $block->content()->get('resolved')->or([])->value();
-
-        if ($kirby->option('blocksResolver.replaceValues', false)) {
+        $resolvedKey = $kirby->option('blocksResolver.resolvedKey');
+        if (!empty($resolvedKey)) {
+            $resolvedData = $block->content()->get($resolvedKey)->or([])->value();
             $block->content()->update([
-                $key => $pages->map($defaultResolver)->values()
+                $resolvedKey => array_merge($resolvedData, [
+                    strtolower($key) => $pages->map($defaultResolver)->values()
+                ])
             ]);
         } else {
             $block->content()->update([
-                'resolved' => array_merge($resolved, [
-                    strtolower($key) => $pages->map($defaultResolver)->values()
-                ])
+                $key => $pages->map($defaultResolver)->values()
             ]);
         }
     }
@@ -129,17 +127,18 @@ $customFieldResolver = function (Block $block) {
         }
 
         $field = $block->content()->get($key);
-        $resolved = $block->content()->get('resolved')->or([])->value();
 
-        if ($kirby->option('blocksResolver.replaceValues', false)) {
+        $resolvedKey = $kirby->option('blocksResolver.resolvedKey');
+        if (!empty($resolvedKey)) {
+            $resolvedData = $block->content()->get($resolvedKey)->or([])->value();
             $block->content()->update([
-                $key => $resolver($field, $block)
+                $resolvedKey => array_merge($resolvedData, [
+                    strtolower($key) => $resolver($field, $block)
+                ])
             ]);
         } else {
             $block->content()->update([
-                'resolved' => array_merge($resolved, [
-                    strtolower($key) => $resolver($field, $block)
-                ])
+                $key => $resolver($field, $block)
             ]);
         }
     }
