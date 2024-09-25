@@ -33,7 +33,7 @@ class Middlewares
         $id = dirname($path);
         $filename = basename($path);
 
-        // Try to resolve image urls for pages and drafts
+        // Try to resolve image URLs for pages and drafts
         if ($page = $kirby->site()->findPageOrDraft($id)) {
             return $page->file($filename);
         }
