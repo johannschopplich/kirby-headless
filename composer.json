@@ -1,6 +1,6 @@
 {
   "name": "johannschopplich/kirby-headless",
-  "description": "Kirby, but headless first",
+  "description": "Kirby CMS plugin to enable headless mode",
   "type": "kirby-plugin",
   "version": "4.0.0",
   "keywords": [
@@ -8,7 +8,7 @@
     "headless"
   ],
   "license": "MIT",
-  "homepage": "https://github.com/johannschopplich/kirby-headless#readme",
+  "homepage": "https://kirby.tools/docs/headless",
   "authors": [
     {
       "name": "Johann Schopplich",
