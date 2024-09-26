@@ -53,11 +53,7 @@ class Middlewares
         $cache = $cacheKey = $data = null;
 
         // The `$args` array contains the route parameters
-        if ($kirby->multilang()) {
-            [$languageCode, $path] = $args;
-        } else {
-            [$path] = $args;
-        }
+        $path = $kirby->multilang() ? $args[1] : $args[0];
 
         // Fall back to homepage id
         if (empty($path)) {
