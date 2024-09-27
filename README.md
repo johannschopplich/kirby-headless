@@ -27,7 +27,7 @@ This plugin is designed for developers who want to use Kirby's backend to serve 
 The recommended way to install the plugin is via Composer. To install the plugin, run the following command in your terminal:
 
 ```bash
-composer require johannschopplich/kirby-content-translator
+composer require johannschopplich/kirby-headless
 ```
 
 ### Download
