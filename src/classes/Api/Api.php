@@ -98,7 +98,7 @@ class Api
         return new Response('', null, 204, [
             'Access-Control-Allow-Origin' => $kirby->option('headless.cors.allowOrigin', '*'),
             'Access-Control-Allow-Methods' => $kirby->option('headless.cors.allowMethods', 'GET, POST, OPTIONS'),
-            'Access-Control-Allow-Headers' => $kirby->option('headless.cors.allowHeaders', 'Accept, Content-Type, Authorization, X-Language'),
+            'Access-Control-Allow-Headers' => $kirby->option('headless.cors.allowHeaders', 'Authorization, X-Language, X-Cacheable'),
             'Access-Control-Max-Age' => $kirby->option('headless.cors.maxAge', '86400'),
         ]);
     }
