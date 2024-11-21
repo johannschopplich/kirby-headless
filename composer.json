@@ -2,7 +2,7 @@
   "name": "johannschopplich/kirby-headless",
   "description": "Kirby CMS plugin to enable headless mode",
   "type": "kirby-plugin",
-  "version": "4.0.1",
+  "version": "4.0.2",
   "keywords": [
     "kirby",
     "headless"
