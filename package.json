@@ -2,15 +2,15 @@
   "type": "module",
   "version": "4.0.0",
   "private": true,
-  "packageManager": "pnpm@9.11.0",
+  "packageManager": "pnpm@9.14.2",
   "scripts": {
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "release": "bumpp --all --execute \"npx zx scripts/pre-release.mjs\""
   },
   "devDependencies": {
-    "@antfu/eslint-config": "^3.7.2",
-    "bumpp": "^9.5.2",
-    "zx": "^8.1.8"
+    "@antfu/eslint-config": "^3.9.2",
+    "bumpp": "^9.8.1",
+    "zx": "^8.2.2"
   }
 }
