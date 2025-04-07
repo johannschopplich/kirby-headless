@@ -1,4 +1,4 @@
-![Kirby Headless Preview](./.github/og.png)
+![Kirby Headless Preview](./.github/kirby-headless.png)
 
 # Kirby Headless
 
