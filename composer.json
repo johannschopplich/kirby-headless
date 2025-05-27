@@ -22,11 +22,6 @@
   "require-dev": {
     "getkirby/cms": "5.0.0-rc.2"
   },
-  "autoload": {
-    "psr-4": {
-      "JohannSchopplich\\Headless\\": "src/classes/"
-    }
-  },
   "scripts": {
     "csfix": "@php tools/phpcs/vendor/bin/php-cs-fixer fix",
     "dist": "composer install --no-dev --optimize-autoloader"
