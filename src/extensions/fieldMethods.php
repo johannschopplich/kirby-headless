@@ -11,7 +11,48 @@ use Kirby\Toolkit\A;
 use Kirby\Toolkit\Dom;
 use Kirby\Uuid\Uuid;
 
-$filesFieldResolver = function (Block $block) {
+// Define helper functions in a closure to avoid polluting the global namespace
+$helpers = (function () {
+    /**
+     * Helper function to create a new block with updated content
+     */
+    $createBlockWithContent = function (Block $block, array $newContent): Block {
+        return new Block([
+            'content' => $newContent,
+            'id' => $block->id(),
+            'isHidden' => $block->isHidden(),
+            'type' => $block->type(),
+            'parent' => $block->parent(),
+            'siblings' => $block->siblings()
+        ]);
+    };
+
+    /**
+     * Helper function to update block content with resolved field values
+     */
+    $updateBlockContent = function (Block $block, string $key, mixed $value, string|null $resolvedKey = null): array {
+        $existingContent = $block->content()->data();
+        $newContent = $existingContent;
+
+        if (!empty($resolvedKey)) {
+            $resolvedData = $block->content()->get($resolvedKey)->or([])->value();
+            $newContent[$resolvedKey] = array_merge($resolvedData, [
+                strtolower($key) => $value
+            ]);
+        } else {
+            $newContent[$key] = $value;
+        }
+
+        return $newContent;
+    };
+
+    return compact(
+        'createBlockWithContent',
+        'updateBlockContent'
+    );
+})();
+
+$filesFieldResolver = function (Block $block) use ($helpers) {
     $kirby = $block->kirby();
     $blocks = $kirby->option('blocksResolver.files', ['image' => 'image']);
 
@@ -47,24 +88,23 @@ $filesFieldResolver = function (Block $block) {
         }
 
         $resolvedKey = $kirby->option('blocksResolver.resolvedKey');
-        if (!empty($resolvedKey)) {
-            $resolvedData = $block->content()->get($resolvedKey)->or([])->value();
-            $block->content()->update([
-                $resolvedKey => array_merge($resolvedData, [
-                    strtolower($key) => $images->map($defaultResolver)->values()
-                ])
-            ]);
-        } else {
-            $block->content()->update([
-                $key => $images->map($defaultResolver)->values()
-            ]);
-        }
+
+        // Update content with resolved images and create a new block
+        $newContent = $helpers['updateBlockContent'](
+            $block,
+            $key,
+            $images->map($defaultResolver)->values(),
+            $resolvedKey
+        );
+
+        // Create and return new block with updated content
+        return $helpers['createBlockWithContent']($block, $newContent);
     }
 
     return $block;
 };
 
-$pagesFieldResolver = function (Block $block) {
+$pagesFieldResolver = function (Block $block) use ($helpers) {
     $kirby = $block->kirby();
     $blocks = $kirby->option('blocksResolver.pages', []);
 
@@ -97,25 +137,24 @@ $pagesFieldResolver = function (Block $block) {
         }
 
         $resolvedKey = $kirby->option('blocksResolver.resolvedKey');
-        if (!empty($resolvedKey)) {
-            $resolvedData = $block->content()->get($resolvedKey)->or([])->value();
-            $block->content()->update([
-                $resolvedKey => array_merge($resolvedData, [
-                    strtolower($key) => $pages->map($defaultResolver)->values()
-                ])
-            ]);
-        } else {
-            $block->content()->update([
-                $key => $pages->map($defaultResolver)->values()
-            ]);
-        }
+
+        // Update content with resolved pages and create a new block
+        $newContent = $helpers['updateBlockContent'](
+            $block,
+            $key,
+            $pages->map($defaultResolver)->values(),
+            $resolvedKey
+        );
+
+        // Create and return new block with updated content
+        return $helpers['createBlockWithContent']($block, $newContent);
     }
 
     return $block;
 };
 
 // Support any field type
-$customFieldResolver = function (Block $block) {
+$customFieldResolver = function (Block $block) use ($helpers) {
     $kirby = $block->kirby();
     $resolvers = $kirby->option('blocksResolver.resolvers', []);
 
@@ -129,18 +168,17 @@ $customFieldResolver = function (Block $block) {
         $field = $block->content()->get($key);
 
         $resolvedKey = $kirby->option('blocksResolver.resolvedKey');
-        if (!empty($resolvedKey)) {
-            $resolvedData = $block->content()->get($resolvedKey)->or([])->value();
-            $block->content()->update([
-                $resolvedKey => array_merge($resolvedData, [
-                    strtolower($key) => $resolver($field, $block)
-                ])
-            ]);
-        } else {
-            $block->content()->update([
-                $key => $resolver($field, $block)
-            ]);
-        }
+
+        // Update content with resolved field value and create a new block
+        $newContent = $helpers['updateBlockContent'](
+            $block,
+            $key,
+            $resolver($field, $block),
+            $resolvedKey
+        );
+
+        // Create and return new block with updated content
+        return $helpers['createBlockWithContent']($block, $newContent);
     }
 
     return $block;

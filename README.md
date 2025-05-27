@@ -17,6 +17,10 @@ This plugin is designed for developers who want to use Kirby's backend to serve 
 - 🍢 Express-esque [API builder](https://kirby.tools/docs/headless/api-builder) with middleware support
 - 🗂 Return [JSON from templates](https://kirby.tools/docs/headless/usage#json-templates) instead of HTML
 
+# Compatibility
+
+The current version of Kirby Headless is compatible with Kirby 5 and later. If you are using an older version of Kirby, please use the [v4 release](https://github.com/johannschopplich/kirby-headless/releases).
+
 ## Installation
 
 > [!TIP]
