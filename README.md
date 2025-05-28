@@ -19,7 +19,7 @@ This plugin is designed for developers who want to use Kirby's backend to serve 
 
 # Compatibility
 
-The current version of Kirby Headless is compatible with Kirby 5 and later. If you are using an older version of Kirby, please use the [v4 release](https://github.com/johannschopplich/kirby-headless/releases).
+The current version of Kirby Headless is compatible with Kirby 4 and 5.
 
 ## Installation
 
