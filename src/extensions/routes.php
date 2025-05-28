@@ -21,9 +21,9 @@ return [
         'pattern' => '(:all)',
         'language' => '*',
         'action' => Api::createHandler(
-            [Middlewares::class, 'tryResolveFiles'],
-            [Middlewares::class, 'hasBearerToken'],
-            [Middlewares::class, 'tryResolvePage']
+            Middlewares::tryResolveFiles(...),
+            Middlewares::hasBearerToken(...),
+            Middlewares::tryResolvePage(...)
         )
     ]
 ];

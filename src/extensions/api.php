@@ -1,27 +1,15 @@
 <?php
 
 use JohannSchopplich\Headless\Api\Api;
+use JohannSchopplich\Headless\Api\Middlewares;
 use Kirby\Cms\App;
 use Kirby\Data\Json;
 use Kirby\Exception\NotFoundException;
 use Kirby\Http\Url;
 use Kirby\Toolkit\Str;
 
-$validateOptionalBearerToken = function (array $context, array $args) {
-    $kirby = App::instance();
-    $token = $kirby->option('headless.token');
-    $authorization = $kirby->request()->header('Authorization');
-
-    if (
-        !empty($token) &&
-        (empty($authorization) || $authorization !== 'Bearer ' . $token)
-    ) {
-        return Api::createResponse(401);
-    }
-};
-
 return [
-    'routes' => function (App $kirby) use ($validateOptionalBearerToken) {
+    'routes' => function (App $kirby) {
         $kqlAuthMethod = $kirby->option('kql.auth', true);
 
         return [
@@ -44,17 +32,12 @@ return [
                 'auth' => !in_array($kqlAuthMethod, [false, 'bearer'], true),
                 'action' => Api::createHandler(
                     // Middleware to validate the bearer token
-                    function (array $context, array $args) use ($kirby, $kqlAuthMethod) {
+                    function (array $context, array $args) use ($kqlAuthMethod) {
                         if ($kqlAuthMethod !== 'bearer') {
                             return;
                         }
 
-                        $token = $kirby->option('headless.token');
-                        $authorization = $kirby->request()->header('Authorization');
-
-                        if ($authorization !== 'Bearer ' . $token) {
-                            return Api::createResponse(401);
-                        }
+                        return Middlewares::validateBearerToken();
                     },
                     // Middleware to run queries and cache their results
                     function (array $context, array $args) use ($kirby) {
@@ -96,7 +79,7 @@ return [
                 'method' => 'GET',
                 'auth' => false,
                 'action' => Api::createHandler(
-                    $validateOptionalBearerToken,
+                    Middlewares::hasBearerTokenWithoutRedirect(...),
                     function (array $context, array $args) use ($kirby) {
                         $data = $kirby->cache('pages')->getOrSet(
                             'sitemap.headless.json',
@@ -173,7 +156,7 @@ return [
                 'method' => 'GET|POST',
                 'auth' => false,
                 'action' => Api::createHandler(
-                    $validateOptionalBearerToken,
+                    Middlewares::hasBearerTokenWithoutRedirect(...),
                     function (array $context, array $args) use ($kirby) {
                         $templateName = $args[0] ?? null;
 

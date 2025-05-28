@@ -95,15 +95,31 @@ class Middlewares
     }
 
     /**
-     * Validates the bearer token sent with the request
+     * Validates the bearer token sent with the request (without Panel redirect)
+     */
+    public static function hasBearerTokenWithoutRedirect()
+    {
+        return fn (array $context, array $args) => static::validateBearerToken(false);
+    }
+
+    /**
+     * Validates the bearer token sent with the request (with Panel redirect)
      */
     public static function hasBearerToken()
+    {
+        return fn (array $context, array $args) => static::validateBearerToken(true);
+    }
+
+    /**
+     * Validates the bearer token sent with the request
+     */
+    public static function validateBearerToken(bool $panelRedirect = false)
     {
         $kirby = App::instance();
         $token = $kirby->option('headless.token');
         $authorization = $kirby->request()->header('Authorization');
 
-        if ($kirby->option('headless.panel.redirect', false) && empty($authorization)) {
+        if ($panelRedirect && $kirby->option('headless.panel.redirect', false) && empty($authorization)) {
             go(Panel::url('site'));
         }
 
