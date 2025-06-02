@@ -22,26 +22,22 @@ final readonly class BlockHelper
     }
 
     /**
-     * Updates block content with resolved field values
+     * Merges resolved field values into content array
      */
-    public static function updateBlockContent(
+    public static function mergeResolvedValue(
+        array &$content,
         Block $block,
         string $key,
         mixed $value,
         string|null $resolvedKey = null
-    ): array {
-        $currentContent = $block->content()->data();
-        $newContent = $currentContent;
-
+    ): void {
         if (!empty($resolvedKey)) {
             $resolvedData = $block->content()->get($resolvedKey)->or([])->value();
-            $newContent[$resolvedKey] = array_merge($resolvedData, [
+            $content[$resolvedKey] = array_merge($resolvedData, [
                 strtolower($key) => $value
             ]);
         } else {
-            $newContent[$key] = $value;
+            $content[$key] = $value;
         }
-
-        return $newContent;
     }
 }

@@ -13,6 +13,8 @@ final readonly class CustomFieldResolver
     {
         $kirby = $block->kirby();
         $resolvers = $kirby->option('blocksResolver.resolvers', []);
+        $currentContent = $block->content()->data();
+        $hasChanges = false;
 
         foreach ($resolvers as $identifier => $resolver) {
             [$blockType, $key] = explode(':', $identifier);
@@ -23,18 +25,16 @@ final readonly class CustomFieldResolver
 
             $field = $block->content()->get($key);
             $resolvedKey = $kirby->option('blocksResolver.resolvedKey');
+            $resolvedValue = $resolver($field, $block);
 
-            // Update content with resolved field value and create a new block
-            $newContent = BlockHelper::updateBlockContent(
-                $block,
-                $key,
-                $resolver($field, $block),
-                $resolvedKey
-            );
-
-            return BlockHelper::createBlockWithContent($block, $newContent);
+            // Merge resolved value into content
+            BlockHelper::mergeResolvedValue($currentContent, $block, $key, $resolvedValue, $resolvedKey);
+            $hasChanges = true;
         }
 
-        return $block;
+        // Only create a new block if there were changes
+        return $hasChanges
+            ? BlockHelper::createBlockWithContent($block, $currentContent)
+            : $block;
     }
 }

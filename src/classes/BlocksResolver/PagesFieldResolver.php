@@ -29,6 +29,9 @@ final readonly class PagesFieldResolver
 
         $fieldKeys = $blocks[$block->type()];
         $fieldKeys = is_array($fieldKeys) ? $fieldKeys : [$fieldKeys];
+        $currentContent = $block->content()->data();
+        $hasChanges = false;
+        $resolvedKey = $kirby->option('blocksResolver.resolvedKey');
 
         foreach ($fieldKeys as $key) {
             /** @var \Kirby\Cms\Pages */
@@ -43,19 +46,16 @@ final readonly class PagesFieldResolver
                 continue;
             }
 
-            $resolvedKey = $kirby->option('blocksResolver.resolvedKey');
+            $resolvedValue = $pages->map($defaultResolver)->values();
 
-            // Update content with resolved pages and create a new block
-            $newContent = BlockHelper::updateBlockContent(
-                $block,
-                $key,
-                $pages->map($defaultResolver)->values(),
-                $resolvedKey
-            );
-
-            return BlockHelper::createBlockWithContent($block, $newContent);
+            // Merge resolved value into content
+            BlockHelper::mergeResolvedValue($currentContent, $block, $key, $resolvedValue, $resolvedKey);
+            $hasChanges = true;
         }
 
-        return $block;
+        // Only create a new block if there were changes
+        return $hasChanges
+            ? BlockHelper::createBlockWithContent($block, $currentContent)
+            : $block;
     }
 }

@@ -32,6 +32,9 @@ final readonly class FilesFieldResolver
 
         $fieldKeys = $blocks[$block->type()];
         $fieldKeys = is_array($fieldKeys) ? $fieldKeys : [$fieldKeys];
+        $currentContent = $block->content()->data();
+        $hasChanges = false;
+        $resolvedKey = $kirby->option('blocksResolver.resolvedKey');
 
         foreach ($fieldKeys as $key) {
             /** @var \Kirby\Cms\Files */
@@ -46,19 +49,16 @@ final readonly class FilesFieldResolver
                 continue;
             }
 
-            $resolvedKey = $kirby->option('blocksResolver.resolvedKey');
+            $resolvedValue = $images->map($defaultResolver)->values();
 
-            // Update content with resolved images and create a new block
-            $newContent = BlockHelper::updateBlockContent(
-                $block,
-                $key,
-                $images->map($defaultResolver)->values(),
-                $resolvedKey
-            );
-
-            return BlockHelper::createBlockWithContent($block, $newContent);
+            // Merge resolved value into content
+            BlockHelper::mergeResolvedValue($currentContent, $block, $key, $resolvedValue, $resolvedKey);
+            $hasChanges = true;
         }
 
-        return $block;
+        // Only create a new block if there were changes
+        return $hasChanges
+            ? BlockHelper::createBlockWithContent($block, $currentContent)
+            : $block;
     }
 }
