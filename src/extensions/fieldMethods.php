@@ -13,11 +13,14 @@ use Kirby\Uuid\Uuid;
 
 return [
     /**
-     * Resolves page and file permalinks in anchor tags
+     * Resolves UUID-based permalinks to actual URLs in anchor and image tags
+     *
+     * Converts `page://xxx` and `file://xxx` permalinks to their respective URLs
+     * Supports custom URL parser via `permalinksResolver.urlParser` option
      *
      * @kql-allowed
      */
-    'resolvePermalinks' => function (Field $field) {
+    'resolvePermalinks' => function (Field $field): Field {
         $kirby = $field->parent()->kirby();
         $urlParser = $kirby->option('permalinksResolver.urlParser');
 
@@ -50,11 +53,13 @@ return [
     },
 
     /**
-     * Enhances the `toBlocks()` method to resolve files, pages, and other fields
+     * Converts field to blocks and resolves all nested content
+     *
+     * Resolves page references, file references, and custom fields within blocks
      *
      * @kql-allowed
      */
-    'toResolvedBlocks' => function (Field $field) {
+    'toResolvedBlocks' => function (Field $field): mixed {
         /** @var \Kirby\Cms\Blocks */
         $blocks = $field->toBlocks();
 
@@ -69,11 +74,13 @@ return [
     },
 
     /**
-     * Enhances the `toLayouts()` method to resolve files, pages, and other fields
+     * Converts field to layouts and resolves all nested content
+     *
+     * Resolves page references, file references, and custom fields within layout blocks
      *
      * @kql-allowed
      */
-    'toResolvedLayouts' => function (Field $field) {
+    'toResolvedLayouts' => function (Field $field): mixed {
         /** @var \Kirby\Cms\Layouts */
         $layouts = $field->toLayouts();
 

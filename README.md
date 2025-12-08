@@ -13,7 +13,6 @@ This plugin is designed for developers who want to use Kirby's backend to serve 
 - 🧱 Resolve fields in blocks: [UUIDs to file and page objects](https://kirby.tools/docs/headless/usage/field-methods) or [any other field](https://kirby.tools/docs/headless/usage/field-methods)
 - ⚡️ Cached KQL queries
 - 🌐 Multi-language support for KQL queries
-- 😵 Built-in CORS handling
 - 🍢 Express-esque [API builder](https://kirby.tools/docs/headless/advanced/api-builder) with middleware support
 - 🗂 Return [JSON from templates](https://kirby.tools/docs/headless/usage/json-templates) instead of HTML
 

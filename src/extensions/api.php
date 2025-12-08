@@ -4,6 +4,7 @@ use JohannSchopplich\Headless\Api\Api;
 use JohannSchopplich\Headless\Api\Middlewares;
 use Kirby\Cms\App;
 use Kirby\Data\Json;
+use Kirby\Exception\Exception;
 use Kirby\Exception\NotFoundException;
 use Kirby\Http\Url;
 use Kirby\Toolkit\Str;
@@ -14,33 +15,31 @@ return [
 
         return [
             /**
-             * Allow preflight requests, mainly for `fetch` requests
-             */
-            [
-                'pattern' => '(:all)',
-                'method' => 'OPTIONS',
-                'auth' => false,
-                'action' => fn () => Api::createPreflightResponse()
-            ],
-
-            /**
-             * KQL with bearer token authentication and caching
+             * KQL endpoint with bearer token authentication and caching support
+             *
+             * Supports multilingual queries via X-Language header
+             * and cache control via X-Cacheable header
              */
             [
                 'pattern' => 'kql',
                 'method' => 'GET|POST',
                 'auth' => !in_array($kqlAuthMethod, [false, 'bearer'], true),
                 'action' => Api::createHandler(
-                    // Middleware to validate the bearer token
-                    function (array $context, array $args) use ($kqlAuthMethod) {
+                    // Validate the bearer token if required
+                    function (array $context, array $args) use ($kqlAuthMethod): mixed {
                         if ($kqlAuthMethod !== 'bearer') {
-                            return;
+                            return null;
                         }
 
                         return Middlewares::validateBearerToken();
                     },
-                    // Middleware to run queries and cache their results
-                    function (array $context, array $args) use ($kirby) {
+                    // Run KQL queries and cache their results
+                    function (array $context, array $args) use ($kirby): mixed {
+                        // Check if KQL is installed
+                        if (!class_exists('Kirby\\Kql\\Kql')) {
+                            throw new Exception('KQL is not installed. Please run: composer require getkirby/kql');
+                        }
+
                         $input = $kirby->request()->get();
                         $cache = $cacheKey = $data = null;
                         $languageCode = $kirby->request()->header('X-Language');
@@ -72,7 +71,10 @@ return [
             ],
 
             /**
-             * Generate a sitemap for headless usage
+             * Sitemap endpoint for headless frontend usage
+             *
+             * Generates a JSON sitemap with support for multilingual sites
+             * and configurable page exclusions
              */
             [
                 'pattern' => '__sitemap__',
@@ -80,7 +82,7 @@ return [
                 'auth' => false,
                 'action' => Api::createHandler(
                     Middlewares::hasBearerTokenWithoutRedirect(...),
-                    function (array $context, array $args) use ($kirby) {
+                    function (array $context, array $args) use ($kirby): mixed {
                         $data = $kirby->cache('pages')->getOrSet(
                             'sitemap.headless.json',
                             function () use ($kirby) {
@@ -149,7 +151,9 @@ return [
             ],
 
             /**
-             * Render a page template as JSON
+             * Template rendering endpoint for standalone template usage
+             *
+             * Renders any Kirby template as JSON without page context
              */
             [
                 'pattern' => '__template__/(:any)',
@@ -157,7 +161,7 @@ return [
                 'auth' => false,
                 'action' => Api::createHandler(
                     Middlewares::hasBearerTokenWithoutRedirect(...),
-                    function (array $context, array $args) use ($kirby) {
+                    function (array $context, array $args) use ($kirby): mixed {
                         $templateName = $args[0] ?? null;
 
                         if (empty($templateName)) {

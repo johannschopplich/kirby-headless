@@ -3,6 +3,7 @@
 namespace JohannSchopplich\Headless\Api;
 
 use Kirby\Cms\App;
+use Kirby\Cms\File;
 use Kirby\Exception\NotFoundException;
 use Kirby\Filesystem\F;
 use Kirby\Http\Response;
@@ -12,22 +13,24 @@ use Kirby\Toolkit\Str;
 class Middlewares
 {
     /**
-     * Try to resolve page and site files
+     * Attempts to resolve page and site files from the request path
+     *
+     * @return \Kirby\Cms\File|null
      */
-    public static function tryResolveFiles(array $context, array $args)
+    public static function tryResolveFiles(array $context, array $args): File|null
     {
         // The `$args` array contains the route parameters
         [$path] = $args;
         $kirby = App::instance();
 
         if (empty($path)) {
-            return;
+            return null;
         }
 
         $extension = F::extension($path);
 
         if (empty($extension)) {
-            return;
+            return null;
         }
 
         $id = dirname($path);
@@ -42,12 +45,18 @@ class Middlewares
         if ($file = $kirby->site()->file($filename)) {
             return $file;
         }
+
+        return null;
     }
 
     /**
-     * Try to resolve the page ID
+     * Attempts to resolve and return the page data as JSON
+     *
+     * Falls back to homepage if path is empty, or error page if not found
+     *
+     * @throws \Kirby\Exception\NotFoundException If the page template does not exist
      */
-    public static function tryResolvePage(array $context, array $args)
+    public static function tryResolvePage(array $context, array $args): Response
     {
         $kirby = App::instance();
         $cache = $cacheKey = $data = null;
@@ -95,25 +104,27 @@ class Middlewares
     }
 
     /**
-     * Validates the bearer token sent with the request (without Panel redirect)
+     * Returns a middleware that validates the bearer token without Panel redirect
      */
-    public static function hasBearerTokenWithoutRedirect()
+    public static function hasBearerTokenWithoutRedirect(): callable
     {
         return fn (array $context, array $args) => static::validateBearerToken(false);
     }
 
     /**
-     * Validates the bearer token sent with the request (with Panel redirect)
+     * Returns a middleware that validates the bearer token with Panel redirect
      */
-    public static function hasBearerToken()
+    public static function hasBearerToken(): callable
     {
         return fn (array $context, array $args) => static::validateBearerToken(true);
     }
 
     /**
-     * Validates the bearer token sent with the request
+     * Validates the bearer token from the Authorization header
+     *
+     * @return Response|null Returns 401 response if validation fails, null otherwise
      */
-    public static function validateBearerToken(bool $panelRedirect = false)
+    public static function validateBearerToken(bool $panelRedirect = false): Response|null
     {
         $kirby = App::instance();
         $token = $kirby->option('headless.token');
@@ -129,12 +140,14 @@ class Middlewares
         ) {
             return Api::createResponse(401);
         }
+
+        return null;
     }
 
     /**
-     * Checks if a body was sent with the request
+     * Validates that a request body exists
      */
-    public static function hasBody(array $context)
+    public static function hasBody(array $context): Response|array
     {
         $request = App::instance()->request();
 

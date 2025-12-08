@@ -5,17 +5,10 @@ use JohannSchopplich\Headless\Api\Middlewares;
 
 return [
     /**
-     * Allow preflight requests, mainly for `fetch` requests
-     */
-    [
-        'pattern' => '(:all)',
-        'method' => 'OPTIONS',
-        'language' => '*',
-        'action' => fn () => Api::createPreflightResponse()
-    ],
-
-    /**
-     * Return JSON-encoded page data for every route
+     * Global catch-all route for headless JSON responses
+     *
+     * Attempts to resolve files first, validates bearer token,
+     * then returns page data as JSON
      */
     [
         'pattern' => '(:all)',

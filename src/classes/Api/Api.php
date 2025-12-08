@@ -11,9 +11,9 @@ use Kirby\Toolkit\A;
 class Api
 {
     /**
-     * Create an API handler
+     * Creates an API handler that processes middleware functions sequentially
      */
-    public static function createHandler(callable ...$fns)
+    public static function createHandler(callable ...$fns): callable
     {
         $context = [
             'kirby' => App::instance()
@@ -35,33 +35,32 @@ class Api
     }
 
     /**
-     * Create an API response
+     * Creates a consistent JSON API response
      *
-     * @remarks
-     * Enforces consistent JSON responses by wrapping Kirby's `Response` class
+     * Wraps data in a standardized format with code and status
      */
-    public static function createResponse(int $code, $data = null): Response
+    public static function createResponse(int $code, mixed $data = null, array $headers = []): Response
     {
-        $kirby = App::instance();
-
         $body = [
             'code' => $code,
-            'status' => static::getStatusMessage($code)
+            'status' => self::getStatusMessage($code)
         ];
 
         if ($data !== null) {
             $body['result'] = $data;
         }
 
-        return Response::json($body, $code, null, [
-            'Access-Control-Allow-Origin' => $kirby->option('headless.cors.allowOrigin', '*')
-        ]);
+        return Response::json(
+            body: $body,
+            code: $code,
+            headers: $headers
+        );
     }
 
     /**
-     * Get the status message for the given code
+     * Returns the status message for a given HTTP status code
      *
-     * @throws \Kirby\Exception\Exception
+     * @throws \Kirby\Exception\Exception If the status code is not supported
      */
     private static function getStatusMessage(int $code): string
     {
@@ -84,22 +83,5 @@ class Api
         }
 
         return $messages[$code];
-    }
-
-    /**
-     * Respond to CORS preflight requests
-     */
-    public static function createPreflightResponse(): Response
-    {
-        $kirby = App::instance();
-
-        // 204 responses **must not** have a `Content-Length` header
-        // See: https://www.rfc-editor.org/rfc/rfc7230#section-3.3.2
-        return new Response('', null, 204, [
-            'Access-Control-Allow-Origin' => $kirby->option('headless.cors.allowOrigin', '*'),
-            'Access-Control-Allow-Methods' => $kirby->option('headless.cors.allowMethods', 'GET, POST, OPTIONS'),
-            'Access-Control-Allow-Headers' => $kirby->option('headless.cors.allowHeaders', 'Accept, Content-Type, Authorization, X-Language, X-Cacheable'),
-            'Access-Control-Max-Age' => $kirby->option('headless.cors.maxAge', '86400'),
-        ]);
     }
 }
