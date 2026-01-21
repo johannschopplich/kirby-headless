@@ -81,7 +81,7 @@ return [
                 'method' => 'GET',
                 'auth' => false,
                 'action' => Api::createHandler(
-                    Middlewares::hasBearerTokenWithoutRedirect(...),
+                    Middlewares::hasBearerToken(),
                     function (array $context, array $args) use ($kirby): mixed {
                         $data = $kirby->cache('pages')->getOrSet(
                             'sitemap.headless.json',
@@ -160,7 +160,7 @@ return [
                 'method' => 'GET|POST',
                 'auth' => false,
                 'action' => Api::createHandler(
-                    Middlewares::hasBearerTokenWithoutRedirect(...),
+                    Middlewares::hasBearerToken(),
                     function (array $context, array $args) use ($kirby): mixed {
                         $templateName = $args[0] ?? null;
 

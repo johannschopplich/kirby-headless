@@ -15,7 +15,7 @@ return [
         'language' => '*',
         'action' => Api::createHandler(
             Middlewares::tryResolveFiles(...),
-            Middlewares::hasBearerToken(...),
+            Middlewares::hasBearerToken(true),
             Middlewares::tryResolvePage(...)
         )
     ]

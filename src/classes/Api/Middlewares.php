@@ -14,8 +14,6 @@ class Middlewares
 {
     /**
      * Attempts to resolve page and site files from the request path
-     *
-     * @return \Kirby\Cms\File|null
      */
     public static function tryResolveFiles(array $context, array $args): File|null
     {
@@ -104,34 +102,28 @@ class Middlewares
     }
 
     /**
-     * Returns a middleware that validates the bearer token without Panel redirect
+     * Returns a middleware that validates the bearer token
+     *
+     * @param bool $redirectToPanel Whether to redirect to Panel when no auth header is present
      */
-    public static function hasBearerTokenWithoutRedirect(): callable
+    public static function hasBearerToken(bool $redirectToPanel = false): callable
     {
-        return fn (array $context, array $args) => static::validateBearerToken(false);
-    }
-
-    /**
-     * Returns a middleware that validates the bearer token with Panel redirect
-     */
-    public static function hasBearerToken(): callable
-    {
-        return fn (array $context, array $args) => static::validateBearerToken(true);
+        return fn (array $context, array $args) => static::validateBearerToken($redirectToPanel);
     }
 
     /**
      * Validates the bearer token from the Authorization header
      *
-     * @return Response|null Returns 401 response if validation fails, null otherwise
+     * @param bool $redirectToPanel Whether to redirect to Panel when no auth header is present
      */
-    public static function validateBearerToken(bool $panelRedirect = false): Response|null
+    public static function validateBearerToken(bool $redirectToPanel = false): Response|null
     {
         $kirby = App::instance();
         $token = $kirby->option('headless.token');
         $authorization = $kirby->request()->header('Authorization');
 
-        if ($panelRedirect && $kirby->option('headless.panel.redirect', false) && empty($authorization)) {
-            go(Panel::url('site'));
+        if ($redirectToPanel && $kirby->option('headless.panel.redirect', false) && empty($authorization)) {
+            return Response::redirect(Panel::url('site'), 302);
         }
 
         if (
