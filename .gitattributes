@@ -3,27 +3,39 @@
 .gitattributes export-ignore
 .gitignore export-ignore
 
-# Source files
+# Build tooling
 scripts/ export-ignore
 src/assets/ export-ignore
 src/panel/ export-ignore
+eslint.config.mjs export-ignore
 kirbyup.config.js export-ignore
 postcss.config.cjs export-ignore
 prettier.config.mjs export-ignore
 tailwind.config.cjs export-ignore
+tsconfig.json export-ignore
+vitest.config.mjs export-ignore
+vitest.config.ts export-ignore
 
-# Development files
-.vscode/ export-ignore
-tools/ export-ignore
-.editorconfig export-ignore
-composer.lock export-ignore
-eslint.config.mjs export-ignore
+# Node.js
 index.dev.mjs export-ignore
 package.json export-ignore
 pnpm-lock.yaml export-ignore
 pnpm-workspace.yaml export-ignore
 
-# Tests
+# Development
+.claude/ export-ignore
+.editorconfig export-ignore
+.env.example export-ignore
+.vscode/ export-ignore
+AGENTS.md export-ignore
+composer.lock export-ignore
+mprocs.yaml export-ignore
+playground/ export-ignore
+readme/ export-ignore
+templates/ export-ignore
+tools/ export-ignore
+
+# Quality assurance
 .codecov.yml export-ignore
 .composer-require-checker.json export-ignore
 .php-cs-fixer.dist.php export-ignore
