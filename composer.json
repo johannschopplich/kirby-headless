@@ -1,6 +1,6 @@
 {
   "name": "johannschopplich/kirby-headless",
-  "description": "Kirby CMS plugin to enable headless mode",
+  "description": "API-first toolkit for Kirby CMS",
   "type": "kirby-plugin",
   "version": "6.0.1",
   "keywords": [
