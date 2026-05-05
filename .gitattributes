@@ -8,11 +8,11 @@ scripts/ export-ignore
 src/assets/ export-ignore
 src/panel/ export-ignore
 eslint.config.mjs export-ignore
+eslint.config.ts export-ignore
 kirbyup.config.js export-ignore
-postcss.config.cjs export-ignore
-prettier.config.mjs export-ignore
-tailwind.config.cjs export-ignore
 tsconfig.json export-ignore
+uno.config.mjs export-ignore
+uno.config.ts export-ignore
 vitest.config.mjs export-ignore
 vitest.config.ts export-ignore
 
