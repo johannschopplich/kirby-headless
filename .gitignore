@@ -8,9 +8,6 @@
 /node_modules
 /vendor
 
-# Build files
-/index.dev.mjs
-
 # Cache and temporary files
 /.cache
 /.php-cs-fixer.cache
