@@ -10,16 +10,18 @@ use Kirby\Http\Response;
 use Kirby\Panel\Panel;
 use Kirby\Toolkit\Str;
 
-class Middlewares
+final readonly class Middlewares
 {
     /**
      * Attempts to resolve page and site files from the request path
      */
     public static function tryResolveFiles(array $context, array $args): File|null
     {
-        // The `$args` array contains the route parameters
-        [$path] = $args;
         $kirby = App::instance();
+
+        // In multilang mode the language object is the first route argument,
+        // so the captured path is the second
+        $path = $kirby->multilang() ? ($args[1] ?? null) : ($args[0] ?? null);
 
         if (empty($path)) {
             return null;
@@ -67,11 +69,12 @@ class Middlewares
             $page = $kirby->site()->homePage();
         } else {
             $path = Str::rtrim($path, '.json');
-            $page = $kirby->site()->find($path);
+            $page = $kirby->site()->find($path) ?? $kirby->site()->errorPage();
+        }
 
-            if (!$page) {
-                $page = $kirby->site()->errorPage();
-            }
+        // A site without a resolvable home or error page yields a JSON 404
+        if (!$page) {
+            return Api::createResponse(404);
         }
 
         // Try to get the page from cache
@@ -91,14 +94,28 @@ class Middlewares
                 ]);
             }
 
-            $kirby->data = $page->controller();
-            $data = $template->render($kirby->data);
+            // Mirror Kirby's own Page::render() so the page.render:before
+            // and page.render:after hooks keep firing for headless responses
+            $kirby->data = $kirby->apply('page.render:before', [
+                'contentType' => 'html',
+                'data' => $page->controller(),
+                'page' => $page
+            ], 'data');
+
+            $html = $template->render($kirby->data);
+
+            $data = $kirby->apply('page.render:after', [
+                'contentType' => 'html',
+                'data' => $kirby->data,
+                'html' => $html,
+                'page' => $page
+            ], 'html');
 
             // Cache the result
             $cache?->set($cacheKey, $data);
         }
 
-        return Response::json($data);
+        return Response::json($data, $page->isErrorPage() ? 404 : 200);
     }
 
     /**
