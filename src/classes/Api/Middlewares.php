@@ -94,8 +94,8 @@ final readonly class Middlewares
                 ]);
             }
 
-            // Mirror Kirby's own Page::render() so the page.render:before
-            // and page.render:after hooks keep firing for headless responses
+            // Mirror Kirby's own   Page::render() so the `page.render:before`
+            // and `page.render:after` hooks keep firing for headless responses
             $kirby->data = $kirby->apply('page.render:before', [
                 'contentType' => 'html',
                 'data' => $page->controller(),
