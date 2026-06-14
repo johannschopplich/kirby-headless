@@ -62,7 +62,11 @@ return [
 
                         if ($data === null) {
                             $data = \Kirby\Kql\Kql::run($input);
-                            $cache?->set($cacheKey, $data);
+
+                            // Only populate the cache for cacheable requests
+                            if ($isCacheable) {
+                                $cache?->set($cacheKey, $data);
+                            }
                         }
 
                         return Api::createResponse(200, $data);
@@ -103,7 +107,7 @@ return [
                                         continue;
                                     }
 
-                                    if (preg_match('!^(?:' . implode('|', $excludePages) . ')$!i', $item->id())) {
+                                    if ($excludePages !== [] && preg_match('!^(?:' . implode('|', $excludePages) . ')$!i', $item->id())) {
                                         continue;
                                     }
 
@@ -116,16 +120,19 @@ return [
                                         continue;
                                     }
 
-                                    $url = [
-                                        'url' => $withoutBase($item->url()),
-                                        'modified' => $item->modified('Y-m-d', 'date')
-                                    ];
+                                    $url = ['url' => $withoutBase($item->url())];
+
+                                    // Omit the field rather than emit null when a
+                                    // page has no resolvable modification date
+                                    if ($modified = $item->modified('Y-m-d', 'date')) {
+                                        $url['modified'] = $modified;
+                                    }
 
                                     if ($kirby->multilang()) {
                                         $url['links'] = $kirby->languages()->map(fn ($lang) => [
                                             // Support ISO 3166-1 Alpha 2 and ISO 639-1
                                             'lang' => Str::slug(preg_replace(
-                                                '/\.utf-?8$/i',
+                                                '/[.@].*$/',
                                                 '',
                                                 $lang->locale(LC_ALL) ?? $lang->code()
                                             )),
@@ -145,7 +152,7 @@ return [
                             }
                         );
 
-                        return Api::createResponse(201, $data);
+                        return Api::createResponse(200, $data);
                     }
                 )
             ],
@@ -189,7 +196,7 @@ return [
                         );
 
                         return Api::createResponse(
-                            201,
+                            200,
                             Json::decode($data)
                         );
                     }
