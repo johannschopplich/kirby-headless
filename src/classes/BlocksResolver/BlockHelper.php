@@ -32,7 +32,15 @@ final readonly class BlockHelper
         string|null $resolvedKey = null
     ): void {
         if (!empty($resolvedKey)) {
-            $resolvedData = $block->content()->get($resolvedKey)->or([])->value();
+            // Accumulate into the in-progress content so multiple fields
+            // resolved into the same key are merged instead of overwritten
+            $resolvedData = $content[$resolvedKey]
+                ?? $block->content()->get($resolvedKey)->or([])->value();
+
+            if (!is_array($resolvedData)) {
+                $resolvedData = [];
+            }
+
             $content[$resolvedKey] = array_merge($resolvedData, [
                 strtolower($key) => $value
             ]);
