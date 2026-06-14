@@ -8,7 +8,7 @@ use Kirby\Exception\Exception;
 use Kirby\Http\Response;
 use Kirby\Toolkit\A;
 
-class Api
+final readonly class Api
 {
     /**
      * Creates an API handler that processes middleware functions sequentially

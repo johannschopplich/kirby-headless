@@ -3,8 +3,10 @@
 use JohannSchopplich\Headless\BlocksResolver\CustomFieldResolver;
 use JohannSchopplich\Headless\BlocksResolver\FilesFieldResolver;
 use JohannSchopplich\Headless\BlocksResolver\PagesFieldResolver;
+use Kirby\Cms\Blocks;
 use Kirby\Cms\Layout;
 use Kirby\Cms\LayoutColumn;
+use Kirby\Cms\Layouts;
 use Kirby\Content\Field;
 use Kirby\Exception\InvalidArgumentException;
 use Kirby\Toolkit\A;
@@ -59,7 +61,7 @@ return [
      *
      * @kql-allowed
      */
-    'toResolvedBlocks' => function (Field $field): mixed {
+    'toResolvedBlocks' => function (Field $field): Blocks {
         /** @var \Kirby\Cms\Blocks */
         $blocks = $field->toBlocks();
 
@@ -80,7 +82,7 @@ return [
      *
      * @kql-allowed
      */
-    'toResolvedLayouts' => function (Field $field): mixed {
+    'toResolvedLayouts' => function (Field $field): Layouts {
         /** @var \Kirby\Cms\Layouts */
         $layouts = $field->toLayouts();
 
