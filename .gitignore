@@ -14,5 +14,6 @@
 /.phpunit.*
 /index.dev.mjs
 /tests/coverage
+/tests/site
 /tests/*/tmp
 /tools/**/vendor
