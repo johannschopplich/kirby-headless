@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace JohannSchopplich\Headless\Api;
 
 use Kirby\Cms\App;
@@ -125,7 +127,7 @@ final readonly class Middlewares
      */
     public static function hasBearerToken(bool $redirectToPanel = false): callable
     {
-        return fn (array $context, array $args) => static::validateBearerToken($redirectToPanel);
+        return fn (array $context, array $args) => self::validateBearerToken($redirectToPanel);
     }
 
     /**

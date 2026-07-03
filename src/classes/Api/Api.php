@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace JohannSchopplich\Headless\Api;
 
 use Kirby\Cms\App;

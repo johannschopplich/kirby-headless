@@ -62,6 +62,7 @@ return (new PhpCsFixer\Config())
 		'phpdoc_scalar' => true,
 		'phpdoc_trim' => true,
 		'php_unit_fqcn_annotation' => true,
+		'self_static_accessor' => true,
 		'single_line_comment_style' => true,
 		'single_quote' => true,
 		'statement_indentation' => ['stick_comment_to_next_continuous_control_statement' => true],
