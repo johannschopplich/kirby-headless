@@ -127,7 +127,9 @@ final readonly class Middlewares
      */
     public static function hasBearerToken(bool $redirectToPanel = false): callable
     {
-        return fn (array $context, array $args) => self::validateBearerToken($redirectToPanel);
+        // Closure is handed to Kirby's dispatch, so `self::` would break if it
+        // were ever rebound/inlined as a route or API action
+        return fn (array $context, array $args) => Middlewares::validateBearerToken($redirectToPanel);
     }
 
     /**
