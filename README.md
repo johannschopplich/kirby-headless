@@ -57,7 +57,7 @@ $page->layout()->toResolvedLayouts()->toArray();
 
 ### ⚡️ Enhanced KQL
 
-A drop-in `/api/kql` endpoint that extends the official KQL plugin with bearer authentication, response caching, and multi-language support via a request header.
+A drop-in `/api/kql` endpoint that extends the official KQL plugin with bearer authentication, response caching, and multi-language support via a request header. Requires the KQL plugin: `composer require getkirby/kql`.
 
 ```ts
 await fetch("https://example.com/api/kql", {
@@ -71,7 +71,7 @@ await fetch("https://example.com/api/kql", {
 
 ### 🗂 JSON Templates
 
-Return JSON from your templates instead of HTML for full control over the response shape, with built-in `__template__` and `__sitemap__` endpoints.
+Return JSON from your templates instead of HTML for full control over the response shape, with built-in `__template__` and `__sitemap__` endpoints. Or enable `headless.globalRoutes` to serve every page as JSON through one catch-all route.
 
 ```php
 // site/templates/about.php
