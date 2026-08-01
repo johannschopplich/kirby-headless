@@ -8,7 +8,7 @@ use Kirby\Cms\Block;
 use Kirby\Cms\Page;
 
 /**
- * Resolver for page fields in blocks
+ * Resolver for page fields in blocks.
  */
 final readonly class PagesFieldResolver
 {

@@ -8,7 +8,7 @@ use Kirby\Cms\Block;
 use Kirby\Cms\File;
 
 /**
- * Resolver for file fields in blocks
+ * Resolver for file fields in blocks.
  */
 final readonly class FilesFieldResolver
 {

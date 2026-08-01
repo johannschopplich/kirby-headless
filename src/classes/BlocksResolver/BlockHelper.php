@@ -9,7 +9,7 @@ use Kirby\Cms\Block;
 final readonly class BlockHelper
 {
     /**
-     * Creates a new block with updated content
+     * Creates a new block with updated content.
      */
     public static function createBlockWithContent(Block $block, array $newContent): Block
     {
@@ -24,7 +24,7 @@ final readonly class BlockHelper
     }
 
     /**
-     * Merges resolved field values into content array
+     * Merges resolved field values into content array.
      */
     public static function mergeResolvedValue(
         array &$content,

@@ -15,7 +15,7 @@ use Kirby\Toolkit\Str;
 final readonly class Middlewares
 {
     /**
-     * Attempts to resolve page and site files from the request path
+     * Attempts to resolve page and site files from the request path.
      */
     public static function tryResolveFiles(array $context, array $args): File|null
     {
@@ -52,9 +52,9 @@ final readonly class Middlewares
     }
 
     /**
-     * Attempts to resolve and return the page data as JSON
+     * Attempts to resolve and return the page data as JSON.
      *
-     * Falls back to homepage if path is empty, or error page if not found
+     * Falls back to homepage if path is empty, or error page if not found.
      *
      * @throws \Kirby\Exception\NotFoundException If the page template does not exist
      */
@@ -121,7 +121,7 @@ final readonly class Middlewares
     }
 
     /**
-     * Returns a middleware that validates the bearer token
+     * Returns a middleware that validates the bearer token.
      *
      * @param bool $redirectToPanel Whether to redirect to Panel when no auth header is present
      */
@@ -133,7 +133,7 @@ final readonly class Middlewares
     }
 
     /**
-     * Validates the bearer token from the Authorization header
+     * Validates the bearer token from the Authorization header.
      *
      * @param bool $redirectToPanel Whether to redirect to Panel when no auth header is present
      */
@@ -158,7 +158,7 @@ final readonly class Middlewares
     }
 
     /**
-     * Validates that a request body exists
+     * Validates that a request body exists.
      */
     public static function hasBody(array $context): Response|array
     {

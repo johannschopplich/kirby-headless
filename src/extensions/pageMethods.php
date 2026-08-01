@@ -4,9 +4,9 @@ use Kirby\Toolkit\Str;
 
 return [
     /**
-     * Returns the frontend URL for this page based on configuration
+     * Returns the frontend URL for this page based on configuration.
      *
-     * Replaces the Kirby site URL with the configured frontend URL
+     * Replaces the Kirby site URL with the configured frontend URL.
      *
      * @kql-allowed
      */
@@ -26,9 +26,9 @@ return [
     },
 
     /**
-     * Returns breadcrumb navigation metadata
+     * Returns breadcrumb navigation metadata.
      *
-     * Generates an array of page titles and URIs from current page to site root
+     * Generates an array of page titles and URIs from current page to site root.
      *
      * @kql-allowed
      */
@@ -54,9 +54,9 @@ return [
     },
 
     /**
-     * Returns internationalization metadata for all languages
+     * Returns internationalization metadata for all languages.
      *
-     * Provides translated titles and URIs for each configured language
+     * Provides translated titles and URIs for each configured language.
      *
      * @kql-allowed
      */

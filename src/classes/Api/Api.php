@@ -13,7 +13,7 @@ use Kirby\Toolkit\A;
 final readonly class Api
 {
     /**
-     * Creates an API handler that processes middleware functions sequentially
+     * Creates an API handler that processes middleware functions sequentially.
      */
     public static function createHandler(callable ...$fns): callable
     {
@@ -37,9 +37,9 @@ final readonly class Api
     }
 
     /**
-     * Creates a consistent JSON API response
+     * Creates a consistent JSON API response.
      *
-     * Wraps data in a standardized format with code and status
+     * Wraps data in a standardized format with code and status.
      */
     public static function createResponse(int $code, mixed $data = null, array $headers = []): Response
     {
@@ -60,7 +60,7 @@ final readonly class Api
     }
 
     /**
-     * Returns the status message for a given HTTP status code
+     * Returns the status message for a given HTTP status code.
      *
      * @throws \Kirby\Exception\Exception If the status code is not supported
      */

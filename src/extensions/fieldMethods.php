@@ -15,10 +15,10 @@ use Kirby\Uuid\Uuid;
 
 return [
     /**
-     * Resolves UUID-based permalinks to actual URLs in anchor and image tags
+     * Resolves UUID-based permalinks to actual URLs in anchor and image tags.
      *
      * Converts `page://xxx` and `file://xxx` permalinks to their respective URLs
-     * Supports custom URL parser via `permalinksResolver.urlParser` option
+     * Supports custom URL parser via `permalinksResolver.urlParser` option.
      *
      * @kql-allowed
      */
@@ -55,9 +55,9 @@ return [
     },
 
     /**
-     * Converts field to blocks and resolves all nested content
+     * Converts field to blocks and resolves all nested content.
      *
-     * Resolves page references, file references, and custom fields within blocks
+     * Resolves page references, file references, and custom fields within blocks.
      *
      * @kql-allowed
      */
@@ -76,9 +76,9 @@ return [
     },
 
     /**
-     * Converts field to layouts and resolves all nested content
+     * Converts field to layouts and resolves all nested content.
      *
-     * Resolves page references, file references, and custom fields within layout blocks
+     * Resolves page references, file references, and custom fields within layout blocks.
      *
      * @kql-allowed
      */

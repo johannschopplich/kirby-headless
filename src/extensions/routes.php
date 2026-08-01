@@ -5,10 +5,10 @@ use JohannSchopplich\Headless\Api\Middlewares;
 
 return [
     /**
-     * Global catch-all route for headless JSON responses
+     * Global catch-all route for headless JSON responses.
      *
      * Attempts to resolve files first, validates bearer token,
-     * then returns page data as JSON
+     * then returns page data as JSON.
      */
     [
         'pattern' => '(:all)',

@@ -7,7 +7,7 @@ namespace JohannSchopplich\Headless\BlocksResolver;
 use Kirby\Cms\Block;
 
 /**
- * Resolver for custom fields in blocks
+ * Resolver for custom fields in blocks.
  */
 final readonly class CustomFieldResolver
 {

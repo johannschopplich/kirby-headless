@@ -4,9 +4,9 @@ use Kirby\Toolkit\Str;
 
 return [
     /**
-     * Returns the frontend URL for the site based on configuration
+     * Returns the frontend URL for the site based on configuration.
      *
-     * Replaces the Kirby site URL with the configured frontend URL
+     * Replaces the Kirby site URL with the configured frontend URL.
      *
      * @kql-allowed
      */

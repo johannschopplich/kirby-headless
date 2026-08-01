@@ -15,10 +15,10 @@ return [
 
         return [
             /**
-             * KQL endpoint with bearer token authentication and caching support
+             * KQL endpoint with bearer token authentication and caching support.
              *
              * Supports multilingual queries via X-Language header
-             * and cache control via X-Cacheable header
+             * and cache control via X-Cacheable header.
              */
             [
                 'pattern' => 'kql',
@@ -75,10 +75,10 @@ return [
             ],
 
             /**
-             * Sitemap endpoint for headless frontend usage
+             * Sitemap endpoint for headless frontend usage.
              *
              * Generates a JSON sitemap with support for multilingual sites
-             * and configurable page exclusions
+             * and configurable page exclusions.
              */
             [
                 'pattern' => '__sitemap__',
@@ -158,9 +158,9 @@ return [
             ],
 
             /**
-             * Template rendering endpoint for standalone template usage
+             * Template rendering endpoint for standalone template usage.
              *
-             * Renders any Kirby template as JSON without page context
+             * Renders any Kirby template as JSON without page context.
              */
             [
                 'pattern' => '__template__/(:any)',
