@@ -14,7 +14,7 @@ return [
         /** @var \Kirby\Cms\Page $this */
         $url = $this->kirby()->option('headless.panel.frontendUrl');
 
-        if (empty($url)) {
+        if ($url === null || $url === '') {
             return null;
         }
 

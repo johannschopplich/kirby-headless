@@ -43,17 +43,18 @@ return [
                         $input = $kirby->request()->get();
                         $cache = $cacheKey = $data = null;
                         $languageCode = $kirby->request()->header('X-Language');
+                        $hasLanguageCode = $languageCode !== null && $languageCode !== '';
                         $isCacheable = $kirby->request()->header('X-Cacheable') !== 'false';
 
                         // Set the Kirby language in multilanguage sites
-                        if ($kirby->multilang() && !empty($languageCode)) {
+                        if ($kirby->multilang() && $hasLanguageCode) {
                             $kirby->setCurrentLanguage($languageCode);
                         }
 
-                        if (!empty($input)) {
+                        if ($input !== []) {
                             $hash = sha1(Json::encode($input));
                             $cache = $kirby->cache('pages');
-                            $cacheKey = 'query-' . $hash . (!empty($languageCode) ? '-' . $languageCode : '') . '.json';
+                            $cacheKey = 'query-' . $hash . ($hasLanguageCode ? '-' . $languageCode : '') . '.json';
 
                             if ($isCacheable) {
                                 $data = $cache->get($cacheKey);
@@ -171,7 +172,7 @@ return [
                     function (array $context, array $args) use ($kirby): mixed {
                         $templateName = $args[0] ?? null;
 
-                        if (empty($templateName)) {
+                        if ($templateName === null || $templateName === '') {
                             throw new NotFoundException([
                                 'key' => 'template.default.notFound'
                             ]);

@@ -164,7 +164,7 @@ final readonly class Middlewares
     {
         $request = App::instance()->request();
 
-        if (empty($request->body()->data())) {
+        if ($request->body()->data() === []) {
             return Api::createResponse(400, [
                 'error' => 'Missing request body'
             ]);
