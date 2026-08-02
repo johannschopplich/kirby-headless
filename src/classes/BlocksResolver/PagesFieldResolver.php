@@ -4,60 +4,36 @@ declare(strict_types = 1);
 
 namespace JohannSchopplich\Headless\BlocksResolver;
 
-use Kirby\Cms\Block;
+use Closure;
+use Kirby\Cms\Collection;
 use Kirby\Cms\Page;
+use Kirby\Content\Field;
 
 /**
  * Resolver for page fields in blocks.
  */
-final readonly class PagesFieldResolver
+final readonly class PagesFieldResolver extends ReferenceFieldResolver
 {
-    public function __invoke(Block $block): Block
+    protected function optionNamespace(): string
     {
-        $kirby = $block->kirby();
-        $blocks = $kirby->option('blocksResolver.pages', []);
+        return 'pages';
+    }
 
-        // If the block type isn't one to be resolved, return early
-        if (!isset($blocks[$block->type()])) {
-            return $block;
-        }
+    protected function defaultBlocks(): array
+    {
+        return [];
+    }
 
-        // Get the resolver method
-        $resolvers = $kirby->option('blocksResolver.resolvers', []);
-        $defaultResolver = $kirby->option('blocksResolver.defaultResolvers.pages', fn (Page $page) => [
+    protected function defaultResolver(): Closure
+    {
+        return fn (Page $page) => [
             'uri' => $page->uri(),
             'title' => $page->title()->value()
-        ]);
+        ];
+    }
 
-        $fieldKeys = $blocks[$block->type()];
-        $fieldKeys = is_array($fieldKeys) ? $fieldKeys : [$fieldKeys];
-        $currentContent = $block->content()->data();
-        $hasChanges = false;
-        $resolvedKey = $kirby->option('blocksResolver.resolvedKey');
-
-        foreach ($fieldKeys as $key) {
-            /** @var \Kirby\Cms\Pages */
-            $pages = $block->content()->get($key)->toPages();
-
-            if ($pages->count() === 0) {
-                continue;
-            }
-
-            // If part of custom resolver, skip
-            if (isset($resolvers[$block->type() . ':' . $key])) {
-                continue;
-            }
-
-            $resolvedValue = $pages->map($defaultResolver)->values();
-
-            // Merge resolved value into content
-            BlockHelper::mergeResolvedValue($currentContent, $block, $key, $resolvedValue, $resolvedKey);
-            $hasChanges = true;
-        }
-
-        // Only create a new block if there were changes
-        return $hasChanges
-            ? BlockHelper::createBlockWithContent($block, $currentContent)
-            : $block;
+    protected function toCollection(Field $field): Collection
+    {
+        return $field->toPages();
     }
 }

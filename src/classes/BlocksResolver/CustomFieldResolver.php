@@ -15,28 +15,36 @@ final readonly class CustomFieldResolver
     {
         $kirby = $block->kirby();
         $resolvers = $kirby->option('blocksResolver.resolvers', []);
-        $currentContent = $block->content()->data();
+        $resolvedKey = $kirby->option('blocksResolver.resolvedKey');
+        $content = $block->content()->data();
         $hasChanges = false;
 
         foreach ($resolvers as $identifier => $resolver) {
+            // A resolver is keyed `blockType:fieldName`; anything else names
+            // no field and would hand the resolver something it cannot read
+            if (!str_contains($identifier, ':')) {
+                continue;
+            }
+
             [$blockType, $key] = explode(':', $identifier);
 
             if ($block->type() !== $blockType) {
                 continue;
             }
 
-            $field = $block->content()->get($key);
-            $resolvedKey = $kirby->option('blocksResolver.resolvedKey');
-            $resolvedValue = $resolver($field, $block);
+            BlockHelper::mergeResolvedValue(
+                $content,
+                $block,
+                $key,
+                $resolver($block->content()->get($key), $block),
+                $resolvedKey
+            );
 
-            // Merge resolved value into content
-            BlockHelper::mergeResolvedValue($currentContent, $block, $key, $resolvedValue, $resolvedKey);
             $hasChanges = true;
         }
 
-        // Only create a new block if there were changes
         return $hasChanges
-            ? BlockHelper::createBlockWithContent($block, $currentContent)
+            ? BlockHelper::createBlockWithContent($block, $content)
             : $block;
     }
 }

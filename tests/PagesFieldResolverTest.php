@@ -14,23 +14,6 @@ use PHPUnit\Framework\TestCase;
 #[PreserveGlobalState(false)]
 final class PagesFieldResolverTest extends TestCase
 {
-    private function app(array $options = []): App
-    {
-        return new App([
-            'roots' => ['index' => __DIR__],
-            'options' => $options,
-            'site' => [
-                'children' => [
-                    [
-                        'slug' => 'about',
-                        'template' => 'default',
-                        'content' => ['title' => 'About Us']
-                    ]
-                ]
-            ]
-        ]);
-    }
-
     protected function tearDown(): void
     {
         App::destroy();
@@ -91,5 +74,21 @@ final class PagesFieldResolverTest extends TestCase
 
         // Default pages resolution is skipped, leaving the raw value untouched
         $this->assertSame('about', $resolved->content()->get('page')->value());
+    }
+    private function app(array $options = []): App
+    {
+        return new App([
+            'roots' => ['index' => __DIR__],
+            'options' => $options,
+            'site' => [
+                'children' => [
+                    [
+                        'slug' => 'about',
+                        'template' => 'default',
+                        'content' => ['title' => 'About Us']
+                    ]
+                ]
+            ]
+        ]);
     }
 }

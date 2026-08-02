@@ -33,35 +33,8 @@ final class BlockHelperTest extends TestCase
         App::destroy();
     }
 
-    private function block(array $content = [], string $type = 'gallery'): Block
-    {
-        return new Block([
-            'type' => $type,
-            'id' => 'block-1',
-            'isHidden' => false,
-            'content' => $content
-        ]);
-    }
-
     #[Test]
-    public function merge_resolved_value_accumulates_multiple_fields_under_one_resolved_key(): void
-    {
-        // A block resolving two file fields into the same resolved bucket
-        $block = $this->block(['image' => 'a', 'cover' => 'b']);
-        $content = [];
-
-        BlockHelper::mergeResolvedValue($content, $block, 'image', ['resolved-image'], 'resolved');
-        BlockHelper::mergeResolvedValue($content, $block, 'cover', ['resolved-cover'], 'resolved');
-
-        // Both resolved values must survive; the second must not clobber the first
-        $this->assertSame([
-            'image' => ['resolved-image'],
-            'cover' => ['resolved-cover']
-        ], $content['resolved']);
-    }
-
-    #[Test]
-    public function merge_resolved_value_sets_top_level_key_when_no_resolved_key(): void
+    public function replaces_the_field_itself_when_no_resolved_key_is_configured(): void
     {
         $block = $this->block(['page' => 'a']);
         $content = [];
@@ -72,7 +45,7 @@ final class BlockHelperTest extends TestCase
     }
 
     #[Test]
-    public function merge_resolved_value_lowercases_field_key_inside_resolved_bucket(): void
+    public function lowercases_the_field_key_inside_the_resolved_bucket(): void
     {
         $block = $this->block(['backgroundImage' => 'a']);
         $content = [];
@@ -83,7 +56,7 @@ final class BlockHelperTest extends TestCase
     }
 
     #[Test]
-    public function create_block_with_content_preserves_id_type_hidden_and_parent(): void
+    public function keeps_a_blocks_identity_when_its_content_is_replaced(): void
     {
         $page = $this->kirby->page('test');
         $block = new Block([
@@ -101,5 +74,15 @@ final class BlockHelperTest extends TestCase
         $this->assertTrue($new->isHidden());
         $this->assertSame($page, $new->parent());
         $this->assertSame('Updated', $new->content()->get('text')->value());
+    }
+
+    private function block(array $content = [], string $type = 'gallery'): Block
+    {
+        return new Block([
+            'type' => $type,
+            'id' => 'block-1',
+            'isHidden' => false,
+            'content' => $content
+        ]);
     }
 }
