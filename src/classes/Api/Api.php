@@ -43,7 +43,7 @@ final readonly class Api
     }
 
     /**
-     * Creates a consistent JSON API response.
+     * Wraps data in the JSON envelope every endpoint answers with.
      */
     public static function createResponse(int $code, mixed $data = null, array $headers = []): Response
     {
@@ -63,9 +63,6 @@ final readonly class Api
         );
     }
 
-    /**
-     * Checks whether the client accepts a cached answer.
-     */
     public static function clientAllowsCache(): bool
     {
         return App::instance()->request()->header('X-Cacheable') !== 'false';
@@ -112,8 +109,6 @@ final readonly class Api
     }
 
     /**
-     * Returns the status message for a given HTTP status code.
-     *
      * A route composed with `createHandler()` may answer with any code, so an
      * unlisted one names its class rather than taking the response down.
      */

@@ -26,7 +26,6 @@ App::plugin('johannschopplich/headless', [
                 'api' => require __DIR__ . '/src/extensions/api.php'
             ];
 
-            // Register global routes, if enabled
             if ($kirby->option('headless.globalRoutes', false) === true) {
                 $extensions['routes'] = require __DIR__ . '/src/extensions/routes.php';
             }

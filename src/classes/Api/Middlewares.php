@@ -93,8 +93,6 @@ final readonly class Middlewares
     }
 
     /**
-     * Validates the bearer token from the Authorization header.
-     *
      * @param bool $redirectToPanel Whether an unauthenticated browser navigation may be sent to the Panel
      */
     public static function validateBearerToken(bool $redirectToPanel = false): Response|null
@@ -151,9 +149,6 @@ final readonly class Middlewares
         return $context;
     }
 
-    /**
-     * Extracts the captured path from the route arguments.
-     */
     private static function pathFromArgs(array $args): string|null
     {
         $path = $args[App::instance()->multilang() ? 1 : 0] ?? null;

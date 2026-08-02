@@ -117,8 +117,6 @@ final readonly class PageRenderer
     }
 
     /**
-     * Renders a page through the given template.
-     *
      * Fires `page.render:before` and `page.render:after`, so plugins that hook
      * Kirby's own rendering keep working for headless responses.
      *
@@ -150,9 +148,6 @@ final readonly class PageRenderer
         ], 'html');
     }
 
-    /**
-     * Builds the page cache key.
-     */
     private static function cacheKey(Page $page, string $contentType, VersionId $versionId): string
     {
         // Filtering on null rather than truthiness keeps a page whose id is `0`

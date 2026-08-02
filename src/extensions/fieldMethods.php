@@ -15,10 +15,9 @@ use Kirby\Uuid\Uuid;
 
 return [
     /**
-     * Resolves UUID-based permalinks to actual URLs in anchor and image tags.
+     * Resolves `page://` and `file://` permalinks in `href` and `src` attributes.
      *
-     * Converts `page://xxx` and `file://xxx` permalinks to their respective URLs
-     * Supports custom URL parser via `permalinksResolver.urlParser` option.
+     * The `permalinksResolver.urlParser` option rewrites every resolved URL.
      *
      * @kql-allowed
      */
@@ -42,7 +41,7 @@ return [
                                 $element->setAttribute($attribute, $url);
                             }
                         } catch (InvalidArgumentException) {
-                            // Ignore anything else than permalinks
+                            // An attribute that is not a permalink is left as it is
                         }
                     }
                 }
@@ -55,9 +54,7 @@ return [
     },
 
     /**
-     * Converts field to blocks and resolves all nested content.
-     *
-     * Resolves page references, file references, and custom fields within blocks.
+     * Converts the field to blocks and resolves the references they hold.
      *
      * @kql-allowed
      */
@@ -76,9 +73,7 @@ return [
     },
 
     /**
-     * Converts field to layouts and resolves all nested content.
-     *
-     * Resolves page references, file references, and custom fields within layout blocks.
+     * Converts the field to layouts and resolves the references their blocks hold.
      *
      * @kql-allowed
      */
