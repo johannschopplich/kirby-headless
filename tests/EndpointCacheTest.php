@@ -3,6 +3,7 @@
 declare(strict_types = 1);
 
 use Kirby\Cms\App;
+use Kirby\Data\Json;
 use Kirby\Filesystem\Dir;
 use Kirby\Filesystem\F;
 use PHPUnit\Framework\Attributes\PreserveGlobalState;
@@ -25,7 +26,7 @@ final class EndpointCacheTest extends TestCase
     protected function tearDown(): void
     {
         $_GET = [];
-        unset($_SERVER['HTTP_X_CACHEABLE']);
+        unset($_SERVER['HTTP_X_CACHEABLE'], $_SERVER['HTTP_X_LANGUAGE']);
         App::destroy();
         Dir::remove($this->root);
     }
@@ -53,6 +54,35 @@ final class EndpointCacheTest extends TestCase
         $kirby->cache('pages')->set($cacheKey, $stale);
 
         return $kirby;
+    }
+
+    /**
+     * The current language is instance state, so every request needs a fresh
+     * app – they meet again in the shared file cache root.
+     */
+    private function appWithLanguages(): App
+    {
+        return new App([
+            // Without an index URL the sitemap paths collapse to an empty string
+            'urls' => [
+                'index' => 'https://example.com'
+            ],
+            'roots' => [
+                'index' => $this->root,
+                'templates' => $this->root . '/templates',
+                'cache' => $this->root . '/cache'
+            ],
+            'options' => [
+                'cache' => ['pages' => ['active' => true]]
+            ],
+            'languages' => [
+                ['code' => 'en', 'default' => true, 'url' => '/'],
+                ['code' => 'de', 'url' => '/de']
+            ],
+            'site' => [
+                'children' => [['slug' => 'about']]
+            ]
+        ]);
     }
 
     #[Test]
@@ -95,5 +125,31 @@ final class EndpointCacheTest extends TestCase
         $kirby = $this->app('sitemap.headless.json', [['url' => '/stale']]);
 
         $this->assertStringNotContainsString('stale', $kirby->router()->call('api/__sitemap__', 'GET')->body());
+    }
+
+    #[Test]
+    public function keeps_the_sitemap_of_one_language_from_answering_another(): void
+    {
+        $_SERVER['HTTP_X_LANGUAGE'] = 'de';
+        $this->appWithLanguages()->router()->call('api/__sitemap__', 'GET');
+
+        unset($_SERVER['HTTP_X_LANGUAGE']);
+        $body = $this->appWithLanguages()->router()->call('api/__sitemap__', 'GET')->body();
+
+        $this->assertSame('/about', Json::decode($body)['result'][0]['url']);
+    }
+
+    #[Test]
+    public function caches_a_rendered_template_per_language(): void
+    {
+        $this->appWithLanguages()->router()->call('api/__template__/probe', 'GET');
+
+        $_SERVER['HTTP_X_LANGUAGE'] = 'de';
+        $kirby = $this->appWithLanguages();
+        $kirby->router()->call('api/__template__/probe', 'GET');
+
+        $cache = $kirby->cache('pages');
+        $this->assertNotNull($cache->get('template-probe-en.headless.json'));
+        $this->assertNotNull($cache->get('template-probe-de.headless.json'));
     }
 }

@@ -95,8 +95,11 @@ return [
                 'action' => Api::createHandler(
                     Middlewares::hasBearerToken(),
                     function (array $context, array $args) use ($kirby): mixed {
+                        // The sitemap renders in the request's language, so the key has to carry it
+                        $languageSuffix = $kirby->multilang() ? '-' . $kirby->languageCode() : '';
+
                         $data = Api::getOrSet(
-                            'sitemap.headless.json',
+                            'sitemap' . $languageSuffix . '.headless.json',
                             function () use ($kirby) {
                                 $withoutBase = fn (string $url) => Url::path($url, true);
                                 $isIndexable = $kirby->option('headless.sitemap.isIndexable');
@@ -184,8 +187,11 @@ return [
                             ]);
                         }
 
+                        // The template renders in the request's language too, and its name alone cannot tell two languages apart
+                        $languageSuffix = $kirby->multilang() ? '-' . $kirby->languageCode() : '';
+
                         $data = Api::getOrSet(
-                            'template-' . $templateName . '.headless.json',
+                            'template-' . $templateName . $languageSuffix . '.headless.json',
                             function () use ($kirby, $templateName) {
                                 $template = $kirby->template($templateName);
 
