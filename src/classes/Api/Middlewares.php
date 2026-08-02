@@ -61,6 +61,8 @@ final readonly class Middlewares
             return null;
         }
 
+        $extension = '';
+
         if ($path === null) {
             $page = $kirby->site()->homePage();
         } else {
@@ -70,14 +72,19 @@ final readonly class Middlewares
                 return $page;
             }
 
-            $page ??= $kirby->site()->errorPage();
+            if ($page !== null) {
+                $extension = F::extension($path);
+            } else {
+                // Kirby renders the error page as HTML whatever extension the request asked for
+                $page = $kirby->site()->errorPage();
+            }
         }
 
         if (!$page) {
             return Api::createResponse(404);
         }
 
-        return PageRenderer::respond($page, $path === null ? '' : F::extension($path));
+        return PageRenderer::respond($page, $extension);
     }
 
     /**

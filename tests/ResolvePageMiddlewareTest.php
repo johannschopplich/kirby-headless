@@ -33,6 +33,7 @@ final class ResolvePageMiddlewareTest extends TestCase
                 ],
                 'children' => [
                     ['slug' => 'home', 'template' => 'default'],
+                    ['slug' => 'error', 'template' => 'default'],
                     ['slug' => 'about', 'template' => 'default'],
                     ['slug' => '0', 'template' => 'default'],
                     ['slug' => 'responder', 'template' => 'responder']
@@ -63,6 +64,18 @@ final class ResolvePageMiddlewareTest extends TestCase
         $this->app();
 
         $this->assertSame(404, Middlewares::tryResolvePage([], ['about.txt'])->code());
+    }
+
+    #[Test]
+    public function serves_the_error_page_without_the_requested_representation(): void
+    {
+        $this->app();
+
+        $response = Middlewares::tryResolvePage([], ['missing.xml']);
+
+        $this->assertSame(404, $response->code());
+        $this->assertSame('{"id":"error"}', $response->body());
+        $this->assertSame('application/json', $response->type());
     }
 
     #[Test]
