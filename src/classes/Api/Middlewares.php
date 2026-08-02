@@ -240,7 +240,7 @@ final readonly class Middlewares
             return false;
         }
 
-        // A page id may begin with another language's path, and the page the
+        // A page ID may begin with another language's path, and the page the
         // current language resolves wins over the prefix
         if ($kirby->site()->find($path) !== null) {
             return false;

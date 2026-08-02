@@ -151,7 +151,7 @@ final readonly class PageRenderer
 
     private static function cacheKey(Page $page, string $contentType, VersionId $versionId): string
     {
-        // Filtering on null rather than truthiness keeps a page whose id is `0`
+        // Filtering on null rather than truthiness keeps a page whose ID is `0`
         return implode('.', array_filter([
             $page->id(),
             App::instance()->language()?->code(),

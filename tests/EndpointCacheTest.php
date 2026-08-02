@@ -57,8 +57,8 @@ final class EndpointCacheTest extends TestCase
     }
 
     /**
-     * The current language is instance state, so every request needs a fresh
-     * app – they meet again in the shared file cache root.
+     * Each request builds a fresh app because the language sticks to the
+     * instance – only the file cache root is shared between them.
      */
     private function appWithLanguages(): App
     {
