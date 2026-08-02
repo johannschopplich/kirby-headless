@@ -33,6 +33,16 @@ final class BlockHelperTest extends TestCase
         App::destroy();
     }
 
+    private function block(array $content = [], string $type = 'gallery'): Block
+    {
+        return new Block([
+            'type' => $type,
+            'id' => 'block-1',
+            'isHidden' => false,
+            'content' => $content
+        ]);
+    }
+
     #[Test]
     public function replaces_the_field_itself_when_no_resolved_key_is_configured(): void
     {
@@ -74,15 +84,5 @@ final class BlockHelperTest extends TestCase
         $this->assertTrue($new->isHidden());
         $this->assertSame($page, $new->parent());
         $this->assertSame('Updated', $new->content()->get('text')->value());
-    }
-
-    private function block(array $content = [], string $type = 'gallery'): Block
-    {
-        return new Block([
-            'type' => $type,
-            'id' => 'block-1',
-            'isHidden' => false,
-            'content' => $content
-        ]);
     }
 }

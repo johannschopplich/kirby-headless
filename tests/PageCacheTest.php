@@ -30,6 +30,41 @@ final class PageCacheTest extends TestCase
     }
 
     /**
+     * Boots with an active pages cache that survives `App::destroy()`, so a
+     * second request can be told apart from a cache hit by its body alone.
+     */
+    private function app(): void
+    {
+        new App([
+            'roots' => [
+                'index' => $this->root,
+                'templates' => $this->root . '/templates',
+                'cache' => $this->root . '/cache'
+            ],
+            'options' => [
+                'cache' => ['pages' => ['active' => true]]
+            ],
+            'site' => [
+                'children' => [['slug' => 'about', 'template' => 'default']]
+            ]
+        ]);
+    }
+
+    private function writeTemplate(string $contents): void
+    {
+        F::write($this->root . '/templates/default.php', $contents);
+    }
+
+    private function seedCache(array $response): void
+    {
+        App::instance()->cache('pages')->set('about.latest.html.headless.json', [
+            'response' => $response,
+            'usesAuth' => false,
+            'usesCookies' => []
+        ]);
+    }
+
+    /**
      * Kirby stores the response configuration next to the rendered body and
      * replays it on a hit – without that, headers and status codes silently
      * apply to the first visitor only.
@@ -111,40 +146,5 @@ final class PageCacheTest extends TestCase
         $this->app();
 
         $this->assertSame('second', Middlewares::tryResolvePage([], ['about'])->body());
-    }
-
-    /**
-     * Boots with an active pages cache that survives `App::destroy()`, so a
-     * second request can be told apart from a cache hit by its body alone.
-     */
-    private function app(): void
-    {
-        new App([
-            'roots' => [
-                'index' => $this->root,
-                'templates' => $this->root . '/templates',
-                'cache' => $this->root . '/cache'
-            ],
-            'options' => [
-                'cache' => ['pages' => ['active' => true]]
-            ],
-            'site' => [
-                'children' => [['slug' => 'about', 'template' => 'default']]
-            ]
-        ]);
-    }
-
-    private function writeTemplate(string $contents): void
-    {
-        F::write($this->root . '/templates/default.php', $contents);
-    }
-
-    private function seedCache(array $response): void
-    {
-        App::instance()->cache('pages')->set('about.latest.html.headless.json', [
-            'response' => $response,
-            'usesAuth' => false,
-            'usesCookies' => []
-        ]);
     }
 }

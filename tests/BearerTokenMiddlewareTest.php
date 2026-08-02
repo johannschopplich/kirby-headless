@@ -20,6 +20,22 @@ final class BearerTokenMiddlewareTest extends TestCase
         App::destroy();
     }
 
+    /**
+     * The request headers are read from `$_SERVER` when Kirby boots,
+     * so the Authorization header has to be in place beforehand.
+     */
+    private function app(array $options, string|null $authorization = null): void
+    {
+        if ($authorization !== null) {
+            $_SERVER['HTTP_AUTHORIZATION'] = $authorization;
+        }
+
+        new App([
+            'roots' => ['index' => __DIR__],
+            'options' => $options
+        ]);
+    }
+
     public static function blankTokens(): array
     {
         return [
@@ -128,21 +144,5 @@ final class BearerTokenMiddlewareTest extends TestCase
         ]);
 
         $this->assertSame(401, Middlewares::validateBearerToken(true)?->code());
-    }
-
-    /**
-     * The request headers are read from `$_SERVER` when Kirby boots,
-     * so the Authorization header has to be in place beforehand.
-     */
-    private function app(array $options, string|null $authorization = null): void
-    {
-        if ($authorization !== null) {
-            $_SERVER['HTTP_AUTHORIZATION'] = $authorization;
-        }
-
-        new App([
-            'roots' => ['index' => __DIR__],
-            'options' => $options
-        ]);
     }
 }

@@ -20,6 +20,27 @@ final class ResolvePageMiddlewareTest extends TestCase
         App::destroy();
     }
 
+    private function app(): void
+    {
+        new App([
+            'roots' => [
+                'index' => __DIR__,
+                'templates' => __DIR__ . '/fixtures/templates'
+            ],
+            'site' => [
+                'drafts' => [
+                    ['slug' => 'secret', 'template' => 'default']
+                ],
+                'children' => [
+                    ['slug' => 'home', 'template' => 'default'],
+                    ['slug' => 'about', 'template' => 'default'],
+                    ['slug' => '0', 'template' => 'default'],
+                    ['slug' => 'responder', 'template' => 'responder']
+                ]
+            ]
+        ]);
+    }
+
     #[Test]
     public function resolves_a_page_whose_slug_is_zero_instead_of_the_homepage(): void
     {
@@ -117,26 +138,5 @@ final class ResolvePageMiddlewareTest extends TestCase
 
         $this->assertSame(301, $response->code());
         $this->assertSame('/about', $response->header('Location'));
-    }
-
-    private function app(): void
-    {
-        new App([
-            'roots' => [
-                'index' => __DIR__,
-                'templates' => __DIR__ . '/fixtures/templates'
-            ],
-            'site' => [
-                'drafts' => [
-                    ['slug' => 'secret', 'template' => 'default']
-                ],
-                'children' => [
-                    ['slug' => 'home', 'template' => 'default'],
-                    ['slug' => 'about', 'template' => 'default'],
-                    ['slug' => '0', 'template' => 'default'],
-                    ['slug' => 'responder', 'template' => 'responder']
-                ]
-            ]
-        ]);
     }
 }

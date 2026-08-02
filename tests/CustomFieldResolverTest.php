@@ -20,6 +20,14 @@ final class CustomFieldResolverTest extends TestCase
         App::destroy();
     }
 
+    private function app(array $options = []): App
+    {
+        return new App([
+            'roots' => ['index' => __DIR__],
+            'options' => $options
+        ]);
+    }
+
     #[Test]
     public function applies_registered_resolver_to_matching_block_type_and_key(): void
     {
@@ -63,13 +71,5 @@ final class CustomFieldResolverTest extends TestCase
         $block = new Block(['type' => 'heading', 'content' => ['level' => 'h2']]);
 
         $this->assertSame($block, (new CustomFieldResolver())($block));
-    }
-
-    private function app(array $options = []): App
-    {
-        return new App([
-            'roots' => ['index' => __DIR__],
-            'options' => $options
-        ]);
     }
 }

@@ -17,6 +17,33 @@ final class GlobalRouteTest extends TestCase
         App::destroy();
     }
 
+    /**
+     * Dispatches through Kirby's router instead of calling the route action,
+     * so that registration and method matching are covered as well.
+     */
+    private function app(string|null $token = 'secret'): App
+    {
+        return new App([
+            'roots' => [
+                'index' => __DIR__,
+                'templates' => __DIR__ . '/fixtures/templates'
+            ],
+            'options' => [
+                'content' => ['fileRedirects' => true],
+                'headless' => ['globalRoutes' => true, 'token' => $token]
+            ],
+            'site' => [
+                'children' => [
+                    [
+                        'slug' => 'about',
+                        'template' => 'default',
+                        'files' => [['filename' => 'hero.jpg']]
+                    ]
+                ]
+            ]
+        ]);
+    }
+
     #[Test]
     public function requires_a_bearer_token_before_resolving_files(): void
     {
@@ -75,32 +102,5 @@ final class GlobalRouteTest extends TestCase
         $result = $kirby->router()->call('de/about', 'GET');
 
         $this->assertSame('{"id":"about","lang":"de"}', $result->body());
-    }
-
-    /**
-     * Dispatches through Kirby's router instead of calling the route action,
-     * so that registration and method matching are covered as well.
-     */
-    private function app(string|null $token = 'secret'): App
-    {
-        return new App([
-            'roots' => [
-                'index' => __DIR__,
-                'templates' => __DIR__ . '/fixtures/templates'
-            ],
-            'options' => [
-                'content' => ['fileRedirects' => true],
-                'headless' => ['globalRoutes' => true, 'token' => $token]
-            ],
-            'site' => [
-                'children' => [
-                    [
-                        'slug' => 'about',
-                        'template' => 'default',
-                        'files' => [['filename' => 'hero.jpg']]
-                    ]
-                ]
-            ]
-        ]);
     }
 }

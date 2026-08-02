@@ -18,6 +18,25 @@ final class ResolveFilesMiddlewareTest extends TestCase
         App::destroy();
     }
 
+    private function siteWithFile(array $config = []): array
+    {
+        return array_merge([
+            'roots' => ['index' => __DIR__],
+            // Clean file URLs are opt-in in Kirby and stay opt-in here
+            'options' => ['content' => ['fileRedirects' => true]],
+            'site' => [
+                'files' => [['filename' => 'logo.png']],
+                'children' => [
+                    [
+                        'slug' => 'about',
+                        'template' => 'default',
+                        'files' => [['filename' => 'hero.jpg']]
+                    ]
+                ]
+            ]
+        ], $config);
+    }
+
     #[Test]
     public function resolves_a_page_file_from_the_request_path(): void
     {
@@ -107,24 +126,5 @@ final class ResolveFilesMiddlewareTest extends TestCase
         $file = Middlewares::tryResolveFiles([], ['unpublished/attachment.pdf']);
 
         $this->assertSame('unpublished/attachment.pdf', $file->id());
-    }
-
-    private function siteWithFile(array $config = []): array
-    {
-        return array_merge([
-            'roots' => ['index' => __DIR__],
-            // Clean file URLs are opt-in in Kirby and stay opt-in here
-            'options' => ['content' => ['fileRedirects' => true]],
-            'site' => [
-                'files' => [['filename' => 'logo.png']],
-                'children' => [
-                    [
-                        'slug' => 'about',
-                        'template' => 'default',
-                        'files' => [['filename' => 'hero.jpg']]
-                    ]
-                ]
-            ]
-        ], $config);
     }
 }

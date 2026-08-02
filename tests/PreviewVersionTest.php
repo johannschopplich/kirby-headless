@@ -34,6 +34,24 @@ final class PreviewVersionTest extends TestCase
     }
 
     /**
+     * Content versions live on disk, so this fixture needs a real content root
+     * rather than the in-memory site the other page tests boot.
+     */
+    private function app(): App
+    {
+        return new App([
+            'roots' => [
+                'index' => $this->root,
+                'templates' => $this->root . '/templates',
+                'content' => $this->root . '/content',
+                'cache' => $this->root . '/cache',
+                'sessions' => $this->root . '/sessions',
+                'accounts' => $this->root . '/accounts'
+            ]
+        ]);
+    }
+
+    /**
      * This is the Panel's live preview: the editor sees what they have typed
      * but not yet saved, which only works if the requested version reaches the
      * template through `VersionId::render()`.
@@ -63,23 +81,5 @@ final class PreviewVersionTest extends TestCase
         $this->app();
 
         $this->assertSame('{"title":"Saved title"}', Middlewares::tryResolvePage([], ['notes'])->body());
-    }
-
-    /**
-     * Content versions live on disk, so this fixture needs a real content root
-     * rather than the in-memory site the other page tests boot.
-     */
-    private function app(): App
-    {
-        return new App([
-            'roots' => [
-                'index' => $this->root,
-                'templates' => $this->root . '/templates',
-                'content' => $this->root . '/content',
-                'cache' => $this->root . '/cache',
-                'sessions' => $this->root . '/sessions',
-                'accounts' => $this->root . '/accounts'
-            ]
-        ]);
     }
 }

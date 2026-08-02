@@ -19,6 +19,26 @@ final class FilesFieldResolverTest extends TestCase
         App::destroy();
     }
 
+    private function app(array $options = []): App
+    {
+        return new App([
+            'roots' => ['index' => __DIR__],
+            'options' => $options,
+            'site' => [
+                'children' => [
+                    [
+                        'slug' => 'about',
+                        'template' => 'default',
+                        'files' => [
+                            ['filename' => 'hero.jpg', 'content' => ['alt' => 'Hero']],
+                            ['filename' => 'cover.jpg', 'content' => ['alt' => 'Cover']]
+                        ]
+                    ]
+                ]
+            ]
+        ]);
+    }
+
     #[Test]
     public function resolves_default_image_block_field_to_url_dimensions_and_alt(): void
     {
@@ -88,25 +108,5 @@ final class FilesFieldResolverTest extends TestCase
         $this->assertArrayHasKey('cover', $resolved);
         $this->assertStringContainsString('hero.jpg', $resolved['image'][0]['url']);
         $this->assertStringContainsString('cover.jpg', $resolved['cover'][0]['url']);
-    }
-
-    private function app(array $options = []): App
-    {
-        return new App([
-            'roots' => ['index' => __DIR__],
-            'options' => $options,
-            'site' => [
-                'children' => [
-                    [
-                        'slug' => 'about',
-                        'template' => 'default',
-                        'files' => [
-                            ['filename' => 'hero.jpg', 'content' => ['alt' => 'Hero']],
-                            ['filename' => 'cover.jpg', 'content' => ['alt' => 'Cover']]
-                        ]
-                    ]
-                ]
-            ]
-        ]);
     }
 }

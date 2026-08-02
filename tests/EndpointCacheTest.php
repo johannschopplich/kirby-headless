@@ -30,6 +30,31 @@ final class EndpointCacheTest extends TestCase
         Dir::remove($this->root);
     }
 
+    /**
+     * Seeds the cache with a marker no template could produce, so a response
+     * carrying it can only have come from the cache.
+     */
+    private function app(string $cacheKey, mixed $stale): App
+    {
+        $kirby = new App([
+            'roots' => [
+                'index' => $this->root,
+                'templates' => $this->root . '/templates',
+                'cache' => $this->root . '/cache'
+            ],
+            'options' => [
+                'cache' => ['pages' => ['active' => true]]
+            ],
+            'site' => [
+                'children' => [['slug' => 'about']]
+            ]
+        ]);
+
+        $kirby->cache('pages')->set($cacheKey, $stale);
+
+        return $kirby;
+    }
+
     #[Test]
     public function serves_a_rendered_template_from_the_cache(): void
     {
@@ -70,30 +95,5 @@ final class EndpointCacheTest extends TestCase
         $kirby = $this->app('sitemap.headless.json', [['url' => '/stale']]);
 
         $this->assertStringNotContainsString('stale', $kirby->router()->call('api/__sitemap__', 'GET')->body());
-    }
-
-    /**
-     * Seeds the cache with a marker no template could produce, so a response
-     * carrying it can only have come from the cache.
-     */
-    private function app(string $cacheKey, mixed $stale): App
-    {
-        $kirby = new App([
-            'roots' => [
-                'index' => $this->root,
-                'templates' => $this->root . '/templates',
-                'cache' => $this->root . '/cache'
-            ],
-            'options' => [
-                'cache' => ['pages' => ['active' => true]]
-            ],
-            'site' => [
-                'children' => [['slug' => 'about']]
-            ]
-        ]);
-
-        $kirby->cache('pages')->set($cacheKey, $stale);
-
-        return $kirby;
     }
 }

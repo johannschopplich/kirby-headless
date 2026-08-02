@@ -19,6 +19,23 @@ final class PagesFieldResolverTest extends TestCase
         App::destroy();
     }
 
+    private function app(array $options = []): App
+    {
+        return new App([
+            'roots' => ['index' => __DIR__],
+            'options' => $options,
+            'site' => [
+                'children' => [
+                    [
+                        'slug' => 'about',
+                        'template' => 'default',
+                        'content' => ['title' => 'About Us']
+                    ]
+                ]
+            ]
+        ]);
+    }
+
     #[Test]
     public function resolves_configured_pages_field_to_default_uri_and_title_shape(): void
     {
@@ -74,22 +91,5 @@ final class PagesFieldResolverTest extends TestCase
 
         // Default pages resolution is skipped, leaving the raw value untouched
         $this->assertSame('about', $resolved->content()->get('page')->value());
-    }
-
-    private function app(array $options = []): App
-    {
-        return new App([
-            'roots' => ['index' => __DIR__],
-            'options' => $options,
-            'site' => [
-                'children' => [
-                    [
-                        'slug' => 'about',
-                        'template' => 'default',
-                        'content' => ['title' => 'About Us']
-                    ]
-                ]
-            ]
-        ]);
     }
 }
