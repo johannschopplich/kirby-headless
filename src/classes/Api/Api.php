@@ -94,7 +94,7 @@ final readonly class Api
      * A request the key cannot account for neither reads a stranger's answer
      * nor becomes one.
      */
-    public static function cached(string $key, callable $build): mixed
+    public static function getOrSet(string $key, callable $build): mixed
     {
         $cache = App::instance()->cache('pages');
         $isCacheable = self::isCacheable();

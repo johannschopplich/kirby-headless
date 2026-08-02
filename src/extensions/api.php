@@ -48,8 +48,10 @@ return [
                         $cache = $cacheKey = $data = null;
                         $languageCode = $kirby->request()->header('X-Language');
                         $hasLanguageCode = $languageCode !== null && $languageCode !== '';
-                        // The cache key covers the query itself, so unlike the
-                        // other endpoints this one may cache a request with data
+                        // Too specific for `Api::getOrSet()`: the cache key
+                        // hashes the query body, so unlike the other endpoints
+                        // this one may answer a request that carries data, and
+                        // an empty query is never cached at all
                         $isCacheable = Api::clientAllowsCache();
 
                         if ($kirby->multilang() && $hasLanguageCode) {
@@ -93,7 +95,7 @@ return [
                 'action' => Api::createHandler(
                     Middlewares::hasBearerToken(),
                     function (array $context, array $args) use ($kirby): mixed {
-                        $data = Api::cached(
+                        $data = Api::getOrSet(
                             'sitemap.headless.json',
                             function () use ($kirby) {
                                 $withoutBase = fn (string $url) => Url::path($url, true);
@@ -182,7 +184,7 @@ return [
                             ]);
                         }
 
-                        $data = Api::cached(
+                        $data = Api::getOrSet(
                             'template-' . $templateName . '.headless.json',
                             function () use ($kirby, $templateName) {
                                 $template = $kirby->template($templateName);
