@@ -123,7 +123,7 @@ final readonly class Middlewares
 
         $token = trim((string)$token);
 
-        if ($token === '' || $authorization !== 'Bearer ' . $token) {
+        if ($token === '' || !hash_equals('Bearer ' . $token, (string)$authorization)) {
             return Api::createResponse(401);
         }
 
