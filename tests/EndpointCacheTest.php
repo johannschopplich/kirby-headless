@@ -33,7 +33,7 @@ final class EndpointCacheTest extends TestCase
     #[Test]
     public function serves_a_rendered_template_from_the_cache(): void
     {
-        $kirby = $this->bootKirby('template-probe.headless.json', '{"value":"stale"}');
+        $kirby = $this->app('template-probe.headless.json', '{"value":"stale"}');
 
         $this->assertStringContainsString('stale', $kirby->router()->call('api/__template__/probe', 'GET')->body());
     }
@@ -41,7 +41,7 @@ final class EndpointCacheTest extends TestCase
     #[Test]
     public function serves_the_sitemap_from_the_cache(): void
     {
-        $kirby = $this->bootKirby('sitemap.headless.json', [['url' => '/stale']]);
+        $kirby = $this->app('sitemap.headless.json', [['url' => '/stale']]);
 
         $this->assertStringContainsString('stale', $kirby->router()->call('api/__sitemap__', 'GET')->body());
     }
@@ -54,7 +54,7 @@ final class EndpointCacheTest extends TestCase
     public function renders_a_template_again_when_the_request_carries_data(): void
     {
         $_GET = ['preview' => '1'];
-        $kirby = $this->bootKirby('template-probe.headless.json', '{"value":"stale"}');
+        $kirby = $this->app('template-probe.headless.json', '{"value":"stale"}');
 
         $this->assertStringContainsString('fresh', $kirby->router()->call('api/__template__/probe', 'GET')->body());
     }
@@ -67,7 +67,7 @@ final class EndpointCacheTest extends TestCase
     public function rebuilds_the_sitemap_when_the_client_declines_the_cache(): void
     {
         $_SERVER['HTTP_X_CACHEABLE'] = 'false';
-        $kirby = $this->bootKirby('sitemap.headless.json', [['url' => '/stale']]);
+        $kirby = $this->app('sitemap.headless.json', [['url' => '/stale']]);
 
         $this->assertStringNotContainsString('stale', $kirby->router()->call('api/__sitemap__', 'GET')->body());
     }
@@ -76,7 +76,7 @@ final class EndpointCacheTest extends TestCase
      * Seeds the cache with a marker no template could produce, so a response
      * carrying it can only have come from the cache.
      */
-    private function bootKirby(string $cacheKey, mixed $stale): App
+    private function app(string $cacheKey, mixed $stale): App
     {
         $kirby = new App([
             'roots' => [

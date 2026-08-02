@@ -23,7 +23,7 @@ final class ResolvePageMiddlewareTest extends TestCase
     #[Test]
     public function resolves_a_page_whose_slug_is_zero_instead_of_the_homepage(): void
     {
-        $this->bootKirby();
+        $this->app();
 
         $this->assertSame('{"id":"0"}', Middlewares::tryResolvePage([], ['0'])->body());
     }
@@ -31,7 +31,7 @@ final class ResolvePageMiddlewareTest extends TestCase
     #[Test]
     public function falls_back_to_the_homepage_for_an_empty_path(): void
     {
-        $this->bootKirby();
+        $this->app();
 
         $this->assertSame('{"id":"home"}', Middlewares::tryResolvePage([], [''])->body());
     }
@@ -39,7 +39,7 @@ final class ResolvePageMiddlewareTest extends TestCase
     #[Test]
     public function serves_a_404_for_an_extension_without_a_representation(): void
     {
-        $this->bootKirby();
+        $this->app();
 
         $this->assertSame(404, Middlewares::tryResolvePage([], ['about.txt'])->code());
     }
@@ -47,7 +47,7 @@ final class ResolvePageMiddlewareTest extends TestCase
     #[Test]
     public function renders_the_content_representation_for_a_matching_extension(): void
     {
-        $this->bootKirby();
+        $this->app();
 
         $response = Middlewares::tryResolvePage([], ['about.xml']);
 
@@ -62,7 +62,7 @@ final class ResolvePageMiddlewareTest extends TestCase
     #[Test]
     public function renders_page_json_from_the_default_template(): void
     {
-        $this->bootKirby();
+        $this->app();
 
         $this->assertSame('{"id":"about"}', Middlewares::tryResolvePage([], ['about.json'])->body());
     }
@@ -74,7 +74,7 @@ final class ResolvePageMiddlewareTest extends TestCase
     #[Test]
     public function lets_the_template_configure_the_response(): void
     {
-        $this->bootKirby();
+        $this->app();
 
         $response = Middlewares::tryResolvePage([], ['responder']);
 
@@ -90,12 +90,12 @@ final class ResolvePageMiddlewareTest extends TestCase
     #[Test]
     public function renders_a_draft_for_a_valid_preview_token(): void
     {
-        $this->bootKirby();
+        $this->app();
         $token = App::instance()->site()->draft('secret')->version(VersionId::latest())->previewToken();
         App::destroy();
 
         $_GET = ['_token' => $token, '_version' => 'latest'];
-        $this->bootKirby();
+        $this->app();
 
         $this->assertSame('{"id":"secret"}', Middlewares::tryResolvePage([], ['secret'])->body());
     }
@@ -103,7 +103,7 @@ final class ResolvePageMiddlewareTest extends TestCase
     #[Test]
     public function keeps_a_draft_hidden_without_a_preview_token(): void
     {
-        $this->bootKirby();
+        $this->app();
 
         $this->assertSame(404, Middlewares::tryResolvePage([], ['secret'])->code());
     }
@@ -111,7 +111,7 @@ final class ResolvePageMiddlewareTest extends TestCase
     #[Test]
     public function redirects_the_default_content_type_to_the_page_url(): void
     {
-        $this->bootKirby();
+        $this->app();
 
         $response = Middlewares::tryResolvePage([], ['about.html']);
 
@@ -119,7 +119,7 @@ final class ResolvePageMiddlewareTest extends TestCase
         $this->assertSame('/about', $response->header('Location'));
     }
 
-    private function bootKirby(): void
+    private function app(): void
     {
         new App([
             'roots' => [

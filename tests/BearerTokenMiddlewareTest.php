@@ -33,7 +33,7 @@ final class BearerTokenMiddlewareTest extends TestCase
     public function rejects_requests_when_the_configured_token_is_blank(string $token): void
     {
         // Even a client sending exactly the configured token is turned away
-        $this->bootKirby(['headless' => ['token' => $token]], 'Bearer ' . $token);
+        $this->app(['headless' => ['token' => $token]], 'Bearer ' . $token);
 
         $this->assertSame(401, Middlewares::validateBearerToken()?->code());
     }
@@ -41,7 +41,7 @@ final class BearerTokenMiddlewareTest extends TestCase
     #[Test]
     public function accepts_a_token_php_considers_falsy(): void
     {
-        $this->bootKirby(['headless' => ['token' => '0']], 'Bearer 0');
+        $this->app(['headless' => ['token' => '0']], 'Bearer 0');
 
         $this->assertNull(Middlewares::validateBearerToken());
     }
@@ -49,7 +49,7 @@ final class BearerTokenMiddlewareTest extends TestCase
     #[Test]
     public function guards_the_site_with_a_token_php_considers_falsy(): void
     {
-        $this->bootKirby(['headless' => ['token' => '0']]);
+        $this->app(['headless' => ['token' => '0']]);
 
         $this->assertSame(401, Middlewares::validateBearerToken()?->code());
     }
@@ -57,7 +57,7 @@ final class BearerTokenMiddlewareTest extends TestCase
     #[Test]
     public function allows_requests_when_no_token_is_configured(): void
     {
-        $this->bootKirby([]);
+        $this->app([]);
 
         $this->assertNull(Middlewares::validateBearerToken());
     }
@@ -72,7 +72,7 @@ final class BearerTokenMiddlewareTest extends TestCase
     {
         $_SERVER['HTTP_ACCEPT'] = 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8';
 
-        $this->bootKirby(['headless' => ['token' => 'secret']]);
+        $this->app(['headless' => ['token' => 'secret']]);
 
         $this->assertSame(401, Middlewares::validateBearerToken(true)?->code());
     }
@@ -82,7 +82,7 @@ final class BearerTokenMiddlewareTest extends TestCase
     {
         $_SERVER['HTTP_ACCEPT'] = 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8';
 
-        $this->bootKirby([
+        $this->app([
             'headless' => [
                 'token' => 'secret',
                 'panel' => ['redirect' => true]
@@ -102,7 +102,7 @@ final class BearerTokenMiddlewareTest extends TestCase
     {
         $_SERVER['HTTP_ACCEPT'] = 'application/json';
 
-        $this->bootKirby([
+        $this->app([
             'headless' => [
                 'token' => 'secret',
                 'panel' => ['redirect' => true]
@@ -120,7 +120,7 @@ final class BearerTokenMiddlewareTest extends TestCase
     #[Test]
     public function answers_a_client_that_stated_no_preference_instead_of_redirecting(): void
     {
-        $this->bootKirby([
+        $this->app([
             'headless' => [
                 'token' => 'secret',
                 'panel' => ['redirect' => true]
@@ -134,7 +134,7 @@ final class BearerTokenMiddlewareTest extends TestCase
      * The request headers are read from `$_SERVER` when Kirby boots,
      * so the Authorization header has to be in place beforehand.
      */
-    private function bootKirby(array $options, string|null $authorization = null): void
+    private function app(array $options, string|null $authorization = null): void
     {
         if ($authorization !== null) {
             $_SERVER['HTTP_AUTHORIZATION'] = $authorization;

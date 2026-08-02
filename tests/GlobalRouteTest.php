@@ -20,7 +20,7 @@ final class GlobalRouteTest extends TestCase
     #[Test]
     public function requires_a_bearer_token_before_resolving_files(): void
     {
-        $result = $this->bootKirby()->router()->call('about/hero.jpg', 'GET');
+        $result = $this->app()->router()->call('about/hero.jpg', 'GET');
 
         $this->assertSame(401, $result->code());
     }
@@ -32,7 +32,7 @@ final class GlobalRouteTest extends TestCase
     #[Test]
     public function guards_pages_against_methods_other_than_get(): void
     {
-        $result = $this->bootKirby()->router()->call('about', 'POST');
+        $result = $this->app()->router()->call('about', 'POST');
 
         $this->assertSame(401, $result->code());
     }
@@ -43,7 +43,7 @@ final class GlobalRouteTest extends TestCase
     #[Test]
     public function serves_pages_when_no_token_is_configured(): void
     {
-        $result = $this->bootKirby(null)->router()->call('about', 'GET');
+        $result = $this->app(null)->router()->call('about', 'GET');
 
         $this->assertSame(200, $result->code());
         $this->assertSame('{"id":"about"}', $result->body());
@@ -81,7 +81,7 @@ final class GlobalRouteTest extends TestCase
      * Dispatches through Kirby's router instead of calling the route action,
      * so that registration and method matching are covered as well.
      */
-    private function bootKirby(string|null $token = 'secret'): App
+    private function app(string|null $token = 'secret'): App
     {
         return new App([
             'roots' => [

@@ -41,14 +41,14 @@ final class PreviewVersionTest extends TestCase
     #[Test]
     public function renders_the_unsaved_changes_version_for_a_valid_preview_token(): void
     {
-        $kirby = $this->bootKirby();
+        $kirby = $this->app();
         $version = $kirby->page('notes')->version(VersionId::changes());
         $version->save(['title' => 'Unsaved title']);
         $token = $version->previewToken();
         App::destroy();
 
         $_GET = ['_token' => $token, '_version' => 'changes'];
-        $this->bootKirby();
+        $this->app();
 
         $this->assertSame('{"title":"Unsaved title"}', Middlewares::tryResolvePage([], ['notes'])->body());
     }
@@ -56,11 +56,11 @@ final class PreviewVersionTest extends TestCase
     #[Test]
     public function renders_the_saved_version_without_a_token(): void
     {
-        $kirby = $this->bootKirby();
+        $kirby = $this->app();
         $kirby->page('notes')->version(VersionId::changes())->save(['title' => 'Unsaved title']);
         App::destroy();
 
-        $this->bootKirby();
+        $this->app();
 
         $this->assertSame('{"title":"Saved title"}', Middlewares::tryResolvePage([], ['notes'])->body());
     }
@@ -69,7 +69,7 @@ final class PreviewVersionTest extends TestCase
      * Content versions live on disk, so this fixture needs a real content root
      * rather than the in-memory site the other page tests boot.
      */
-    private function bootKirby(): App
+    private function app(): App
     {
         return new App([
             'roots' => [

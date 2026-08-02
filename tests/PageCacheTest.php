@@ -38,12 +38,12 @@ final class PageCacheTest extends TestCase
     public function replays_the_response_configuration_on_a_cache_hit(): void
     {
         $this->writeTemplate('<?php $kirby->response()->header("X-Custom", "yes")->code(201); echo "first";');
-        $this->bootKirby();
+        $this->app();
         Middlewares::tryResolvePage([], ['about']);
         App::destroy();
 
         $this->writeTemplate('<?php echo "second";');
-        $this->bootKirby();
+        $this->app();
         $response = Middlewares::tryResolvePage([], ['about']);
 
         $this->assertSame('first', $response->body());
@@ -64,13 +64,13 @@ final class PageCacheTest extends TestCase
         // outright, so the entry that must not be replayed is the one an
         // anonymous visitor left behind
         $this->writeTemplate('<?php $kirby->request()->auth(); echo "first";');
-        $this->bootKirby();
+        $this->app();
         Middlewares::tryResolvePage([], ['about']);
         App::destroy();
 
         $_SERVER['HTTP_AUTHORIZATION'] = 'Bearer secret';
         $this->writeTemplate('<?php echo "second";');
-        $this->bootKirby();
+        $this->app();
 
         $this->assertSame('second', Middlewares::tryResolvePage([], ['about'])->body());
     }
@@ -86,12 +86,12 @@ final class PageCacheTest extends TestCase
 
         // The positive control pins the key the renderer builds – without it
         // the assertion below would pass by missing the entry altogether
-        $this->bootKirby();
+        $this->app();
         $this->seedCache(['body' => 'from cache', 'code' => 200]);
         $this->assertSame('from cache', Middlewares::tryResolvePage([], ['about'])->body());
         App::destroy();
 
-        $this->bootKirby();
+        $this->app();
         $this->seedCache(['code' => 418]);
         $response = Middlewares::tryResolvePage([], ['about']);
 
@@ -103,12 +103,12 @@ final class PageCacheTest extends TestCase
     public function honors_a_template_that_opts_out_of_the_cache(): void
     {
         $this->writeTemplate('<?php $kirby->response()->cache(false); echo "first";');
-        $this->bootKirby();
+        $this->app();
         Middlewares::tryResolvePage([], ['about']);
         App::destroy();
 
         $this->writeTemplate('<?php echo "second";');
-        $this->bootKirby();
+        $this->app();
 
         $this->assertSame('second', Middlewares::tryResolvePage([], ['about'])->body());
     }
@@ -117,7 +117,7 @@ final class PageCacheTest extends TestCase
      * Boots with an active pages cache that survives `App::destroy()`, so a
      * second request can be told apart from a cache hit by its body alone.
      */
-    private function bootKirby(): void
+    private function app(): void
     {
         new App([
             'roots' => [
