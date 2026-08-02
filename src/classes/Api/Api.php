@@ -5,7 +5,7 @@ declare(strict_types = 1);
 namespace JohannSchopplich\Headless\Api;
 
 use Kirby\Cms\App;
-use Kirby\Exception\Exception;
+use Kirby\Http\Header;
 use Kirby\Http\Response;
 use Kirby\Toolkit\A;
 
@@ -117,28 +117,27 @@ final readonly class Api
     /**
      * Returns the status message for a given HTTP status code.
      *
-     * @throws \Kirby\Exception\Exception If the status code is not supported
+     * A route composed with `createHandler()` may answer with any code, so an
+     * unlisted one names its class rather than taking the response down.
      */
     private static function getStatusMessage(int $code): string
     {
+        // The three codes Kirby's own table leaves out
         $messages = [
-            200 => 'OK',
-            201 => 'Created',
             204 => 'No Content',
-            400 => 'Bad Request',
-            401 => 'Unauthorized',
-            403 => 'Forbidden',
-            404 => 'Not Found',
-            405 => 'Method Not Allowed',
             409 => 'Conflict',
-            422 => 'Unprocessable Entity',
-            500 => 'Internal Server Error'
+            422 => 'Unprocessable Entity'
         ];
 
-        if (!isset($messages[$code])) {
-            throw new Exception('Unknown status code: ' . $code);
-        }
-
-        return $messages[$code];
+        return Header::$codes['_' . $code]
+            ?? $messages[$code]
+            ?? match (intdiv($code, 100)) {
+                1 => 'Informational',
+                2 => 'Success',
+                3 => 'Redirection',
+                4 => 'Client Error',
+                5 => 'Server Error',
+                default => 'Unknown'
+            };
     }
 }
