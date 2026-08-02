@@ -89,6 +89,7 @@ final class FilesFieldResolverTest extends TestCase
         $this->assertStringContainsString('hero.jpg', $resolved['image'][0]['url']);
         $this->assertStringContainsString('cover.jpg', $resolved['cover'][0]['url']);
     }
+
     private function app(array $options = []): App
     {
         return new App([

@@ -54,6 +54,7 @@ return (new PhpCsFixer\Config())
 		'nullable_type_declaration_for_default_null_value' => true,
 		'object_operator_without_whitespace' => true,
 		'operator_linebreak' => ['position' => 'end', 'only_booleans' => true],
+		'ordered_class_elements' => true,
 		'ordered_imports' => ['sort_algorithm' => 'alpha'],
 		'ordered_types' => ['sort_algorithm' => 'none', 'null_adjustment' => 'always_last'],
 		'phpdoc_align' => ['align' => 'left'],

@@ -12,29 +12,6 @@ use PHPUnit\Framework\TestCase;
 #[PreserveGlobalState(false)]
 final class ResolvePermalinksFieldMethodTest extends TestCase
 {
-    private function app(array $options = []): App
-    {
-        return new App([
-            'roots' => ['index' => __DIR__],
-            'options' => $options,
-            'site' => [
-                'children' => [
-                    [
-                        'slug' => 'about',
-                        'content' => ['uuid' => 'about-uuid']
-                    ],
-                    [
-                        'slug' => 'home',
-                        'content' => [
-                            'uuid' => 'home-uuid',
-                            'text' => '<p><a href="page://about-uuid">About</a></p>'
-                        ]
-                    ]
-                ]
-            ]
-        ]);
-    }
-
     protected function tearDown(): void
     {
         App::destroy();
@@ -87,5 +64,28 @@ final class ResolvePermalinksFieldMethodTest extends TestCase
             $page->text()->resolvePermalinks()->value()
         );
         $this->assertSame('', $page->empty()->resolvePermalinks()->value());
+    }
+
+    private function app(array $options = []): App
+    {
+        return new App([
+            'roots' => ['index' => __DIR__],
+            'options' => $options,
+            'site' => [
+                'children' => [
+                    [
+                        'slug' => 'about',
+                        'content' => ['uuid' => 'about-uuid']
+                    ],
+                    [
+                        'slug' => 'home',
+                        'content' => [
+                            'uuid' => 'home-uuid',
+                            'text' => '<p><a href="page://about-uuid">About</a></p>'
+                        ]
+                    ]
+                ]
+            ]
+        ]);
     }
 }

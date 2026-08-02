@@ -4,15 +4,15 @@ use Kirby\Cms\App;
 use Kirby\Filesystem\F;
 
 F::loadClasses([
-    'JohannSchopplich\\Headless\\FrontendUrl' => 'src/classes/FrontendUrl.php',
-    'JohannSchopplich\\Headless\\PageRenderer' => 'src/classes/PageRenderer.php',
     'JohannSchopplich\\Headless\\Api\\Api' => 'src/classes/Api/Api.php',
     'JohannSchopplich\\Headless\\Api\\Middlewares' => 'src/classes/Api/Middlewares.php',
     'JohannSchopplich\\Headless\\BlocksResolver\\BlockHelper' => 'src/classes/BlocksResolver/BlockHelper.php',
-    'JohannSchopplich\\Headless\\BlocksResolver\\ReferenceFieldResolver' => 'src/classes/BlocksResolver/ReferenceFieldResolver.php',
+    'JohannSchopplich\\Headless\\BlocksResolver\\CustomFieldResolver' => 'src/classes/BlocksResolver/CustomFieldResolver.php',
     'JohannSchopplich\\Headless\\BlocksResolver\\FilesFieldResolver' => 'src/classes/BlocksResolver/FilesFieldResolver.php',
     'JohannSchopplich\\Headless\\BlocksResolver\\PagesFieldResolver' => 'src/classes/BlocksResolver/PagesFieldResolver.php',
-    'JohannSchopplich\\Headless\\BlocksResolver\\CustomFieldResolver' => 'src/classes/BlocksResolver/CustomFieldResolver.php'
+    'JohannSchopplich\\Headless\\BlocksResolver\\ReferenceFieldResolver' => 'src/classes/BlocksResolver/ReferenceFieldResolver.php',
+    'JohannSchopplich\\Headless\\FrontendUrl' => 'src/classes/FrontendUrl.php',
+    'JohannSchopplich\\Headless\\PageRenderer' => 'src/classes/PageRenderer.php'
 ], __DIR__);
 
 App::plugin('johannschopplich/headless', [

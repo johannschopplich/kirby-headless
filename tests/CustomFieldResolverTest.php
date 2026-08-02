@@ -64,6 +64,7 @@ final class CustomFieldResolverTest extends TestCase
 
         $this->assertSame($block, (new CustomFieldResolver())($block));
     }
+
     private function app(array $options = []): App
     {
         return new App([

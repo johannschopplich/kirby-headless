@@ -75,6 +75,7 @@ final class PagesFieldResolverTest extends TestCase
         // Default pages resolution is skipped, leaving the raw value untouched
         $this->assertSame('about', $resolved->content()->get('page')->value());
     }
+
     private function app(array $options = []): App
     {
         return new App([
