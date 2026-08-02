@@ -18,36 +18,31 @@ final readonly class Middlewares
 {
     /**
      * Attempts to resolve page and site files from the request path.
+     *
+     * Mirrors Kirby's own `App::resolve()`: a page under the same path wins,
+     * site files are only addressable at the root level, and every match is
+     * filtered through the `content.fileRedirects` option.
      */
     public static function tryResolveFiles(array $context, array $args): File|null
     {
         $kirby = App::instance();
+        $path = self::pathFromArgs($args);
 
-        // In multilang mode the language object is the first route argument,
-        // so the captured path is the second
-        $path = $kirby->multilang() ? ($args[1] ?? null) : ($args[0] ?? null);
-
-        if (empty($path)) {
+        if ($path === null || F::extension($path) === '') {
             return null;
         }
 
-        $extension = F::extension($path);
-
-        if (empty($extension)) {
+        // Page resolution decides afterwards whether the extension is serveable
+        if (self::findPage($path) !== null) {
             return null;
         }
 
-        $id = dirname($path);
-        $filename = basename($path);
-
-        // Try to resolve image URLs for pages and drafts
-        if ($page = $kirby->site()->findPageOrDraft($id)) {
-            return $page->file($filename);
+        if (!str_contains($path, '/')) {
+            return $kirby->resolveFile($kirby->site()->file($path));
         }
 
-        // Try to resolve site files at last
-        if ($file = $kirby->site()->file($filename)) {
-            return $file;
+        if ($page = $kirby->site()->findPageOrDraft(dirname($path))) {
+            return $kirby->resolveFile($page->file(basename($path)));
         }
 
         return null;
