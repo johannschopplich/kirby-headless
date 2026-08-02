@@ -54,7 +54,8 @@ return [
     },
 
     /**
-     * Converts the field to blocks and resolves the references they hold.
+     * Converts the field to blocks and resolves the page and file references
+     * they hold, plus any field a `blocksResolver.resolvers` entry claims.
      *
      * @kql-allowed
      */
@@ -73,7 +74,8 @@ return [
     },
 
     /**
-     * Converts the field to layouts and resolves the references their blocks hold.
+     * Converts the field to layouts and resolves the page and file references
+     * their blocks hold, plus any field a `blocksResolver.resolvers` entry claims.
      *
      * @kql-allowed
      */
