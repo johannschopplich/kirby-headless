@@ -103,4 +103,40 @@ final class GlobalRouteTest extends TestCase
 
         $this->assertSame('{"id":"about","lang":"de"}', $result->body());
     }
+
+    /**
+     * Only holds while the default language routes first – file-based
+     * languages load alphabetically, so a `de.php` ahead of an `en.php`
+     * claims the path before this route is ever reached.
+     */
+    #[Test]
+    public function serves_a_default_language_page_below_another_languages_path(): void
+    {
+        $kirby = new App([
+            'roots' => [
+                'index' => __DIR__,
+                'templates' => __DIR__ . '/fixtures/templates'
+            ],
+            'options' => ['headless' => ['globalRoutes' => true]],
+            'languages' => [
+                ['code' => 'en', 'default' => true, 'url' => '/'],
+                ['code' => 'de', 'url' => '/de']
+            ],
+            'site' => [
+                'children' => [
+                    [
+                        'slug' => 'de',
+                        'template' => 'language',
+                        'children' => [
+                            ['slug' => 'berlin', 'template' => 'language']
+                        ]
+                    ]
+                ]
+            ]
+        ]);
+
+        $result = $kirby->router()->call('de/berlin', 'GET');
+
+        $this->assertSame('{"id":"de\/berlin","lang":"en"}', $result->body());
+    }
 }
