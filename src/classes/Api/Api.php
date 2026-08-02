@@ -45,8 +45,6 @@ final readonly class Api
 
     /**
      * Creates a consistent JSON API response.
-     *
-     * Wraps data in a standardized format with code and status.
      */
     public static function createResponse(int $code, mixed $data = null, array $headers = []): Response
     {
@@ -64,6 +62,56 @@ final readonly class Api
             code: $code,
             headers: $headers
         );
+    }
+
+    /**
+     * Checks whether the client accepts a cached answer.
+     *
+     * `X-Cacheable: false` is how a caller asks for a freshly built response.
+     */
+    public static function clientAllowsCache(): bool
+    {
+        return App::instance()->request()->header('X-Cacheable') !== 'false';
+    }
+
+    /**
+     * Checks whether the current request may be answered from the pages cache.
+     *
+     * Mirrors `Page::isCacheable()`: an endpoint whose cache key does not cover
+     * the request must not answer from the cache once the request carries data.
+     */
+    public static function isCacheable(): bool
+    {
+        $request = App::instance()->request();
+
+        return self::clientAllowsCache() &&
+            in_array($request->method(), ['GET', 'HEAD'], true) &&
+            $request->data() === [] &&
+            $request->params()->isEmpty();
+    }
+
+    /**
+     * Returns a cached value, building and storing it when the request may be
+     * answered from the cache.
+     *
+     * A request the cache key cannot account for is built fresh and left
+     * unstored, so it neither reads a stranger's answer nor becomes one.
+     */
+    public static function cached(string $key, callable $build): mixed
+    {
+        $cache = App::instance()->cache('pages');
+        $isCacheable = self::isCacheable();
+        $value = $isCacheable ? $cache->get($key) : null;
+
+        if ($value === null) {
+            $value = $build();
+
+            if ($isCacheable) {
+                $cache->set($key, $value);
+            }
+        }
+
+        return $value;
     }
 
     /**

@@ -22,17 +22,16 @@ return [
 
         return [
             /**
-             * KQL endpoint with bearer token authentication and caching support.
+             * Runs KQL queries against the site.
              *
-             * Supports multilingual queries via X-Language header
-             * and cache control via X-Cacheable header.
+             * `X-Language` picks the language a query runs in, `X-Cacheable: false`
+             * asks for a freshly built answer.
              */
             [
                 'pattern' => 'kql',
                 'method' => 'GET|POST',
                 'auth' => !in_array($kqlAuthMethod, [false, 'bearer'], true),
                 'action' => Api::createHandler(
-                    // Validate the bearer token if required
                     function (array $context, array $args) use ($kqlAuthMethod): mixed {
                         if ($kqlAuthMethod !== 'bearer') {
                             return null;
@@ -40,9 +39,7 @@ return [
 
                         return Middlewares::validateBearerToken();
                     },
-                    // Run KQL queries and cache their results
                     function (array $context, array $args) use ($kirby): mixed {
-                        // Check if KQL is installed
                         if (!class_exists('Kirby\\Kql\\Kql')) {
                             throw new Exception('KQL is not installed. Please run: composer require getkirby/kql');
                         }
@@ -51,9 +48,10 @@ return [
                         $cache = $cacheKey = $data = null;
                         $languageCode = $kirby->request()->header('X-Language');
                         $hasLanguageCode = $languageCode !== null && $languageCode !== '';
-                        $isCacheable = $kirby->request()->header('X-Cacheable') !== 'false';
+                        // The cache key covers the query itself, so unlike the
+                        // other endpoints this one may cache a request with data
+                        $isCacheable = Api::clientAllowsCache();
 
-                        // Set the Kirby language in multilanguage sites
                         if ($kirby->multilang() && $hasLanguageCode) {
                             $kirby->setCurrentLanguage($languageCode);
                         }
@@ -71,7 +69,6 @@ return [
                         if ($data === null) {
                             $data = \Kirby\Kql\Kql::run($input);
 
-                            // Only populate the cache for cacheable requests
                             if ($isCacheable) {
                                 $cache?->set($cacheKey, $data);
                             }
@@ -83,10 +80,11 @@ return [
             ],
 
             /**
-             * Sitemap endpoint for headless frontend usage.
+             * Answers with every indexable page of the site.
              *
-             * Generates a JSON sitemap with support for multilingual sites
-             * and configurable page exclusions.
+             * Pages are filtered through the `headless.sitemap.exclude` options
+             * and each blueprint's own `sitemap` option. A multilang site gets
+             * the alternates of every language alongside each URL.
              */
             [
                 'pattern' => '__sitemap__',
@@ -95,7 +93,7 @@ return [
                 'action' => Api::createHandler(
                     Middlewares::hasBearerToken(),
                     function (array $context, array $args) use ($kirby): mixed {
-                        $data = $kirby->cache('pages')->getOrSet(
+                        $data = Api::cached(
                             'sitemap.headless.json',
                             function () use ($kirby) {
                                 $withoutBase = fn (string $url) => Url::path($url, true);
@@ -109,47 +107,47 @@ return [
 
                                 $sitemap = [];
 
-                                foreach ($kirby->site()->index() as $item) {
-                                    /** @var \Kirby\Cms\Page $item */
-                                    if (in_array($item->intendedTemplate()->name(), $excludeTemplates, true)) {
+                                foreach ($kirby->site()->index() as $page) {
+                                    /** @var \Kirby\Cms\Page $page */
+                                    if (in_array($page->intendedTemplate()->name(), $excludeTemplates, true)) {
                                         continue;
                                     }
 
-                                    if ($excludePages !== [] && preg_match('!^(?:' . implode('|', $excludePages) . ')$!i', $item->id())) {
+                                    if ($excludePages !== [] && preg_match('!^(?:' . implode('|', $excludePages) . ')$!i', $page->id())) {
                                         continue;
                                     }
 
-                                    $options = $item->blueprint()->options();
+                                    $options = $page->blueprint()->options();
                                     if (isset($options['sitemap']) && $options['sitemap'] === false) {
                                         continue;
                                     }
 
-                                    if (is_callable($isIndexable) && $isIndexable($item) === false) {
+                                    if (is_callable($isIndexable) && $isIndexable($page) === false) {
                                         continue;
                                     }
 
-                                    $url = ['url' => $withoutBase($item->url())];
+                                    $url = ['url' => $withoutBase($page->url())];
 
                                     // Omit the field rather than emit null when a
                                     // page has no resolvable modification date
-                                    if ($modified = $item->modified('Y-m-d', 'date')) {
+                                    if ($modified = $page->modified('Y-m-d', 'date')) {
                                         $url['modified'] = $modified;
                                     }
 
                                     if ($kirby->multilang()) {
-                                        $url['links'] = $kirby->languages()->map(fn ($lang) => [
+                                        $url['links'] = $kirby->languages()->map(fn ($language) => [
                                             // Support ISO 3166-1 Alpha 2 and ISO 639-1
                                             'lang' => Str::slug(preg_replace(
                                                 '/[.@].*$/',
                                                 '',
-                                                $lang->locale(LC_ALL) ?? $lang->code()
+                                                $language->locale(LC_ALL) ?? $language->code()
                                             )),
-                                            'url' => $withoutBase($item->url($lang->code()))
+                                            'url' => $withoutBase($page->url($language->code()))
                                         ])->values();
 
                                         $url['links'][] = [
                                             'lang' => 'x-default',
-                                            'url' => $withoutBase($item->url())
+                                            'url' => $withoutBase($page->url())
                                         ];
                                     }
 
@@ -166,9 +164,10 @@ return [
             ],
 
             /**
-             * Template rendering endpoint for standalone template usage.
+             * Renders a template that belongs to no page.
              *
-             * Renders any Kirby template as JSON without page context.
+             * The template receives `$kirby` and `$site` only – whatever a page
+             * or its controller would contribute is out of reach here.
              */
             [
                 'pattern' => '__template__/(:any)',
@@ -185,10 +184,10 @@ return [
                             ]);
                         }
 
-                        $data = $kirby->cache('pages')->getOrSet(
+                        $data = Api::cached(
                             'template-' . $templateName . '.headless.json',
-                            function () use ($args, $kirby) {
-                                $template = $kirby->template($args[0]);
+                            function () use ($kirby, $templateName) {
+                                $template = $kirby->template($templateName);
 
                                 if (!$template->exists()) {
                                     throw new NotFoundException([
@@ -198,7 +197,7 @@ return [
 
                                 return $template->render([
                                     'kirby' => $kirby,
-                                    'site'  => $kirby->site()
+                                    'site' => $kirby->site()
                                 ]);
                             }
                         );
