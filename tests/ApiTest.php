@@ -32,6 +32,22 @@ final class ApiTest extends TestCase
         $this->assertSame(['code' => 204, 'status' => 'No Content'], json_decode($response->body(), true));
     }
 
+    /**
+     * Only the three codes the plugin adds itself are worth pinning – the rest
+     * is Kirby's `Header::$codes` table, which `ok` stands in for.
+     *
+     * @return array<string, array{int, string}>
+     */
+    public static function supportedStatusCodes(): array
+    {
+        return [
+            'ok' => [200, 'OK'],
+            'no content' => [204, 'No Content'],
+            'conflict' => [409, 'Conflict'],
+            'unprocessable entity' => [422, 'Unprocessable Entity']
+        ];
+    }
+
     #[Test]
     #[DataProvider('supportedStatusCodes')]
     public function names_the_status_of_a_supported_code(int $code, string $message): void
@@ -39,6 +55,18 @@ final class ApiTest extends TestCase
         $response = Api::createResponse($code);
 
         $this->assertSame($message, json_decode($response->body(), true)['status']);
+    }
+
+    /**
+     * @return array<string, array{int, string}>
+     */
+    public static function unlistedStatusCodes(): array
+    {
+        return [
+            'too many requests' => [429, 'Client Error'],
+            'insufficient storage' => [507, 'Server Error'],
+            'im used' => [226, 'Success']
+        ];
     }
 
     /**
@@ -61,33 +89,5 @@ final class ApiTest extends TestCase
         $response = Api::createResponse(200, null, ['X-Foo' => 'bar']);
 
         $this->assertSame('bar', $response->headers()['X-Foo']);
-    }
-
-    /**
-     * Only the three codes the plugin adds itself are worth pinning – the rest
-     * is Kirby's `Header::$codes` table, which `ok` stands in for.
-     *
-     * @return array<string, array{int, string}>
-     */
-    public static function supportedStatusCodes(): array
-    {
-        return [
-            'ok' => [200, 'OK'],
-            'no content' => [204, 'No Content'],
-            'conflict' => [409, 'Conflict'],
-            'unprocessable entity' => [422, 'Unprocessable Entity']
-        ];
-    }
-
-    /**
-     * @return array<string, array{int, string}>
-     */
-    public static function unlistedStatusCodes(): array
-    {
-        return [
-            'too many requests' => [429, 'Client Error'],
-            'insufficient storage' => [507, 'Server Error'],
-            'im used' => [226, 'Success']
-        ];
     }
 }
