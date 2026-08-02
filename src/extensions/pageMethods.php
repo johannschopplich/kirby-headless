@@ -1,28 +1,17 @@
 <?php
 
-use Kirby\Toolkit\Str;
+use JohannSchopplich\Headless\FrontendUrl;
+use Kirby\Cms\Page;
 
 return [
     /**
      * Returns the frontend URL for this page based on configuration.
      *
-     * Replaces the Kirby site URL with the configured frontend URL.
-     *
      * @kql-allowed
      */
     'frontendUrl' => function (): string|null {
         /** @var \Kirby\Cms\Page $this */
-        $url = $this->kirby()->option('headless.panel.frontendUrl');
-
-        if ($url === null || $url === '') {
-            return null;
-        }
-
-        return Str::replace(
-            $this->url(),
-            $this->kirby()->url(),
-            $url
-        );
+        return FrontendUrl::resolve($this->url());
     },
 
     /**
@@ -34,23 +23,13 @@ return [
      */
     'breadcrumbMeta' => function (): array {
         /** @var \Kirby\Cms\Page $this */
-        $breadcrumb = [];
-        $breadcrumb[] = [
-            'title' => $this->title()->value(),
-            'uri' => $this->uri()
-        ];
-        $parent = $this->parent();
-
-        while ($parent) {
-            $breadcrumb[] = [
-                'title' => $parent->title()->value(),
-                'uri' => $parent->uri()
-            ];
-
-            $parent = $parent->parent();
-        }
-
-        return array_reverse($breadcrumb);
+        return $this->parents()
+            ->flip()
+            ->add($this)
+            ->values(fn (Page $page) => [
+                'title' => $page->title()->value(),
+                'uri' => $page->uri()
+            ]);
     },
 
     /**
@@ -62,13 +41,13 @@ return [
      */
     'i18nMeta' => function (): array {
         /** @var \Kirby\Cms\Page $this */
-        $locales = $this->kirby()->languages()->codes();
+        $languageCodes = $this->kirby()->languages()->codes();
         $meta = [];
 
-        foreach ($locales as $locale) {
-            $meta[$locale] = [
-                'title' => $this->content($locale)->get('title')->value(),
-                'uri' => $this->uri($locale)
+        foreach ($languageCodes as $languageCode) {
+            $meta[$languageCode] = [
+                'title' => $this->content($languageCode)->get('title')->value(),
+                'uri' => $this->uri($languageCode)
             ];
         }
 

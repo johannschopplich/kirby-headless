@@ -1,27 +1,15 @@
 <?php
 
-use Kirby\Toolkit\Str;
+use JohannSchopplich\Headless\FrontendUrl;
 
 return [
     /**
      * Returns the frontend URL for the site based on configuration.
      *
-     * Replaces the Kirby site URL with the configured frontend URL.
-     *
      * @kql-allowed
      */
     'frontendUrl' => function (): string|null {
         /** @var \Kirby\Cms\Site $this */
-        $url = $this->kirby()->option('headless.panel.frontendUrl');
-
-        if ($url === null || $url === '') {
-            return null;
-        }
-
-        return Str::replace(
-            $this->url(),
-            $this->kirby()->url(),
-            $url
-        );
+        return FrontendUrl::resolve($this->url());
     }
 ];

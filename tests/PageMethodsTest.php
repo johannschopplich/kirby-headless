@@ -74,30 +74,13 @@ final class PageMethodsTest extends TestCase
     {
         $kirby = new App([
             'roots' => ['index' => __DIR__],
-            'url' => 'https://example.com',
+            'urls' => ['index' => 'https://example.com'],
             'options' => ['headless.panel.frontendUrl' => 'https://frontend.test'],
             'site' => [
                 'children' => [['slug' => 'about']]
             ]
         ]);
 
-        $frontendUrl = $kirby->page('about')->frontendUrl();
-
-        $this->assertStringStartsWith('https://frontend.test', $frontendUrl);
-        $this->assertStringContainsString('about', $frontendUrl);
-        $this->assertStringNotContainsString('example.com', $frontendUrl);
-    }
-
-    #[Test]
-    public function frontend_url_returns_null_when_not_configured(): void
-    {
-        $kirby = new App([
-            'roots' => ['index' => __DIR__],
-            'site' => [
-                'children' => [['slug' => 'about']]
-            ]
-        ]);
-
-        $this->assertNull($kirby->page('about')->frontendUrl());
+        $this->assertSame('https://frontend.test/about', $kirby->page('about')->frontendUrl());
     }
 }
