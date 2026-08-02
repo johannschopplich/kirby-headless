@@ -81,6 +81,9 @@ echo \Kirby\Data\Json::encode([
 ]);
 ```
 
+> [!NOTE]
+> With `globalRoutes` enabled, page JSON and clean file URLs sit behind `headless.token`. Media URLs (`/media/pages/…`) do not – Kirby serves them from its own routes, so images keep working in the browser without a token.
+
 **[Read more →](https://kirby.tools/docs/headless/usage/json-templates)**
 
 ### 🍢 API Builder
