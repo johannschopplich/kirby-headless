@@ -24,7 +24,7 @@ final class PageCacheTest extends TestCase
 
     protected function tearDown(): void
     {
-        unset($_SERVER['HTTP_AUTHORIZATION']);
+        unset($_SERVER['HTTP_AUTHORIZATION'], $_SERVER['HTTP_X_CACHEABLE']);
         App::destroy();
         Dir::remove($this->root);
     }
@@ -132,6 +132,25 @@ final class PageCacheTest extends TestCase
 
         $this->assertSame('fresh', $response->body());
         $this->assertSame(200, $response->code());
+    }
+
+    #[Test]
+    public function renders_afresh_when_the_client_declines_the_cache(): void
+    {
+        $this->writeTemplate('<?php echo "first";');
+        $this->app();
+        Middlewares::tryResolvePage([], ['about']);
+        App::destroy();
+
+        $_SERVER['HTTP_X_CACHEABLE'] = 'false';
+        $this->writeTemplate('<?php echo "second";');
+        $this->app();
+
+        $this->assertSame('second', Middlewares::tryResolvePage([], ['about'])->body());
+        $this->assertSame(
+            'first',
+            App::instance()->cache('pages')->get('about.latest.html.headless.json')['response']['body']
+        );
     }
 
     #[Test]

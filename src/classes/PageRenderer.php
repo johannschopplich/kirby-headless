@@ -4,6 +4,7 @@ declare(strict_types = 1);
 
 namespace JohannSchopplich\Headless;
 
+use JohannSchopplich\Headless\Api\Api;
 use Kirby\Cms\App;
 use Kirby\Cms\Page;
 use Kirby\Cms\Responder;
@@ -33,7 +34,7 @@ final readonly class PageRenderer
         $versionId = self::renderVersion($page);
         $cache = $cacheKey = $body = null;
 
-        if ($page->isCacheable($versionId)) {
+        if (Api::clientAllowsCache() && $page->isCacheable($versionId)) {
             $cache = $kirby->cache('pages');
             $cacheKey = self::cacheKey($page, $contentType, $versionId);
             $body = self::replayCachedResponse($cache->get($cacheKey), $response);
