@@ -5,7 +5,6 @@ declare(strict_types = 1);
 namespace JohannSchopplich\Headless\Api;
 
 use Kirby\Cms\App;
-use Kirby\Cms\File;
 use Kirby\Exception\Exception;
 use Kirby\Http\Response;
 use Kirby\Toolkit\A;
@@ -14,23 +13,31 @@ final readonly class Api
 {
     /**
      * Creates an API handler that processes middleware functions sequentially.
+     *
+     * A middleware yields `null` to pass the request on and an array to add to
+     * the context every later middleware receives. Anything else is the answer
+     * and ends the chain – Kirby's router knows what to do with responses,
+     * files, pages and plain strings alike.
      */
-    public static function createHandler(callable ...$fns): callable
+    public static function createHandler(callable ...$middlewares): callable
     {
-        $context = [
-            'kirby' => App::instance()
-        ];
+        return function (...$args) use ($middlewares) {
+            // The handler outlives the request it was registered in, so the
+            // app has to be looked up per call
+            $context = [
+                'kirby' => App::instance()
+            ];
 
-        return function (...$args) use ($fns, $context) {
-            foreach ($fns as $fn) {
-                $result = $fn($context, $args);
-
-                if ($result instanceof Response || $result instanceof File) {
-                    return $result;
-                }
+            foreach ($middlewares as $middleware) {
+                $result = $middleware($context, $args);
 
                 if (is_array($result)) {
                     $context = A::merge($context, $result);
+                    continue;
+                }
+
+                if ($result !== null) {
+                    return $result;
                 }
             }
         };

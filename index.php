@@ -4,6 +4,7 @@ use Kirby\Cms\App;
 use Kirby\Filesystem\F;
 
 F::loadClasses([
+    'JohannSchopplich\\Headless\\PageRenderer' => 'src/classes/PageRenderer.php',
     'JohannSchopplich\\Headless\\Api\\Api' => 'src/classes/Api/Api.php',
     'JohannSchopplich\\Headless\\Api\\Middlewares' => 'src/classes/Api/Middlewares.php',
     'JohannSchopplich\\Headless\\BlocksResolver\\BlockHelper' => 'src/classes/BlocksResolver/BlockHelper.php',

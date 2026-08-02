@@ -4,8 +4,6 @@ declare(strict_types = 1);
 
 use JohannSchopplich\Headless\Api\Api;
 use Kirby\Cms\App;
-use Kirby\Cms\File;
-use Kirby\Http\Response;
 use PHPUnit\Framework\Attributes\PreserveGlobalState;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use PHPUnit\Framework\Attributes\Test;
@@ -17,12 +15,7 @@ final class ApiHandlerTest extends TestCase
 {
     protected function setUp(): void
     {
-        new App([
-            'roots' => ['index' => __DIR__],
-            'site' => [
-                'files' => [['filename' => 'banner.jpg']]
-            ]
-        ]);
+        new App(['roots' => ['index' => __DIR__]]);
     }
 
     protected function tearDown(): void
@@ -43,43 +36,48 @@ final class ApiHandlerTest extends TestCase
 
         $handler();
 
-        $this->assertArrayHasKey('kirby', $captured);
         $this->assertSame('x', $captured['body']);
     }
 
+    /**
+     * The first middleware to answer ends the chain, whatever it answers with:
+     * Kirby's router takes more than responses, so a page or a plain string
+     * has to reach `App::io()` instead of vanishing.
+     */
     #[Test]
-    public function short_circuits_and_returns_response_without_running_later_middlewares(): void
+    public function returns_any_result_a_middleware_produces(): void
     {
         $reached = false;
         $handler = Api::createHandler(
-            fn (array $context, array $args) => Api::createResponse(401),
+            fn (array $context, array $args) => 'raw body',
             function (array $context, array $args) use (&$reached): void {
                 $reached = true;
             }
         );
 
-        $result = $handler();
-
-        $this->assertInstanceOf(Response::class, $result);
-        $this->assertSame(401, $result->code());
+        $this->assertSame('raw body', $handler());
         $this->assertFalse($reached);
     }
 
+    /**
+     * Handlers are built once when the routes are registered, but the app they
+     * hand to the middlewares has to be the one serving the request.
+     */
     #[Test]
-    public function short_circuits_and_returns_file_without_running_later_middlewares(): void
+    public function hands_the_current_app_instance_to_the_middlewares(): void
     {
-        $reached = false;
+        $captured = null;
         $handler = Api::createHandler(
-            fn (array $context, array $args) => App::instance()->site()->file('banner.jpg'),
-            function (array $context, array $args) use (&$reached): void {
-                $reached = true;
+            function (array $context, array $args) use (&$captured): void {
+                $captured = $context['kirby'];
             }
         );
 
-        $result = $handler();
+        App::destroy();
+        $kirby = new App(['roots' => ['index' => __DIR__]]);
+        $handler();
 
-        $this->assertInstanceOf(File::class, $result);
-        $this->assertFalse($reached);
+        $this->assertSame($kirby, $captured);
     }
 
     #[Test]
