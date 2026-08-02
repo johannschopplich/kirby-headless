@@ -13,6 +13,13 @@ return [
     'routes' => function (App $kirby) {
         $kqlAuthMethod = $kirby->option('kql.auth', true);
 
+        // Bearer auth without a token would authenticate nobody, and `false`
+        // already exists for opening the endpoint on purpose – so fall back
+        // to Kirby's native API auth rather than silently serving everyone
+        if ($kqlAuthMethod === 'bearer' && $kirby->option('headless.token') === null) {
+            $kqlAuthMethod = true;
+        }
+
         return [
             /**
              * KQL endpoint with bearer token authentication and caching support.

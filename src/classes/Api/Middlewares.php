@@ -88,34 +88,49 @@ final readonly class Middlewares
     /**
      * Returns a middleware that validates the bearer token.
      *
-     * @param bool $redirectToPanel Whether to redirect to Panel when no auth header is present
+     * @param bool $redirectToPanel Whether an unauthenticated browser navigation may be sent to the Panel
      */
     public static function hasBearerToken(bool $redirectToPanel = false): callable
     {
-        // Closure is handed to Kirby's dispatch, so `self::` would break if it
-        // were ever rebound/inlined as a route or API action
+        // Kirby's dispatch rebinds the closure to the `Route` object, so
+        // `self::` would resolve to `Route` instead of this class
         return fn (array $context, array $args) => Middlewares::validateBearerToken($redirectToPanel);
     }
 
     /**
      * Validates the bearer token from the Authorization header.
      *
-     * @param bool $redirectToPanel Whether to redirect to Panel when no auth header is present
+     * @param bool $redirectToPanel Whether an unauthenticated browser navigation may be sent to the Panel
      */
     public static function validateBearerToken(bool $redirectToPanel = false): Response|null
     {
         $kirby = App::instance();
         $token = $kirby->option('headless.token');
         $authorization = $kirby->request()->header('Authorization');
+        $accept = $kirby->request()->header('Accept');
 
-        if ($redirectToPanel && $kirby->option('headless.panel.redirect', false) && empty($authorization)) {
+        // Only a browser navigation is worth redirecting. `prefersJson()` tests
+        // for JSON rather than against HTML, so a client that sent no `Accept`
+        // header states no preference and must not be redirected either
+        if (
+            $redirectToPanel &&
+            $kirby->option('headless.panel.redirect', false) &&
+            ($authorization === null || $authorization === '') &&
+            ($accept !== null && $accept !== '') &&
+            !$kirby->visitor()->prefersJson()
+        ) {
             return Response::redirect(Panel::url('site'), 302);
         }
 
-        if (
-            !empty($token) &&
-            (empty($authorization) || $authorization !== 'Bearer ' . $token)
-        ) {
+        // An absent token opts out of authentication, but a blank one is a
+        // failed configuration that must never open the site
+        if ($token === null) {
+            return null;
+        }
+
+        $token = trim((string)$token);
+
+        if ($token === '' || $authorization !== 'Bearer ' . $token) {
             return Api::createResponse(401);
         }
 
@@ -123,7 +138,8 @@ final readonly class Middlewares
     }
 
     /**
-     * Validates that a request body exists.
+     * Rejects a request without a body and hands the parsed one to the
+     * middlewares that follow.
      */
     public static function hasBody(array $context): Response|array
     {

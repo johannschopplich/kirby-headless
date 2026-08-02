@@ -7,15 +7,23 @@ return [
     /**
      * Global catch-all route for headless JSON responses.
      *
-     * Attempts to resolve files first, validates bearer token,
-     * then returns page data as JSON.
+     * Validates the bearer token first, so neither file nor page resolution
+     * can hand out anything ahead of the gate.
+     *
+     * Kirby registers its own catch-all for every method, so this route has
+     * to match every method too – otherwise anything but `GET` falls straight
+     * through to Kirby's resolver, past the gate.
+     *
+     * Media URLs never reach this route – Kirby serves them from its own
+     * `before` routes, which plugins cannot overwrite.
      */
     [
         'pattern' => '(:all)',
+        'method' => 'ALL',
         'language' => '*',
         'action' => Api::createHandler(
-            Middlewares::tryResolveFiles(...),
             Middlewares::hasBearerToken(true),
+            Middlewares::tryResolveFiles(...),
             Middlewares::tryResolvePage(...)
         )
     ]
