@@ -179,13 +179,7 @@ return [
                 'action' => Api::createHandler(
                     Middlewares::hasBearerToken(),
                     function (array $context, array $args) use ($kirby): mixed {
-                        $templateName = $args[0] ?? null;
-
-                        if ($templateName === null || $templateName === '') {
-                            throw new NotFoundException([
-                                'key' => 'template.default.notFound'
-                            ]);
-                        }
+                        $templateName = $args[0];
 
                         // The template renders in the request's language too, and its name alone cannot tell two languages apart
                         $languageSuffix = $kirby->multilang() ? '-' . $kirby->languageCode() : '';
