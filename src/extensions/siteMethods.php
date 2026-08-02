@@ -4,7 +4,8 @@ use JohannSchopplich\Headless\FrontendUrl;
 
 return [
     /**
-     * Returns the frontend URL for the site based on configuration.
+     * Returns the site's URL rebased onto `headless.panel.frontendUrl`,
+     * or `null` when that option is unset.
      *
      * @kql-allowed
      */

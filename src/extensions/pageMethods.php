@@ -5,7 +5,8 @@ use Kirby\Cms\Page;
 
 return [
     /**
-     * Returns the frontend URL for this page based on configuration.
+     * Returns the page's URL rebased onto `headless.panel.frontendUrl`,
+     * or `null` when that option is unset.
      *
      * @kql-allowed
      */
