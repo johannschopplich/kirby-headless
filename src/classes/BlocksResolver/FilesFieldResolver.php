@@ -9,9 +9,6 @@ use Kirby\Cms\Collection;
 use Kirby\Cms\File;
 use Kirby\Content\Field;
 
-/**
- * Resolver for file fields in blocks.
- */
 final readonly class FilesFieldResolver extends ReferenceFieldResolver
 {
     protected function optionNamespace(): string

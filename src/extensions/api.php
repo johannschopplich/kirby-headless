@@ -128,8 +128,7 @@ return [
 
                                     $url = ['url' => $withoutBase($page->url())];
 
-                                    // Omit the field rather than emit null when a
-                                    // page has no resolvable modification date
+                                    // Omit the field rather than emit null
                                     if ($modified = $page->modified('Y-m-d', 'date')) {
                                         $url['modified'] = $modified;
                                     }
@@ -166,8 +165,7 @@ return [
             /**
              * Renders a template that belongs to no page.
              *
-             * The template receives `$kirby` and `$site` only – whatever a page
-             * or its controller would contribute is out of reach here.
+             * The template receives `$kirby` and `$site` only.
              */
             [
                 'pattern' => '__template__/(:any)',

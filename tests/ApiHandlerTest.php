@@ -40,9 +40,8 @@ final class ApiHandlerTest extends TestCase
     }
 
     /**
-     * The first middleware to answer ends the chain, whatever it answers with:
-     * Kirby's router takes more than responses, so a page or a plain string
-     * has to reach `App::io()` instead of vanishing.
+     * The first middleware to answer ends the chain, whatever it answers with –
+     * Kirby's router takes more than responses.
      */
     #[Test]
     public function returns_any_result_a_middleware_produces(): void

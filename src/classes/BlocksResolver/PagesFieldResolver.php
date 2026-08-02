@@ -9,9 +9,6 @@ use Kirby\Cms\Collection;
 use Kirby\Cms\Page;
 use Kirby\Content\Field;
 
-/**
- * Resolver for page fields in blocks.
- */
 final readonly class PagesFieldResolver extends ReferenceFieldResolver
 {
     protected function optionNamespace(): string

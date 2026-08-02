@@ -19,9 +19,7 @@ final readonly class Middlewares
     /**
      * Attempts to resolve page and site files from the request path.
      *
-     * Mirrors Kirby's own `App::resolve()`: a page under the same path wins,
-     * site files are only addressable at the root level, and every match is
-     * filtered through the `content.fileRedirects` option.
+     * Mirrors Kirby's own `App::resolve()`, down to `content.fileRedirects`.
      */
     public static function tryResolveFiles(array $context, array $args): File|null
     {
@@ -50,9 +48,6 @@ final readonly class Middlewares
 
     /**
      * Attempts to resolve the request path to a rendered page response.
-     *
-     * Falls back to the homepage for an empty path and to the error page when
-     * nothing resolves. Yields `null` for a path addressed to another language.
      *
      * @throws \Kirby\Exception\NotFoundException If the page template does not exist
      */
@@ -158,9 +153,6 @@ final readonly class Middlewares
 
     /**
      * Extracts the captured path from the route arguments.
-     *
-     * In multilang mode the language object is the first route argument,
-     * so the captured path is the second.
      */
     private static function pathFromArgs(array $args): string|null
     {
@@ -173,10 +165,9 @@ final readonly class Middlewares
      * Finds the page a request path points to, drafts included.
      *
      * `Site::find()` strips the extension itself, so a file never claims a
-     * path a page already occupies – no matter which extension it carries.
+     * path a page already occupies.
      *
-     * A draft needs the same permission Kirby asks for in `App::resolve()`:
-     * a Panel user who may see it, or a valid preview token in the request.
+     * A draft needs the same permission Kirby asks for in `App::resolve()`.
      */
     private static function findPage(string $path): Page|null
     {

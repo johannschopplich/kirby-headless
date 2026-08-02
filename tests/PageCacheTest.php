@@ -55,7 +55,7 @@ final class PageCacheTest extends TestCase
      * A template that reads the `Authorization` header varies by it, so the
      * copy filled by an anonymous visitor is that visitor's alone. Kirby marks
      * such a response through `Responder::usesAuth()`, and the entry has to
-     * carry the mark – a bearer-authenticated route is where it has to hold.
+     * carry the mark.
      */
     #[Test]
     public function refuses_to_replay_an_entry_that_varies_by_credentials(): void

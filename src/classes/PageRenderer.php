@@ -18,8 +18,7 @@ final readonly class PageRenderer
      *
      * Mirrors `Page::render()`: the response configuration travels with the
      * body, so headers and status codes a template sets apply to every visitor
-     * and not just the one whose request filled the cache. An entry that hinged
-     * on the visitor's credentials is never replayed for someone else.
+     * and not just the one whose request filled the cache.
      *
      * @param string $extension The extension the request asked for, empty for none
      * @throws \Kirby\Exception\NotFoundException If the template does not exist
@@ -82,9 +81,6 @@ final readonly class PageRenderer
 
     /**
      * Restores a cached response and returns its body.
-     *
-     * Yields `null` when there is nothing to replay, which sends the caller
-     * back to rendering.
      */
     private static function replayCachedResponse(mixed $cachedEntry, Responder $response): string|null
     {
@@ -123,8 +119,8 @@ final readonly class PageRenderer
     /**
      * Renders a page through the given template.
      *
-     * Mirrors Kirby's own `Page::render()` so the `page.render:before` and
-     * `page.render:after` hooks keep firing for headless responses.
+     * Fires `page.render:before` and `page.render:after`, so plugins that hook
+     * Kirby's own rendering keep working for headless responses.
      *
      * @throws \Kirby\Exception\NotFoundException If the template does not exist
      */

@@ -6,9 +6,6 @@ namespace JohannSchopplich\Headless\BlocksResolver;
 
 use Kirby\Cms\Block;
 
-/**
- * Resolver for custom fields in blocks.
- */
 final readonly class CustomFieldResolver
 {
     public function __invoke(Block $block): Block
@@ -20,8 +17,7 @@ final readonly class CustomFieldResolver
         $hasChanges = false;
 
         foreach ($resolvers as $identifier => $resolver) {
-            // A resolver is keyed `blockType:fieldName`; anything else names
-            // no field and would hand the resolver something it cannot read
+            // A resolver is keyed `blockType:fieldName`
             if (!str_contains($identifier, ':')) {
                 continue;
             }

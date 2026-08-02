@@ -60,8 +60,8 @@ final class EndpointCacheTest extends TestCase
     }
 
     /**
-     * `X-Cacheable: false` is how a client asks for a fresh answer. KQL has
-     * honored it for releases; the other endpoints have to speak the same language.
+     * `X-Cacheable: false` is how a client asks for a fresh answer – every
+     * endpoint has to speak that language, not just KQL.
      */
     #[Test]
     public function rebuilds_the_sitemap_when_the_client_declines_the_cache(): void

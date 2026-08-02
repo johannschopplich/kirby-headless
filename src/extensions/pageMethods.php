@@ -15,9 +15,7 @@ return [
     },
 
     /**
-     * Returns breadcrumb navigation metadata.
-     *
-     * Generates an array of page titles and URIs from current page to site root.
+     * Returns breadcrumb navigation metadata, from the site root down to this page.
      *
      * @kql-allowed
      */
@@ -33,9 +31,7 @@ return [
     },
 
     /**
-     * Returns internationalization metadata for all languages.
-     *
-     * Provides translated titles and URIs for each configured language.
+     * Returns the translated title and URI per configured language.
      *
      * @kql-allowed
      */

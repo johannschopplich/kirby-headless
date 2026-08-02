@@ -16,8 +16,7 @@ final readonly class Api
      *
      * A middleware yields `null` to pass the request on and an array to add to
      * the context every later middleware receives. Anything else is the answer
-     * and ends the chain – Kirby's router knows what to do with responses,
-     * files, pages and plain strings alike.
+     * and ends the chain.
      */
     public static function createHandler(callable ...$middlewares): callable
     {
@@ -66,8 +65,6 @@ final readonly class Api
 
     /**
      * Checks whether the client accepts a cached answer.
-     *
-     * `X-Cacheable: false` is how a caller asks for a freshly built response.
      */
     public static function clientAllowsCache(): bool
     {
@@ -94,8 +91,8 @@ final readonly class Api
      * Returns a cached value, building and storing it when the request may be
      * answered from the cache.
      *
-     * A request the cache key cannot account for is built fresh and left
-     * unstored, so it neither reads a stranger's answer nor becomes one.
+     * A request the key cannot account for neither reads a stranger's answer
+     * nor becomes one.
      */
     public static function cached(string $key, callable $build): mixed
     {

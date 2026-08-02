@@ -11,10 +11,6 @@ use Kirby\Content\Field;
 
 /**
  * Turns the references a block holds into ready-made data for the frontend.
- *
- * Pages and files differ only in the option namespace they read, the shape
- * they resolve to and the collection their field yields – everything else
- * about walking a block's configured fields is the same.
  */
 abstract readonly class ReferenceFieldResolver
 {
