@@ -2,7 +2,7 @@
   "name": "johannschopplich/kirby-headless",
   "description": "API-first toolkit for Kirby CMS",
   "type": "kirby-plugin",
-  "version": "7.0.0",
+  "version": "8.0.0",
   "keywords": [
     "kirby",
     "headless"
