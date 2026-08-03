@@ -71,7 +71,7 @@ final class FilesFieldResolverTest extends TestCase
     }
 
     #[Test]
-    public function skips_field_when_custom_resolver_registered_for_block_and_key(): void
+    public function skips_field_when_a_custom_resolver_is_registered_for_block_and_key(): void
     {
         $kirby = $this->app([
             'blocksResolver.resolvers' => ['image:image' => fn () => 'custom']
