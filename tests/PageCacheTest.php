@@ -154,7 +154,7 @@ final class PageCacheTest extends TestCase
     }
 
     #[Test]
-    public function honors_a_template_that_opts_out_of_the_cache(): void
+    public function respects_a_template_that_opts_out_of_the_cache(): void
     {
         $this->writeTemplate('<?php $kirby->response()->cache(false); echo "first";');
         $this->app();
