@@ -51,7 +51,7 @@ final class PagesFieldResolverTest extends TestCase
     }
 
     #[Test]
-    public function returns_same_block_untouched_when_block_type_not_configured(): void
+    public function leaves_a_block_of_an_unconfigured_type_untouched(): void
     {
         $this->app(['blocksResolver.pages' => ['link' => 'page']]);
         $block = new Block(['type' => 'text', 'content' => ['page' => 'about']]);
@@ -60,7 +60,7 @@ final class PagesFieldResolverTest extends TestCase
     }
 
     #[Test]
-    public function nests_resolved_value_under_resolved_key_when_configured(): void
+    public function nests_the_resolved_value_under_the_resolved_key_and_keeps_the_original_field(): void
     {
         $this->app([
             'blocksResolver.pages' => ['link' => 'page'],

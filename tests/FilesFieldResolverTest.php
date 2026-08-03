@@ -40,7 +40,7 @@ final class FilesFieldResolverTest extends TestCase
     }
 
     #[Test]
-    public function resolves_default_image_block_field_to_url_dimensions_and_alt(): void
+    public function resolves_the_default_image_block_field_to_url_dimensions_srcset_and_alt(): void
     {
         $kirby = $this->app();
         $block = new Block([
@@ -58,7 +58,7 @@ final class FilesFieldResolverTest extends TestCase
     }
 
     #[Test]
-    public function returns_same_block_when_referenced_files_collection_is_empty(): void
+    public function leaves_a_block_with_an_empty_files_field_untouched(): void
     {
         $kirby = $this->app();
         $block = new Block([

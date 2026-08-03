@@ -61,7 +61,7 @@ final class CustomFieldResolverTest extends TestCase
     }
 
     #[Test]
-    public function ignores_resolver_whose_block_type_does_not_match(): void
+    public function ignores_a_resolver_whose_block_type_does_not_match(): void
     {
         $this->app([
             'blocksResolver.resolvers' => [
