@@ -28,6 +28,7 @@ pnpm-workspace.yaml export-ignore
 .env.example export-ignore
 .vscode/ export-ignore
 AGENTS.md export-ignore
+CLAUDE.md export-ignore
 composer.lock export-ignore
 mprocs.yaml export-ignore
 playground/ export-ignore
