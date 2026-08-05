@@ -22,7 +22,7 @@ final class ResolveFilesMiddlewareTest extends TestCase
     {
         return array_merge([
             'roots' => ['index' => __DIR__],
-            // Clean file URLs are opt-in in Kirby and stay opt-in here
+            // Clean file URLs are opt-in in Kirby and stay opt-in here.
             'options' => ['content' => ['fileRedirects' => true]],
             'site' => [
                 'files' => [['filename' => 'logo.png']],
@@ -58,7 +58,7 @@ final class ResolveFilesMiddlewareTest extends TestCase
         ]));
 
         // In multilang mode the language object is the first route argument
-        // and the captured path is the second
+        // and the captured path is the second.
         $file = Middlewares::tryResolveFiles([], [$kirby->language('en'), 'about/hero.jpg']);
 
         $this->assertSame('about/hero.jpg', $file->id());

@@ -30,7 +30,7 @@ final readonly class Middlewares
             return null;
         }
 
-        // Page resolution decides afterwards whether the extension is serveable
+        // Page resolution decides afterwards whether the extension is servable.
         if (self::findPage($path) !== null) {
             return null;
         }
@@ -56,7 +56,7 @@ final readonly class Middlewares
         $kirby = App::instance();
         $path = self::pathFromArgs($args);
 
-        // Returning null lets Kirby move on to the language this path addresses
+        // Returning `null` lets Kirby move on to the language this path addresses.
         if ($path !== null && self::hasOtherLanguagePrefix($path)) {
             return null;
         }
@@ -75,7 +75,7 @@ final readonly class Middlewares
             if ($page !== null) {
                 $extension = F::extension($path);
             } else {
-                // Kirby renders the error page as HTML whatever extension the request asked for
+                // Kirby renders the error page as HTML whatever extension the request asked for.
                 $page = $kirby->site()->errorPage();
             }
         }
@@ -95,7 +95,7 @@ final readonly class Middlewares
     public static function hasBearerToken(bool $redirectToPanel = false): callable
     {
         // Kirby's dispatch rebinds the closure to the `Route` object, so
-        // `self::` would resolve to `Route` instead of this class
+        // `self::` would resolve to `Route` instead of this class.
         return fn (array $context, array $args) => Middlewares::validateBearerToken($redirectToPanel);
     }
 
@@ -111,7 +111,7 @@ final readonly class Middlewares
 
         // Only a browser navigation is worth redirecting. `prefersJson()` tests
         // for JSON rather than against HTML, so a client that sent no `Accept`
-        // header states no preference and must not be redirected either
+        // header states no preference and must not be redirected either.
         if (
             $redirectToPanel &&
             $kirby->option('headless.panel.redirect', false) &&
@@ -123,7 +123,7 @@ final readonly class Middlewares
         }
 
         // An absent token opts out of authentication, but a blank one is a
-        // failed configuration that must never open the site
+        // failed configuration that must never open the site.
         if ($token === null) {
             return null;
         }
@@ -205,7 +205,7 @@ final readonly class Middlewares
      */
     private static function resolvePath(string $path): Page|Response|null
     {
-        // Kirby refuses paths with an incomplete content representation
+        // Kirby refuses paths with an incomplete content representation.
         if (Str::endsWith($path, '.')) {
             return null;
         }
@@ -241,7 +241,7 @@ final readonly class Middlewares
         }
 
         // A page ID may begin with another language's path, and the page the
-        // current language resolves wins over the prefix
+        // current language resolves wins over the prefix.
         if ($kirby->site()->find($path) !== null) {
             return false;
         }

@@ -36,7 +36,7 @@ abstract readonly class ReferenceFieldResolver
         $hasChanges = false;
 
         foreach ($fieldKeys as $key) {
-            // A resolver registered for this very field takes precedence
+            // A resolver registered for this very field takes precedence.
             if (isset($resolvers[$block->type() . ':' . $key])) {
                 continue;
             }

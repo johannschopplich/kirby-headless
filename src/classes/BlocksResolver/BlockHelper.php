@@ -29,7 +29,7 @@ final readonly class BlockHelper
     ): void {
         if ($resolvedKey !== null && $resolvedKey !== '') {
             // Accumulate into the in-progress content so multiple fields
-            // resolved into the same key are merged instead of overwritten
+            // resolved into the same key are merged instead of overwritten.
             $resolvedData = $content[$resolvedKey]
                 ?? $block->content()->get($resolvedKey)->or([])->value();
 

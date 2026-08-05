@@ -15,7 +15,7 @@ return [
 
         // Bearer auth without a token would authenticate nobody, and `false`
         // already exists for opening the endpoint on purpose – so fall back
-        // to Kirby's native API auth rather than silently serving everyone
+        // to Kirby's native API auth rather than silently serving everyone.
         if ($kqlAuthMethod === 'bearer' && $kirby->option('headless.token') === null) {
             $kqlAuthMethod = true;
         }
@@ -51,7 +51,7 @@ return [
                         // Too specific for `Api::getOrSet()`: the cache key
                         // hashes the query body, so unlike the other endpoints
                         // this one may answer a request that carries data, and
-                        // an empty query is never cached at all
+                        // an empty query is never cached at all.
                         $isCacheable = Api::clientAllowsCache();
 
                         if ($kirby->multilang() && $hasLanguageCode) {
@@ -95,7 +95,7 @@ return [
                 'action' => Api::createHandler(
                     Middlewares::hasBearerToken(),
                     function (array $context, array $args) use ($kirby): mixed {
-                        // The sitemap renders in the request's language, so the key has to carry it
+                        // The sitemap renders in the request's language, so the key has to carry it.
                         $languageSuffix = $kirby->multilang() ? '-' . $kirby->languageCode() : '';
 
                         $data = Api::getOrSet(
@@ -133,14 +133,14 @@ return [
 
                                     $url = ['url' => $withoutBase($page->url())];
 
-                                    // Omit the field rather than emit null
+                                    // Omit the field rather than emit `null`.
                                     if ($modified = $page->modified('Y-m-d', 'date')) {
                                         $url['modified'] = $modified;
                                     }
 
                                     if ($kirby->multilang()) {
                                         $url['links'] = $kirby->languages()->map(fn ($language) => [
-                                            // Support ISO 3166-1 Alpha 2 and ISO 639-1
+                                            // Support ISO 3166-1 Alpha 2 and ISO 639-1.
                                             'lang' => Str::slug(preg_replace(
                                                 '/[.@].*$/',
                                                 '',
@@ -181,7 +181,7 @@ return [
                     function (array $context, array $args) use ($kirby): mixed {
                         $templateName = $args[0];
 
-                        // The template renders in the request's language too, and its name alone cannot tell two languages apart
+                        // The template renders in the request's language too, and its name alone cannot tell two languages apart.
                         $languageSuffix = $kirby->multilang() ? '-' . $kirby->languageCode() : '';
 
                         $data = Api::getOrSet(

@@ -48,7 +48,7 @@ final class BearerTokenMiddlewareTest extends TestCase
     #[DataProvider('blankTokens')]
     public function rejects_requests_when_the_configured_token_is_blank(string $token): void
     {
-        // Even a client sending exactly the configured token is turned away
+        // Even a client sending exactly the configured token is turned away.
         $this->app(['headless' => ['token' => $token]], 'Bearer ' . $token);
 
         $this->assertSame(401, Middlewares::validateBearerToken()?->code());

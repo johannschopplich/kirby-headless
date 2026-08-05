@@ -90,8 +90,6 @@ final class FilesFieldResolverTest extends TestCase
     #[Test]
     public function accumulates_multiple_file_fields_under_one_resolved_key(): void
     {
-        // Regression: a block resolving two file fields into one bucket must
-        // keep both, not let the second overwrite the first
         $kirby = $this->app([
             'blocksResolver.files' => ['gallery' => ['image', 'cover']],
             'blocksResolver.resolvedKey' => 'resolved'

@@ -41,7 +41,7 @@ return [
                                 $element->setAttribute($attribute, $url);
                             }
                         } catch (InvalidArgumentException) {
-                            // An attribute that is not a permalink is left as it is
+                            // An attribute that is not a permalink is left as it is.
                         }
                     }
                 }

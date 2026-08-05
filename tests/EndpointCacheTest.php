@@ -63,7 +63,7 @@ final class EndpointCacheTest extends TestCase
     private function appWithLanguages(): App
     {
         return new App([
-            // Without an index URL the sitemap paths collapse to an empty string
+            // Without an index URL the sitemap paths collapse to an empty string.
             'urls' => [
                 'index' => 'https://example.com'
             ],

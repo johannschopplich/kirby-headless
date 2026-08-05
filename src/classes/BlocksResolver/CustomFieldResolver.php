@@ -17,7 +17,7 @@ final readonly class CustomFieldResolver
         $hasChanges = false;
 
         foreach ($resolvers as $identifier => $resolver) {
-            // A resolver is keyed `blockType:fieldName`
+            // A resolver is keyed `blockType:fieldName`.
             if (!str_contains($identifier, ':')) {
                 continue;
             }

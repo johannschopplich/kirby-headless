@@ -42,7 +42,7 @@ final readonly class PageRenderer
 
         if ($body === null) {
             // The body travels inside the response, so it has to be in place
-            // before the configuration is handed to the cache
+            // before the configuration is handed to the cache.
             $response->body(VersionId::render(
                 $versionId,
                 fn () => self::render($page, $template, $contentType)
@@ -58,7 +58,7 @@ final readonly class PageRenderer
         }
 
         // A representation keeps the MIME type its extension implies –
-        // everything else is page JSON
+        // everything else is page JSON.
         if ($response->type() === null) {
             $response->type($contentType === 'html' ? 'json' : $contentType);
         }
@@ -85,13 +85,12 @@ final readonly class PageRenderer
      */
     private static function replayCachedResponse(mixed $cachedEntry, Responder $response): string|null
     {
-        // Releases up to v8.0 cached the bare body
         if (!is_array($cachedEntry)) {
             return null;
         }
 
         // Read the body before touching the response, so an entry that turns
-        // out to be unusable cannot colour the one we render in its place
+        // out to be unusable cannot color the one we render in its place.
         $body = $cachedEntry['response']['body'] ?? null;
 
         if ($body === null) {
@@ -151,7 +150,7 @@ final readonly class PageRenderer
 
     private static function cacheKey(Page $page, string $contentType, VersionId $versionId): string
     {
-        // Filtering on null rather than truthiness keeps a page whose ID is `0`
+        // Filtering on `null` rather than truthiness keeps a page whose ID is `0`.
         return implode('.', array_filter([
             $page->id(),
             App::instance()->language()?->code(),

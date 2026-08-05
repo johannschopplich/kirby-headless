@@ -74,7 +74,6 @@ final class PagesFieldResolverTest extends TestCase
             [['uri' => 'about', 'title' => 'About Us']],
             $resolved->content()->get('resolved')->value()['page']
         );
-        // Original field value is preserved alongside the resolved bucket
         $this->assertSame('about', $resolved->content()->get('page')->value());
     }
 
@@ -89,7 +88,6 @@ final class PagesFieldResolverTest extends TestCase
 
         $resolved = (new PagesFieldResolver())($block);
 
-        // Default pages resolution is skipped, leaving the raw value untouched
         $this->assertSame('about', $resolved->content()->get('page')->value());
     }
 }

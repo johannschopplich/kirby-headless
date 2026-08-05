@@ -97,7 +97,7 @@ final class PageCacheTest extends TestCase
     {
         // Filling the cache while authenticated would be refused by Kirby
         // outright, so the entry that must not be replayed is the one an
-        // anonymous visitor left behind
+        // anonymous visitor left behind.
         $this->writeTemplate('<?php $kirby->request()->auth(); echo "first";');
         $this->app();
         Middlewares::tryResolvePage([], ['about']);
@@ -120,7 +120,7 @@ final class PageCacheTest extends TestCase
         $this->writeTemplate('<?php echo "fresh";');
 
         // The positive control pins the key the renderer builds – without it
-        // the assertion below would pass by missing the entry altogether
+        // the assertion below would pass by missing the entry altogether.
         $this->app();
         $this->seedCache(['body' => 'from cache', 'code' => 200]);
         $this->assertSame('from cache', Middlewares::tryResolvePage([], ['about'])->body());

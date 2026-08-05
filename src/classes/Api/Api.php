@@ -22,7 +22,7 @@ final readonly class Api
     {
         return function (...$args) use ($middlewares) {
             // The handler outlives the request it was registered in, so the
-            // app has to be looked up per call
+            // app has to be looked up per call.
             $context = [
                 'kirby' => App::instance()
             ];
@@ -114,7 +114,7 @@ final readonly class Api
      */
     private static function getStatusMessage(int $code): string
     {
-        // The three codes Kirby's own table leaves out
+        // The three codes Kirby's own table leaves out.
         $messages = [
             204 => 'No Content',
             409 => 'Conflict',
