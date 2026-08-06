@@ -7,7 +7,6 @@
 # Vendor files
 /node_modules
 /vendor
-/site/plugins
 
 # Cache and temporary files
 /.cache

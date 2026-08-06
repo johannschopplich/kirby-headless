@@ -37,6 +37,7 @@
     }
   },
   "extra": {
-    "kirby-cms-path": false
+    "kirby-cms-path": false,
+    "kirby-plugin-path": "vendor/kirby-plugins"
   }
 }

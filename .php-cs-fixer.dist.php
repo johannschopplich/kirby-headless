@@ -5,7 +5,6 @@ use PhpCsFixer\Runner\Parallel\ParallelConfigFactory;
 
 $finder = Finder::create()
 	->exclude('node_modules')
-	->exclude('site')
 	->in(__DIR__);
 
 return (new PhpCsFixer\Config())
