@@ -84,7 +84,10 @@ final class GlobalRouteTest extends TestCase
                 'index' => __DIR__,
                 'templates' => __DIR__ . '/fixtures/templates'
             ],
-            'options' => ['headless' => ['globalRoutes' => true]],
+            'options' => [
+                'content' => ['fileRedirects' => true],
+                'headless' => ['globalRoutes' => true]
+            ],
             'languages' => [
                 ['code' => 'en', 'default' => true, 'url' => '/'],
                 ['code' => 'de', 'url' => '/de']
@@ -213,5 +216,42 @@ final class GlobalRouteTest extends TestCase
             ->call('about', 'GET');
 
         $this->assertSame('{"id":"about","lang":"en","translation":"en"}', $result->body());
+    }
+
+    /**
+     * The middleware sits in front of every request, so a site that never
+     * declares a language has to walk past it untouched.
+     */
+    #[Test]
+    public function serves_a_single_language_site_regardless_of_x_language(): void
+    {
+        $_SERVER['HTTP_X_LANGUAGE'] = 'de';
+
+        $result = $this->app(null)->router()->call('about', 'GET');
+
+        $this->assertSame(200, $result->code());
+        $this->assertSame('{"id":"about"}', $result->body());
+    }
+
+    /**
+     * Kirby looks a page up by the current language's slugs, and the header
+     * runs before files resolve – so a file keeps resolving through the parent
+     * page whose ID is the same in either language.
+     */
+    #[Test]
+    public function resolves_a_file_for_a_path_carrying_x_language(): void
+    {
+        $_SERVER['HTTP_X_LANGUAGE'] = 'de';
+
+        $result = $this
+            ->multilangApp([[
+                'slug' => 'about',
+                'template' => 'language',
+                'files' => [['filename' => 'hero.jpg']]
+            ]])
+            ->router()
+            ->call('about/hero.jpg', 'GET');
+
+        $this->assertSame('about/hero.jpg', $result->id());
     }
 }
