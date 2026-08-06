@@ -44,6 +44,14 @@ return [
                             throw new Exception('KQL is not installed. Please run: composer require getkirby/kql');
                         }
 
+                        // Kirby's API takes the translation from the logged-in user or the
+                        // panel language, never the content one, so a translated value such
+                        // as a blueprint title would come back in another language than the
+                        // content around it.
+                        if ($kirby->multilang()) {
+                            $kirby->setCurrentTranslation($kirby->languageCode());
+                        }
+
                         $input = $kirby->request()->get();
                         $cache = $cacheKey = $data = null;
                         // Too specific for `Api::getOrSet()`: the cache key

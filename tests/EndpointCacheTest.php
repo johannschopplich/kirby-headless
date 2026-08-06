@@ -6,6 +6,7 @@ use Kirby\Cms\App;
 use Kirby\Data\Json;
 use Kirby\Filesystem\Dir;
 use Kirby\Filesystem\F;
+use Kirby\Toolkit\I18n;
 use PHPUnit\Framework\Attributes\PreserveGlobalState;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use PHPUnit\Framework\Attributes\Test;
@@ -169,6 +170,16 @@ final class EndpointCacheTest extends TestCase
         $cache = $kirby->cache('pages');
         $this->assertNotNull($cache->get('query-' . $hash . '-en.json'));
         $this->assertNotNull($cache->get('query-' . $hash . '-de.json'));
+    }
+
+    #[Test]
+    public function switches_the_translation_alongside_the_language_of_a_kql_answer(): void
+    {
+        $_GET = ['query' => 'site.title'];
+        $_SERVER['HTTP_X_LANGUAGE'] = 'de';
+        $this->appWithLanguages()->router()->call('api/kql', 'GET');
+
+        $this->assertSame('de', I18n::locale());
     }
 
     /**
