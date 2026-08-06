@@ -22,6 +22,7 @@ return [
         'language' => '*',
         'action' => Api::createHandler(
             Middlewares::hasBearerToken(true),
+            Middlewares::applyLanguageHeader(...),
             Middlewares::tryResolveFiles(...),
             Middlewares::tryResolvePage(...)
         )

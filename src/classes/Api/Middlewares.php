@@ -17,6 +17,51 @@ use Kirby\Toolkit\Str;
 final readonly class Middlewares
 {
     /**
+     * Sets the current language from the `X-Language` header.
+     *
+     * Kirby dispatches the catch-all into every language's router, so a prefixed
+     * URL has already named its language and keeps that authority. The header
+     * speaks only for a path that names none, which is what a headless client
+     * asking for `/about` in German sends.
+     */
+    public static function applyLanguageHeader(array $context, array $args): null
+    {
+        $kirby = App::instance();
+
+        if (!$kirby->multilang()) {
+            return null;
+        }
+
+        // A language with a URL path was reached through that path, so the request stated its own language.
+        if ($kirby->language()?->path() !== '') {
+            return null;
+        }
+
+        $path = self::pathFromArgs($args);
+
+        // The path addresses another language, which `tryResolvePage()` hands on to.
+        if ($path !== null && self::hasOtherLanguagePrefix($path)) {
+            return null;
+        }
+
+        $languageCode = $kirby->request()->header('X-Language');
+
+        // An unknown code would send `setCurrentLanguage()` back to the default
+        // language, quietly answering in a language nobody asked for.
+        if (
+            $languageCode === null ||
+            $languageCode === '' ||
+            $kirby->language($languageCode) === null
+        ) {
+            return null;
+        }
+
+        $kirby->setCurrentLanguage($languageCode);
+
+        return null;
+    }
+
+    /**
      * Attempts to resolve page and site files from the request path.
      *
      * Mirrors Kirby's own `App::resolve()`, down to `content.fileRedirects`.

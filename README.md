@@ -71,7 +71,7 @@ await fetch("https://example.com/api/kql", {
 
 ### 🗂 JSON Templates
 
-Return JSON from your templates instead of HTML for full control over the response shape, with built-in `__template__` and `__sitemap__` endpoints. Or enable `headless.globalRoutes` to serve every page as JSON through one catch-all route.
+Return JSON from your templates instead of HTML for full control over the response shape, with built-in `__template__` and `__sitemap__` endpoints. Or enable `headless.globalRoutes` to serve every page as JSON through one catch-all route, where an `X-Language` header picks the language for a path that carries no prefix.
 
 ```php
 // site/templates/about.php

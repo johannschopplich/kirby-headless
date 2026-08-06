@@ -14,6 +14,7 @@ final class GlobalRouteTest extends TestCase
 {
     protected function tearDown(): void
     {
+        unset($_SERVER['HTTP_X_LANGUAGE']);
         App::destroy();
     }
 
@@ -76,6 +77,22 @@ final class GlobalRouteTest extends TestCase
         $this->assertSame('{"id":"about"}', $result->body());
     }
 
+    private function multilangApp(array $children): App
+    {
+        return new App([
+            'roots' => [
+                'index' => __DIR__,
+                'templates' => __DIR__ . '/fixtures/templates'
+            ],
+            'options' => ['headless' => ['globalRoutes' => true]],
+            'languages' => [
+                ['code' => 'en', 'default' => true, 'url' => '/'],
+                ['code' => 'de', 'url' => '/de']
+            ],
+            'site' => ['children' => $children]
+        ]);
+    }
+
     /**
      * Kirby hands the catch-all to every language's router, and the default
      * language's pattern matches any path – so the route has to step aside
@@ -84,22 +101,10 @@ final class GlobalRouteTest extends TestCase
     #[Test]
     public function serves_pages_in_a_non_default_language(): void
     {
-        $kirby = new App([
-            'roots' => [
-                'index' => __DIR__,
-                'templates' => __DIR__ . '/fixtures/templates'
-            ],
-            'options' => ['headless' => ['globalRoutes' => true]],
-            'languages' => [
-                ['code' => 'en', 'default' => true, 'url' => '/'],
-                ['code' => 'de', 'url' => '/de']
-            ],
-            'site' => [
-                'children' => [['slug' => 'about', 'template' => 'language']]
-            ]
-        ]);
-
-        $result = $kirby->router()->call('de/about', 'GET');
+        $result = $this
+            ->multilangApp([['slug' => 'about', 'template' => 'language']])
+            ->router()
+            ->call('de/about', 'GET');
 
         $this->assertSame('{"id":"about","lang":"de"}', $result->body());
     }
@@ -107,31 +112,71 @@ final class GlobalRouteTest extends TestCase
     #[Test]
     public function serves_a_default_language_page_below_another_languages_path(): void
     {
-        $kirby = new App([
-            'roots' => [
-                'index' => __DIR__,
-                'templates' => __DIR__ . '/fixtures/templates'
-            ],
-            'options' => ['headless' => ['globalRoutes' => true]],
-            'languages' => [
-                ['code' => 'en', 'default' => true, 'url' => '/'],
-                ['code' => 'de', 'url' => '/de']
-            ],
-            'site' => [
-                'children' => [
-                    [
-                        'slug' => 'de',
-                        'template' => 'language',
-                        'children' => [
-                            ['slug' => 'berlin', 'template' => 'language']
-                        ]
+        $result = $this
+            ->multilangApp([
+                [
+                    'slug' => 'de',
+                    'template' => 'language',
+                    'children' => [
+                        ['slug' => 'berlin', 'template' => 'language']
                     ]
                 ]
-            ]
-        ]);
-
-        $result = $kirby->router()->call('de/berlin', 'GET');
+            ])
+            ->router()
+            ->call('de/berlin', 'GET');
 
         $this->assertSame('{"id":"de\/berlin","lang":"en"}', $result->body());
+    }
+
+    /**
+     * A headless client addresses a page by the path it has and states the
+     * language out of band, which is the only way an unprefixed URL can ask
+     * for a translation.
+     */
+    #[Test]
+    public function serves_an_unprefixed_path_in_the_language_named_by_x_language(): void
+    {
+        $_SERVER['HTTP_X_LANGUAGE'] = 'de';
+
+        $result = $this
+            ->multilangApp([['slug' => 'about', 'template' => 'language']])
+            ->router()
+            ->call('about', 'GET');
+
+        $this->assertSame('{"id":"about","lang":"de"}', $result->body());
+    }
+
+    /**
+     * A prefixed URL has already named its language, and a proxy that appends
+     * the header to every request must not be able to overrule it.
+     */
+    #[Test]
+    public function ignores_x_language_for_a_path_that_carries_a_language_prefix(): void
+    {
+        $_SERVER['HTTP_X_LANGUAGE'] = 'en';
+
+        $result = $this
+            ->multilangApp([['slug' => 'about', 'template' => 'language']])
+            ->router()
+            ->call('de/about', 'GET');
+
+        $this->assertSame('{"id":"about","lang":"de"}', $result->body());
+    }
+
+    /**
+     * `setCurrentLanguage()` falls back to the default language for a code it
+     * does not know, which would answer in a language nobody asked for.
+     */
+    #[Test]
+    public function ignores_an_x_language_code_no_language_declares(): void
+    {
+        $_SERVER['HTTP_X_LANGUAGE'] = 'fr';
+
+        $result = $this
+            ->multilangApp([['slug' => 'about', 'template' => 'language']])
+            ->router()
+            ->call('about', 'GET');
+
+        $this->assertSame('{"id":"about","lang":"en"}', $result->body());
     }
 }
