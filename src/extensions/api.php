@@ -186,6 +186,13 @@ return [
                     function (array $context, array $args) use ($kirby): mixed {
                         $templateName = $args[0];
 
+                        // Kirby's API takes the translation from the logged-in user or
+                        // the panel language, so `t()` in the template would answer in
+                        // another language than the content around it.
+                        if ($kirby->multilang()) {
+                            $kirby->setCurrentTranslation($kirby->languageCode());
+                        }
+
                         // The template renders in the request's language too, and its name alone cannot tell two languages apart.
                         $languageSuffix = $kirby->multilang() ? '-' . $kirby->languageCode() : '';
 
