@@ -5,7 +5,6 @@ declare(strict_types = 1);
 use Kirby\Cms\App;
 use Kirby\Data\Json;
 use Kirby\Filesystem\Dir;
-use Kirby\Filesystem\F;
 use Kirby\Toolkit\I18n;
 use PHPUnit\Framework\Attributes\PreserveGlobalState;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -17,12 +16,6 @@ use PHPUnit\Framework\TestCase;
 final class EndpointCacheTest extends TestCase
 {
     private string $root = __DIR__ . '/fixtures/endpoints';
-
-    protected function setUp(): void
-    {
-        Dir::make($this->root . '/templates');
-        F::write($this->root . '/templates/probe.php', '<?php echo json_encode(["value" => "fresh"]);');
-    }
 
     protected function tearDown(): void
     {
@@ -41,7 +34,7 @@ final class EndpointCacheTest extends TestCase
         $kirby = new App([
             'roots' => [
                 'index' => $this->root,
-                'templates' => $this->root . '/templates',
+                'templates' => __DIR__ . '/fixtures/templates',
                 'cache' => $this->root . '/cache'
             ],
             'options' => [
@@ -70,7 +63,7 @@ final class EndpointCacheTest extends TestCase
             ],
             'roots' => [
                 'index' => $this->root,
-                'templates' => $this->root . '/templates',
+                'templates' => __DIR__ . '/fixtures/templates',
                 'cache' => $this->root . '/cache',
                 'plugins' => dirname(__DIR__) . '/vendor/kirby-plugins'
             ],
@@ -158,6 +151,16 @@ final class EndpointCacheTest extends TestCase
         $cache = $kirby->cache('pages');
         $this->assertNotNull($cache->get('template-probe-en.headless.json'));
         $this->assertNotNull($cache->get('template-probe-de.headless.json'));
+    }
+
+    #[Test]
+    public function switches_the_translation_alongside_the_language_of_a_rendered_template(): void
+    {
+        $_SERVER['HTTP_X_LANGUAGE'] = 'de';
+
+        $body = $this->appWithLanguages()->router()->call('api/__template__/probe', 'GET')->body();
+
+        $this->assertSame('de', Json::decode($body)['result']['translation']);
     }
 
     /**
