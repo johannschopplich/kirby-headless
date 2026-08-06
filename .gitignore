@@ -7,7 +7,7 @@
 # Vendor files
 /node_modules
 /vendor
-# Composer installs Kirby plugins here, which is where `getkirby/kql` lands
+# Composer installs Kirby plugins here, which is where `getkirby/kql` lands.
 /site/plugins
 
 # Cache and temporary files
