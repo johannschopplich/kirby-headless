@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b21f64e80e2e9916ea42ac7e7b3670a1",
+    "content-hash": "5f4afad61d479e7606788df005a247ef",
     "packages": [
         {
             "name": "getkirby/composer-installer",
@@ -533,6 +533,74 @@
                 }
             ],
             "time": "2026-07-28T09:07:49+00:00"
+        },
+        {
+            "name": "getkirby/kql",
+            "version": "3.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/getkirby/kql.git",
+                "reference": "b67598f93d17e567abab6b8c692548c2c4a2e5b6"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/getkirby/kql/zipball/b67598f93d17e567abab6b8c692548c2c4a2e5b6",
+                "reference": "b67598f93d17e567abab6b8c692548c2c4a2e5b6",
+                "shasum": ""
+            },
+            "require": {
+                "getkirby/cms": "^3.10.0 || ^4.0 || ^5.0",
+                "getkirby/composer-installer": "^1.2.1"
+            },
+            "type": "kirby-plugin",
+            "extra": {
+                "installer-name": "kql",
+                "kirby-cms-path": false
+            },
+            "autoload": {
+                "psr-4": {
+                    "Kirby\\": [
+                        "tests/"
+                    ]
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Bastian Allgeier",
+                    "email": "bastian@getkirby.com"
+                },
+                {
+                    "name": "Nico Hoffmann",
+                    "email": "nico@getkirby.com"
+                }
+            ],
+            "description": "Kirby Query Language",
+            "homepage": "https://getkirby.com",
+            "keywords": [
+                "api",
+                "cms",
+                "headless",
+                "json",
+                "kirby",
+                "query"
+            ],
+            "support": {
+                "email": "support@getkirby.com",
+                "forum": "https://forum.getkirby.com",
+                "issues": "https://github.com/getkirby/kql/issues",
+                "source": "https://github.com/getkirby/kql"
+            },
+            "funding": [
+                {
+                    "url": "https://getkirby.com/buy",
+                    "type": "custom"
+                }
+            ],
+            "time": "2025-07-03T10:26:56+00:00"
         },
         {
             "name": "laminas/laminas-escaper",
@@ -3017,7 +3085,7 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "php": ">=8.2"
+        "php": ">=8.3"
     },
     "platform-dev": {},
     "plugin-api-version": "2.9.0"

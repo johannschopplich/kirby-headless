@@ -5,6 +5,8 @@ use PhpCsFixer\Runner\Parallel\ParallelConfigFactory;
 
 $finder = Finder::create()
 	->exclude('node_modules')
+	// Composer installs Kirby plugins into `site/plugins`, whose code is not ours to format.
+	->exclude('site')
 	->in(__DIR__);
 
 return (new PhpCsFixer\Config())

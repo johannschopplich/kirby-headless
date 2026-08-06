@@ -24,8 +24,8 @@ return [
             /**
              * Runs KQL queries against the site.
              *
-             * `X-Language` picks the language a query runs in, `X-Cacheable: false`
-             * asks for a freshly built answer.
+             * `?language=` or `X-Language` picks the language a query runs in – Kirby's
+             * API resolves both – and `X-Cacheable: false` asks for a freshly built answer.
              */
             [
                 'pattern' => 'kql',
@@ -46,22 +46,19 @@ return [
 
                         $input = $kirby->request()->get();
                         $cache = $cacheKey = $data = null;
-                        $languageCode = $kirby->request()->header('X-Language');
-                        $hasLanguageCode = $languageCode !== null && $languageCode !== '';
                         // Too specific for `Api::getOrSet()`: the cache key
                         // hashes the query body, so unlike the other endpoints
                         // this one may answer a request that carries data, and
                         // an empty query is never cached at all.
                         $isCacheable = Api::clientAllowsCache();
 
-                        if ($kirby->multilang() && $hasLanguageCode) {
-                            $kirby->setCurrentLanguage($languageCode);
-                        }
-
                         if ($input !== []) {
+                            // Kirby's API resolved the language before this action ran, so the
+                            // key follows the language the answer actually holds.
+                            $languageSuffix = $kirby->multilang() ? '-' . $kirby->languageCode() : '';
                             $hash = sha1(Json::encode($input));
                             $cache = $kirby->cache('pages');
-                            $cacheKey = 'query-' . $hash . ($hasLanguageCode ? '-' . $languageCode : '') . '.json';
+                            $cacheKey = 'query-' . $hash . $languageSuffix . '.json';
 
                             if ($isCacheable) {
                                 $data = $cache->get($cacheKey);

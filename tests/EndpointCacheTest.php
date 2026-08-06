@@ -70,10 +70,13 @@ final class EndpointCacheTest extends TestCase
             'roots' => [
                 'index' => $this->root,
                 'templates' => $this->root . '/templates',
-                'cache' => $this->root . '/cache'
+                'cache' => $this->root . '/cache',
+                // Composer installs `getkirby/kql` outside the fixture's own index root.
+                'plugins' => dirname(__DIR__) . '/site/plugins'
             ],
             'options' => [
-                'cache' => ['pages' => ['active' => true]]
+                'cache' => ['pages' => ['active' => true]],
+                'kql' => ['auth' => false]
             ],
             'languages' => [
                 ['code' => 'en', 'default' => true, 'url' => '/'],
@@ -151,5 +154,37 @@ final class EndpointCacheTest extends TestCase
         $cache = $kirby->cache('pages');
         $this->assertNotNull($cache->get('template-probe-en.headless.json'));
         $this->assertNotNull($cache->get('template-probe-de.headless.json'));
+    }
+
+    #[Test]
+    public function caches_a_kql_answer_per_language(): void
+    {
+        $_GET = ['query' => 'site.title'];
+        $this->appWithLanguages()->router()->call('api/kql', 'GET');
+
+        $_SERVER['HTTP_X_LANGUAGE'] = 'de';
+        $kirby = $this->appWithLanguages();
+        $kirby->router()->call('api/kql', 'GET');
+
+        $hash = sha1(Json::encode(['query' => 'site.title']));
+        $cache = $kirby->cache('pages');
+        $this->assertNotNull($cache->get('query-' . $hash . '-en.json'));
+        $this->assertNotNull($cache->get('query-' . $hash . '-de.json'));
+    }
+
+    /**
+     * Kirby's API reads `?language=` ahead of the header, and the key has to
+     * follow the language the answer was built in rather than the one asked for.
+     */
+    #[Test]
+    public function keys_a_kql_answer_on_the_language_query_ahead_of_x_language(): void
+    {
+        $_GET = ['query' => 'site.title', 'language' => 'de'];
+        $_SERVER['HTTP_X_LANGUAGE'] = 'en';
+        $kirby = $this->appWithLanguages();
+        $kirby->router()->call('api/kql', 'GET');
+
+        $hash = sha1(Json::encode(['query' => 'site.title', 'language' => 'de']));
+        $this->assertNotNull($kirby->cache('pages')->get('query-' . $hash . '-de.json'));
     }
 }
