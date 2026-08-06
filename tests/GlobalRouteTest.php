@@ -179,4 +179,39 @@ final class GlobalRouteTest extends TestCase
 
         $this->assertSame('{"id":"about","lang":"en"}', $result->body());
     }
+
+    /**
+     * Kirby's language router sets the translation and the language together,
+     * so a template that mixes `t()` into its content does not answer half in
+     * one language and half in the other.
+     */
+    #[Test]
+    public function switches_the_translation_alongside_the_language_named_by_x_language(): void
+    {
+        $_SERVER['HTTP_X_LANGUAGE'] = 'de';
+
+        $result = $this
+            ->multilangApp([['slug' => 'about', 'template' => 'translation']])
+            ->router()
+            ->call('about', 'GET');
+
+        $this->assertSame('{"id":"about","lang":"de","translation":"de"}', $result->body());
+    }
+
+    /**
+     * `App::language()` resolves `default` and `current` as if they named a
+     * language, so the guard reads the collection, which knows only real codes.
+     */
+    #[Test]
+    public function ignores_default_as_an_x_language_code(): void
+    {
+        $_SERVER['HTTP_X_LANGUAGE'] = 'default';
+
+        $result = $this
+            ->multilangApp([['slug' => 'about', 'template' => 'translation']])
+            ->router()
+            ->call('about', 'GET');
+
+        $this->assertSame('{"id":"about","lang":"en","translation":"en"}', $result->body());
+    }
 }

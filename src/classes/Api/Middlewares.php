@@ -32,7 +32,6 @@ final readonly class Middlewares
             return null;
         }
 
-        // A language with a URL path was reached through that path, so the request stated its own language.
         if ($kirby->language()?->path() !== '') {
             return null;
         }
@@ -46,16 +45,19 @@ final readonly class Middlewares
 
         $languageCode = $kirby->request()->header('X-Language');
 
-        // An unknown code would send `setCurrentLanguage()` back to the default
-        // language, quietly answering in a language nobody asked for.
+        // `App::language()` answers `default` and `current` as if they were codes,
+        // and an unknown code would send `setCurrentLanguage()` to the default
+        // language – both answer in a language nobody asked for.
         if (
             $languageCode === null ||
-            $languageCode === '' ||
-            $kirby->language($languageCode) === null
+            $kirby->languages()->find($languageCode) === null
         ) {
             return null;
         }
 
+        // Kirby's own language router sets the translation alongside the language,
+        // so `t()` in a template speaks the language the content is in.
+        $kirby->setCurrentTranslation($languageCode);
         $kirby->setCurrentLanguage($languageCode);
 
         return null;
