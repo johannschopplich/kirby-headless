@@ -32,7 +32,6 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        # The first entry is the floor of the `php` constraint in composer.json.
         php: ['8.2', '8.3', '8.4']
     steps:
       - uses: actions/checkout@v6

@@ -131,11 +131,6 @@ final class GlobalRouteTest extends TestCase
         $this->assertSame('{"id":"de\/berlin","lang":"en"}', $result->body());
     }
 
-    /**
-     * A headless client addresses a page by the path it has and states the
-     * language out of band, which is the only way an unprefixed URL can ask
-     * for a translation.
-     */
     #[Test]
     public function serves_an_unprefixed_path_in_the_language_named_by_x_language(): void
     {
@@ -149,10 +144,6 @@ final class GlobalRouteTest extends TestCase
         $this->assertSame('{"id":"about","lang":"de"}', $result->body());
     }
 
-    /**
-     * A prefixed URL has already named its language, and a proxy that appends
-     * the header to every request must not be able to overrule it.
-     */
     #[Test]
     public function ignores_x_language_for_a_path_that_carries_a_language_prefix(): void
     {
@@ -218,10 +209,6 @@ final class GlobalRouteTest extends TestCase
         $this->assertSame('{"id":"about","lang":"en","translation":"en"}', $result->body());
     }
 
-    /**
-     * The middleware sits in front of every request, so a site that never
-     * declares a language has to walk past it untouched.
-     */
     #[Test]
     public function serves_a_single_language_site_regardless_of_x_language(): void
     {
