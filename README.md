@@ -119,7 +119,7 @@ $page->i18nMeta();       // language switcher metadata
 ## Requirements
 
 - Kirby 5
-- PHP 8.3+
+- PHP 8.2+
 
 > [!NOTE]
 > Using Kirby 4? Install the [`v4` release](https://github.com/johannschopplich/kirby-headless/releases/tag/v4.0.2).
