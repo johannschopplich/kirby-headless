@@ -164,6 +164,26 @@ final class EndpointCacheTest extends TestCase
     }
 
     /**
+     * `setCurrentTranslation(null)` pins `I18n::$locale` to `en`, so dropping
+     * the `multilang()` guard would overrule `panel.language`.
+     */
+    #[Test]
+    public function keeps_a_single_language_template_on_the_panel_language(): void
+    {
+        $kirby = new App([
+            'roots' => [
+                'index' => $this->root,
+                'templates' => __DIR__ . '/fixtures/templates'
+            ],
+            'options' => ['panel' => ['language' => 'de']]
+        ]);
+
+        $body = $kirby->router()->call('api/__template__/probe', 'GET')->body();
+
+        $this->assertSame('de', Json::decode($body)['result']['translation']);
+    }
+
+    /**
      * The English request seeds the cache first, so a key that did not carry
      * the language would answer the German one with the English title.
      */
@@ -186,6 +206,26 @@ final class EndpointCacheTest extends TestCase
         $_GET = ['query' => 'site.title'];
         $_SERVER['HTTP_X_LANGUAGE'] = 'de';
         $this->appWithLanguages()->router()->call('api/kql', 'GET');
+
+        $this->assertSame('de', I18n::locale());
+    }
+
+    #[Test]
+    public function keeps_a_single_language_kql_answer_on_the_panel_language(): void
+    {
+        $_GET = ['query' => 'site.title'];
+        $kirby = new App([
+            'roots' => [
+                'index' => $this->root,
+                'plugins' => dirname(__DIR__) . '/vendor/kirby-plugins'
+            ],
+            'options' => [
+                'kql' => ['auth' => false],
+                'panel' => ['language' => 'de']
+            ]
+        ]);
+
+        $kirby->router()->call('api/kql', 'GET');
 
         $this->assertSame('de', I18n::locale());
     }
