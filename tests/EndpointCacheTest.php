@@ -71,7 +71,6 @@ final class EndpointCacheTest extends TestCase
                 'index' => $this->root,
                 'templates' => $this->root . '/templates',
                 'cache' => $this->root . '/cache',
-                // Composer installs `getkirby/kql` outside the fixture's own index root.
                 'plugins' => dirname(__DIR__) . '/vendor/kirby-plugins'
             ],
             'options' => [
