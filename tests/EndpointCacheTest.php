@@ -83,6 +83,10 @@ final class EndpointCacheTest extends TestCase
                 ['code' => 'de', 'url' => '/de']
             ],
             'site' => [
+                'translations' => [
+                    ['code' => 'en', 'content' => ['title' => 'Headless']],
+                    ['code' => 'de', 'content' => ['title' => 'Kopflos']]
+                ],
                 'children' => [['slug' => 'about']]
             ]
         ]);
@@ -156,20 +160,21 @@ final class EndpointCacheTest extends TestCase
         $this->assertNotNull($cache->get('template-probe-de.headless.json'));
     }
 
+    /**
+     * The English request seeds the cache first, so a key that did not carry
+     * the language would answer the German one with the English title.
+     */
     #[Test]
     public function caches_a_kql_answer_per_language(): void
     {
         $_GET = ['query' => 'site.title'];
-        $this->appWithLanguages()->router()->call('api/kql', 'GET');
+        $english = $this->appWithLanguages()->router()->call('api/kql', 'GET')->body();
 
         $_SERVER['HTTP_X_LANGUAGE'] = 'de';
-        $kirby = $this->appWithLanguages();
-        $kirby->router()->call('api/kql', 'GET');
+        $german = $this->appWithLanguages()->router()->call('api/kql', 'GET')->body();
 
-        $hash = sha1(Json::encode(['query' => 'site.title']));
-        $cache = $kirby->cache('pages');
-        $this->assertNotNull($cache->get('query-' . $hash . '-en.json'));
-        $this->assertNotNull($cache->get('query-' . $hash . '-de.json'));
+        $this->assertSame('Headless', Json::decode($english)['result']);
+        $this->assertSame('Kopflos', Json::decode($german)['result']);
     }
 
     #[Test]
@@ -183,11 +188,11 @@ final class EndpointCacheTest extends TestCase
     }
 
     /**
-     * Kirby's API reads `?language=` ahead of the header, and the key has to
-     * follow the language the answer was built in rather than the one asked for.
+     * Both sources resolve to German content either way, so only the suffix
+     * tells a header-derived key from a resolved one.
      */
     #[Test]
-    public function keys_a_kql_answer_on_the_language_query_ahead_of_x_language(): void
+    public function keys_a_kql_answer_on_language_ahead_of_x_language(): void
     {
         $_GET = ['query' => 'site.title', 'language' => 'de'];
         $_SERVER['HTTP_X_LANGUAGE'] = 'en';
