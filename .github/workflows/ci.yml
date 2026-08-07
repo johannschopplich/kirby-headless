@@ -28,7 +28,7 @@ jobs:
       - uses: actions/checkout@v6
       - uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.3'
+          php-version: 8.3
           coverage: none
       - run: composer install --working-dir=tools/phpcs
       - run: composer csfix -- --dry-run --diff
@@ -37,7 +37,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        php: ['8.3', '8.4']
+        php: [8.2, 8.3, 8.4]
     steps:
       - uses: actions/checkout@v6
       - uses: shivammathur/setup-php@v2
