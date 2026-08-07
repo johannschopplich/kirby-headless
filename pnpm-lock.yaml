@@ -14,6 +14,9 @@ importers:
       bumpp:
         specifier: ^12.1.1
         version: 12.1.1
+      eslint:
+        specifier: ^10.8.0
+        version: 10.8.0(jiti@2.7.0)
       zx:
         specifier: ^8.8.5
         version: 8.8.5
