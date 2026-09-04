@@ -1,6 +1,6 @@
 {
   "name": "johannschopplich/kirby-headless",
-  "description": "API-first toolkit for Kirby CMS",
+  "description": "KQL, JSON templates, and API routes for Kirby CMS",
   "type": "kirby-plugin",
   "version": "8.1.0",
   "keywords": [
