@@ -3,7 +3,7 @@
 
 # Kirby Headless
 
-Bearer-authenticated KQL, UUID resolution in blocks and layouts, JSON templates, and an Express-style API builder for Kirby – everything you need to drive any frontend from Kirby.
+Bearer-authenticated KQL, UUID resolution in blocks and layouts, JSON templates, and an Express-style API builder for Kirby – keep editing in Kirby and serve the result to whatever frontend you prefer.
 
 [KQL](https://kirby.tools/docs/headless/usage/kql) •
 [Field Methods](https://kirby.tools/docs/headless/usage/field-methods) •
