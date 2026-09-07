@@ -1,25 +1,16 @@
-<div align="center">
-  <img src="./.github/favicon.svg" alt="Kirby Headless logo" width="120">
+<a href="https://kirby.tools/headless"><img src="./.github/favicon.svg" alt="Kirby Headless" width="120"></a>
 
 # Kirby Headless
 
-Bearer-authenticated KQL, UUID resolution in blocks and layouts, JSON templates, and an Express-style API builder for Kirby – keep editing in Kirby and serve the result to whatever frontend you prefer.
-
-[KQL](https://kirby.tools/docs/headless/usage/kql) •
-[Field Methods](https://kirby.tools/docs/headless/usage/field-methods) •
-[JSON Templates](https://kirby.tools/docs/headless/usage/json-templates) •
-[API Builder](https://kirby.tools/docs/headless/advanced/api-builder) •
-[Authentication](https://kirby.tools/docs/headless/configuration/authentication)
-
-</div>
+Kirby Headless is a plugin for [Kirby CMS](https://getkirby.com) that adds bearer-authenticated KQL, UUID resolution in blocks and layouts, JSON templates, and an Express-style API builder – keep editing in Kirby and serve the result to whatever frontend you prefer.
 
 > [!NOTE]
 > Want a ready-to-use headless-only project? Start from the [Kirby Headless Starter](https://github.com/johannschopplich/kirby-headless-starter).
 
 ## When to Use
 
-| I want to…                                              | Use                                            |
-| ------------------------------------------------------- | ---------------------------------------------- |
+| I want to…                                              | Use                                             |
+| ------------------------------------------------------- | ----------------------------------------------- |
 | Query content from a frontend over HTTP                 | KQL endpoint at `/api/kql`                      |
 | Lock the API behind a token instead of basic auth       | `kql.auth => 'bearer'` + `headless.token`       |
 | Resolve UUIDs in blocks and layouts to real objects     | `$field->toResolvedBlocks()`                    |
@@ -30,96 +21,16 @@ Bearer-authenticated KQL, UUID resolution in blocks and layouts, JSON templates,
 
 ## Features
 
-### 🔑 Bearer Token Authentication
-
-Protect the `/api/kql` endpoint and your own API routes with a bearer token, or fall back to Kirby's native API authentication.
-
-```php
-// config.php
-return [
-    'kql' => ['auth' => 'bearer'],
-    'headless' => ['token' => 'your-secret-token']
-];
-```
-
-**[Read more →](https://kirby.tools/docs/headless/configuration/authentication)**
-
-### 🧱 Block & Layout Resolution
-
-Resolve UUIDs in blocks and layouts to complete file and page objects server-side, so your frontend consumes ready-to-use URLs and data. Configure which fields to resolve, or plug in custom resolvers.
-
-```php
-$page->blocks()->toResolvedBlocks()->toArray();
-$page->layout()->toResolvedLayouts()->toArray();
-```
-
-**[Read more →](https://kirby.tools/docs/headless/usage/field-methods)**
-
-### ⚡️ Enhanced KQL
-
-A drop-in `/api/kql` endpoint that extends the official KQL plugin with bearer authentication, response caching, and multi-language support via a request header. Requires the KQL plugin: `composer require getkirby/kql`.
-
-```ts
-await fetch("https://example.com/api/kql", {
-  method: "POST",
-  headers: { Authorization: `Bearer ${token}` },
-  body: JSON.stringify({ query: "page('notes').children" }),
-});
-```
-
-**[Read more →](https://kirby.tools/docs/headless/usage/kql)**
-
-### 🗂 JSON Templates
-
-Return JSON from your templates instead of HTML for full control over the response shape, with built-in `__template__` and `__sitemap__` endpoints. Or enable `headless.globalRoutes` to serve every page as JSON through one catch-all route, where an `X-Language` header picks the language for a path that carries no prefix, as long as the site serves one language from the root.
-
-```php
-// site/templates/about.php
-echo \Kirby\Data\Json::encode([
-    'title' => $page->title()->value(),
-    'layout' => $page->layout()->toResolvedLayouts()->toArray()
-]);
-```
-
-> [!NOTE]
-> With `globalRoutes` enabled, page JSON and clean file URLs sit behind `headless.token`. Media URLs (`/media/pages/…`) do not – Kirby serves them from its own routes, so images keep working in the browser without a token.
-
-**[Read more →](https://kirby.tools/docs/headless/usage/json-templates)**
-
-### 🍢 API Builder
-
-Compose routes from middleware chains – Express-style. Reuse bearer auth, file and page resolution, or your own validators across routes.
-
-```php
-use JohannSchopplich\Headless\Api\Api;
-use JohannSchopplich\Headless\Api\Middlewares;
-
-Api::createHandler(
-    Middlewares::hasBearerToken(),
-    fn (array $context, array $args) => Api::createResponse(200, [
-        'message' => 'Hello World'
-    ])
-);
-```
-
-**[Read more →](https://kirby.tools/docs/headless/advanced/api-builder)**
-
-### 🧭 Page Methods
-
-Helpers for headless frontends: frontend URLs, breadcrumb data, and multi-language metadata for navigation and language switchers.
-
-```php
-$page->frontendUrl();    // URL on your frontend app
-$page->breadcrumbMeta(); // breadcrumb data for navigation
-$page->i18nMeta();       // language switcher metadata
-```
-
-**[Read more →](https://kirby.tools/docs/headless/usage/page-methods)**
+- 🔑 **Bearer Token Authentication**: Protect `/api/kql` and your own API routes with a bearer token, or fall back to Kirby's native API authentication – see [authentication](https://kirby.tools/docs/headless/configuration/authentication).
+- 🧱 **Block & Layout Resolution**: UUIDs in blocks and layouts resolved to file and page objects server-side, with configurable fields and custom resolvers – see [field methods](https://kirby.tools/docs/headless/usage/field-methods).
+- ⚡️ **Enhanced KQL**: A drop-in `/api/kql` endpoint with bearer authentication, response caching, and multi-language support via a request header; needs `getkirby/kql` installed – see [KQL](https://kirby.tools/docs/headless/usage/kql).
+- 🗂 **JSON Templates**: Return JSON from templates instead of HTML, with built-in `__template__` and `__sitemap__` endpoints, or serve every page as JSON through one catch-all route – see [JSON templates](https://kirby.tools/docs/headless/usage/json-templates).
+- 🍢 **API Builder**: Compose routes from middleware chains, Express-style, and reuse bearer auth, file and page resolution, or your own validators – see [API builder](https://kirby.tools/docs/headless/advanced/api-builder).
+- 🧭 **Page Methods**: Frontend URLs, breadcrumb data, and multi-language metadata for navigation and language switchers – see [page methods](https://kirby.tools/docs/headless/usage/page-methods).
 
 ## Requirements
 
 - Kirby 5
-- PHP 8.2+
 
 > [!NOTE]
 > Using Kirby 4? Install the [`v4` release](https://github.com/johannschopplich/kirby-headless/releases/tag/v4.0.2).
@@ -135,6 +46,10 @@ composer require johannschopplich/kirby-headless
 ### Manual Installation
 
 Download and copy this repository to `/site/plugins/kirby-headless`.
+
+## Documentation
+
+For installation, configuration, and usage, see the [Kirby Headless documentation](https://kirby.tools/docs/headless).
 
 ## License
 
