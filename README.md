@@ -3,7 +3,7 @@
 
 # Kirby Headless
 
-Kirby Headless is a plugin for [Kirby CMS](https://getkirby.com) that lets you keep editing in Kirby while serving the result to whatever frontend you prefer. Drop it into an existing site without breaking your Panel or HTML routes – or start a headless-only project from scratch.
+Kirby Headless is a plugin for [Kirby CMS](https://getkirby.com): JSON pages and KQL queries, served behind one bearer token.
 
 [Authentication](https://kirby.tools/docs/headless/configuration/authentication) •
 [KQL](https://kirby.tools/docs/headless/usage/kql) •
