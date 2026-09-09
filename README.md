@@ -7,9 +7,7 @@ Kirby Headless is a plugin for [Kirby CMS](https://getkirby.com): JSON pages and
 
 [Authentication](https://kirby.tools/docs/headless/configuration/authentication) •
 [KQL](https://kirby.tools/docs/headless/usage/kql) •
-[JSON Templates](https://kirby.tools/docs/headless/usage/json-templates) •
 [Field Methods](https://kirby.tools/docs/headless/usage/field-methods) •
-[API Builder](https://kirby.tools/docs/headless/advanced/api-builder) •
 [Page Methods](https://kirby.tools/docs/headless/usage/page-methods)
 
 </div>
