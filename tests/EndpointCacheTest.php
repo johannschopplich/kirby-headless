@@ -119,7 +119,7 @@ final class EndpointCacheTest extends TestCase
      * endpoint has to speak that language, not just KQL.
      */
     #[Test]
-    public function rebuilds_the_sitemap_when_the_client_declines_the_cache(): void
+    public function rebuilds_the_sitemap_with_x_cacheable_false(): void
     {
         $_SERVER['HTTP_X_CACHEABLE'] = 'false';
         $kirby = $this->app('sitemap.headless.json', [['url' => '/stale']]);

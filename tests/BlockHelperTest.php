@@ -44,7 +44,7 @@ final class BlockHelperTest extends TestCase
     }
 
     #[Test]
-    public function replaces_the_field_itself_when_no_resolved_key_is_configured(): void
+    public function merge_resolved_value_replaces_the_field_itself_when_no_resolved_key_is_configured(): void
     {
         $block = $this->block(['page' => 'a']);
         $content = [];
@@ -55,7 +55,7 @@ final class BlockHelperTest extends TestCase
     }
 
     #[Test]
-    public function lowercases_the_field_key_inside_the_resolved_bucket(): void
+    public function merge_resolved_value_lowercases_the_field_key_inside_the_resolved_bucket(): void
     {
         $block = $this->block(['backgroundImage' => 'a']);
         $content = [];
@@ -66,7 +66,7 @@ final class BlockHelperTest extends TestCase
     }
 
     #[Test]
-    public function keeps_a_blocks_identity_when_its_content_is_replaced(): void
+    public function create_block_with_content_keeps_the_blocks_identity(): void
     {
         $page = $this->kirby->page('test');
         $block = new Block([

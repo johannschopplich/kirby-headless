@@ -135,7 +135,7 @@ final class PageCacheTest extends TestCase
     }
 
     #[Test]
-    public function renders_afresh_when_the_client_declines_the_cache(): void
+    public function renders_afresh_with_x_cacheable_false_without_replacing_the_entry(): void
     {
         $this->writeTemplate('<?php echo "first";');
         $this->app();
