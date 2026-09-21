@@ -30,6 +30,8 @@ pnpm-workspace.yaml export-ignore
 AGENTS.md export-ignore
 CLAUDE.md export-ignore
 composer.lock export-ignore
+CONTEXT.md export-ignore
+docs/ export-ignore
 mprocs.yaml export-ignore
 playground/ export-ignore
 readme/ export-ignore
