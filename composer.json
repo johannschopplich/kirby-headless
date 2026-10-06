@@ -38,6 +38,9 @@
   },
   "extra": {
     "kirby-cms-path": false,
-    "kirby-plugin-path": "vendor/kirby-plugins"
+    "kirby-plugin-path": "vendor/kirby-plugins",
+    "kirby": {
+      "compatible": "^5.0"
+    }
   }
 }
