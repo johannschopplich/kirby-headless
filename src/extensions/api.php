@@ -87,12 +87,14 @@ return [
             ],
 
             /**
-             * Answers with every indexable page of the site.
+             * Answers with the indexable pages of the site.
              *
              * Pages are filtered through the `headless.sitemap.exclude` options
              * and each blueprint's own `sitemap` option. A multilang site lists
-             * only the pages translated into the request's language, each with
-             * the alternates of its translated languages.
+             * a page only in the languages it is translated into; a page without
+             * any content counts as translated into all of them. Its alternates
+             * are those languages, plus an `x-default` when they include the
+             * default language.
              */
             [
                 'pattern' => '__sitemap__',
@@ -111,6 +113,7 @@ return [
                                 $isIndexable = $kirby->option('headless.sitemap.isIndexable');
                                 $excludeTemplates = $kirby->option('headless.sitemap.exclude.templates', []);
                                 $excludePages = $kirby->option('headless.sitemap.exclude.pages', []);
+                                $defaultLanguageCode = $kirby->defaultLanguage()?->code();
 
                                 if (is_callable($excludePages)) {
                                     $excludePages = $excludePages();
@@ -144,11 +147,11 @@ return [
                                         );
 
                                         // A virtual page without content props exists in no language at all.
-                                        if ($translatedLanguages->count() === 0) {
+                                        if ($translatedLanguages->isEmpty()) {
                                             $translatedLanguages = $kirby->languages();
                                         }
 
-                                        if (!$translatedLanguages->has($kirby->language()->code())) {
+                                        if (!$translatedLanguages->has($kirby->languageCode())) {
                                             continue;
                                         }
                                     }
@@ -171,10 +174,12 @@ return [
                                             'url' => $withoutBase($page->url($language->code()))
                                         ])->values();
 
-                                        $url['links'][] = [
-                                            'lang' => 'x-default',
-                                            'url' => $withoutBase($page->url())
-                                        ];
+                                        if ($translatedLanguages->has($defaultLanguageCode)) {
+                                            $url['links'][] = [
+                                                'lang' => 'x-default',
+                                                'url' => $withoutBase($page->url($defaultLanguageCode))
+                                            ];
+                                        }
                                     }
 
                                     $sitemap[] = $url;

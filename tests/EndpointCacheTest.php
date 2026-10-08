@@ -80,16 +80,7 @@ final class EndpointCacheTest extends TestCase
                     ['code' => 'en', 'content' => ['title' => 'Headless']],
                     ['code' => 'de', 'content' => ['title' => 'Kopflos']]
                 ],
-                'children' => [
-                    [
-                        'slug' => 'about',
-                        // The sitemap lists a page only in the languages it is translated into.
-                        'translations' => [
-                            ['code' => 'en', 'content' => ['title' => 'About']],
-                            ['code' => 'de', 'content' => ['title' => 'Über uns']]
-                        ]
-                    ]
-                ]
+                'children' => [['slug' => 'about']]
             ]
         ]);
     }
@@ -133,7 +124,7 @@ final class EndpointCacheTest extends TestCase
         $_SERVER['HTTP_X_CACHEABLE'] = 'false';
         $kirby = $this->app('sitemap.headless.json', [['url' => '/stale']]);
 
-        $this->assertStringNotContainsString('stale', $kirby->router()->call('api/__sitemap__', 'GET')->body());
+        $this->assertSame([['url' => '/about']], Json::decode($kirby->router()->call('api/__sitemap__', 'GET')->body())['result']);
     }
 
     #[Test]

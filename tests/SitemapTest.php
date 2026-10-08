@@ -10,10 +10,6 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
-/**
- * Kirby renders a page in a language it has no translation for, filled from
- * the default language, so the sitemap has to check the translation itself.
- */
 #[RunTestsInSeparateProcesses]
 #[PreserveGlobalState(false)]
 final class SitemapTest extends TestCase
@@ -43,10 +39,16 @@ final class SitemapTest extends TestCase
         $this->assertSame(['/de/about'], array_keys($this->sitemap()));
     }
 
-    /**
-     * A virtual page without content props has no translation in any
-     * language, not even the default one.
-     */
+    #[Test]
+    public function points_x_default_at_the_default_language_from_a_non_default_language(): void
+    {
+        $_SERVER['HTTP_X_LANGUAGE'] = 'de';
+
+        $links = array_column($this->sitemap()['/de/about']['links'], 'url', 'lang');
+
+        $this->assertSame('/about', $links['x-default']);
+    }
+
     #[Test]
     public function keeps_a_page_without_content_in_every_language(): void
     {
@@ -55,8 +57,25 @@ final class SitemapTest extends TestCase
         $this->assertSame(['en', 'de', 'x-default'], array_column($links, 'lang'));
     }
 
+    #[Test]
+    public function leaves_x_default_out_for_a_page_without_the_default_language(): void
+    {
+        $_SERVER['HTTP_X_LANGUAGE'] = 'de';
+
+        $links = $this->sitemap([
+            [
+                'slug' => 'only-german',
+                'translations' => [
+                    ['code' => 'de', 'content' => ['title' => 'Nur Deutsch']]
+                ]
+            ]
+        ])['/de/only-german']['links'];
+
+        $this->assertSame(['de'], array_column($links, 'lang'));
+    }
+
     /**
-     * @param array<int, array<string, mixed>> $children Pages added to the fixture's two
+     * @param array<int, array<string, mixed>> $children
      * @return array<string, array<string, mixed>>
      */
     private function sitemap(array $children = []): array
