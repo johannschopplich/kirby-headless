@@ -42,7 +42,7 @@ final class PageMethodsTest extends TestCase
     }
 
     #[Test]
-    public function i18n_meta_returns_title_and_uri_per_configured_language(): void
+    public function i18n_meta_returns_title_and_uri_per_translated_language(): void
     {
         $kirby = new App([
             'roots' => ['index' => __DIR__],
@@ -67,6 +67,30 @@ final class PageMethodsTest extends TestCase
             'en' => ['title' => 'About', 'uri' => 'about'],
             'de' => ['title' => 'Über uns', 'uri' => 'about']
         ], $kirby->page('about')->i18nMeta());
+    }
+
+    #[Test]
+    public function i18n_meta_leaves_out_an_untranslated_language(): void
+    {
+        $kirby = new App([
+            'roots' => ['index' => __DIR__],
+            'languages' => [
+                ['code' => 'en', 'default' => true],
+                ['code' => 'de']
+            ],
+            'site' => [
+                'children' => [
+                    [
+                        'slug' => 'only-english',
+                        'translations' => [
+                            ['code' => 'en', 'content' => ['title' => 'Only English']]
+                        ]
+                    ]
+                ]
+            ]
+        ]);
+
+        $this->assertSame(['en'], array_keys($kirby->page('only-english')->i18nMeta()));
     }
 
     #[Test]

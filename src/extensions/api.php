@@ -2,6 +2,7 @@
 
 use JohannSchopplich\Headless\Api\Api;
 use JohannSchopplich\Headless\Api\Middlewares;
+use JohannSchopplich\Headless\PageLanguages;
 use Kirby\Cms\App;
 use Kirby\Data\Json;
 use Kirby\Exception\Exception;
@@ -113,6 +114,7 @@ return [
                                 $isIndexable = $kirby->option('headless.sitemap.isIndexable');
                                 $excludeTemplates = $kirby->option('headless.sitemap.exclude.templates', []);
                                 $excludePages = $kirby->option('headless.sitemap.exclude.pages', []);
+                                $languageCode = $kirby->languageCode();
                                 $defaultLanguageCode = $kirby->defaultLanguage()?->code();
 
                                 if (is_callable($excludePages)) {
@@ -141,17 +143,9 @@ return [
                                     }
 
                                     if ($kirby->multilang()) {
-                                        // Kirby renders a missing translation from the default language.
-                                        $translatedLanguages = $kirby->languages()->filter(
-                                            fn ($language) => $page->translation($language->code())->exists()
-                                        );
+                                        $sitemapLanguages = PageLanguages::of($page);
 
-                                        // A virtual page without content props exists in no language at all.
-                                        if ($translatedLanguages->isEmpty()) {
-                                            $translatedLanguages = $kirby->languages();
-                                        }
-
-                                        if (!$translatedLanguages->has($kirby->languageCode())) {
+                                        if (!$sitemapLanguages->has($languageCode)) {
                                             continue;
                                         }
                                     }
@@ -164,7 +158,7 @@ return [
                                     }
 
                                     if ($kirby->multilang()) {
-                                        $url['links'] = $translatedLanguages->map(fn ($language) => [
+                                        $url['links'] = $sitemapLanguages->map(fn ($language) => [
                                             // Support ISO 3166-1 Alpha 2 and ISO 639-1.
                                             'lang' => Str::slug(preg_replace(
                                                 '/[.@].*$/',
@@ -174,7 +168,7 @@ return [
                                             'url' => $withoutBase($page->url($language->code()))
                                         ])->values();
 
-                                        if ($translatedLanguages->has($defaultLanguageCode)) {
+                                        if ($sitemapLanguages->has($defaultLanguageCode)) {
                                             $url['links'][] = [
                                                 'lang' => 'x-default',
                                                 'url' => $withoutBase($page->url($defaultLanguageCode))

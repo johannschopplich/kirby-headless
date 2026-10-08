@@ -12,6 +12,7 @@ F::loadClasses([
     'JohannSchopplich\\Headless\\BlocksResolver\\PagesFieldResolver' => 'src/classes/BlocksResolver/PagesFieldResolver.php',
     'JohannSchopplich\\Headless\\BlocksResolver\\ReferenceFieldResolver' => 'src/classes/BlocksResolver/ReferenceFieldResolver.php',
     'JohannSchopplich\\Headless\\FrontendUrl' => 'src/classes/FrontendUrl.php',
+    'JohannSchopplich\\Headless\\PageLanguages' => 'src/classes/PageLanguages.php',
     'JohannSchopplich\\Headless\\PageRenderer' => 'src/classes/PageRenderer.php'
 ], __DIR__);
 

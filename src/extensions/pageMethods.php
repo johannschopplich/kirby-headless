@@ -1,6 +1,7 @@
 <?php
 
 use JohannSchopplich\Headless\FrontendUrl;
+use JohannSchopplich\Headless\PageLanguages;
 use Kirby\Cms\Page;
 
 return [
@@ -32,13 +33,14 @@ return [
     },
 
     /**
-     * Returns the translated title and URI per configured language.
+     * Returns the title and URI in each language the page is translated
+     * into; a page without any content lists every language.
      *
      * @kql-allowed
      */
     'i18nMeta' => function (): array {
         /** @var \Kirby\Cms\Page $this */
-        $languageCodes = $this->kirby()->languages()->codes();
+        $languageCodes = PageLanguages::of($this)->codes();
         $meta = [];
 
         foreach ($languageCodes as $languageCode) {
