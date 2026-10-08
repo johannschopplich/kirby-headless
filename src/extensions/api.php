@@ -90,8 +90,9 @@ return [
              * Answers with every indexable page of the site.
              *
              * Pages are filtered through the `headless.sitemap.exclude` options
-             * and each blueprint's own `sitemap` option. A multilang site gets
-             * the alternates of every language alongside each URL.
+             * and each blueprint's own `sitemap` option. A multilang site lists
+             * only the pages translated into the request's language, each with
+             * the alternates of its translated languages.
              */
             [
                 'pattern' => '__sitemap__',
@@ -136,6 +137,22 @@ return [
                                         continue;
                                     }
 
+                                    if ($kirby->multilang()) {
+                                        // Kirby renders a missing translation from the default language.
+                                        $translatedLanguages = $kirby->languages()->filter(
+                                            fn ($language) => $page->translation($language->code())->exists()
+                                        );
+
+                                        // A virtual page without content props exists in no language at all.
+                                        if ($translatedLanguages->count() === 0) {
+                                            $translatedLanguages = $kirby->languages();
+                                        }
+
+                                        if (!$translatedLanguages->has($kirby->language()->code())) {
+                                            continue;
+                                        }
+                                    }
+
                                     $url = ['url' => $withoutBase($page->url())];
 
                                     // Omit the field rather than emit `null`.
@@ -144,7 +161,7 @@ return [
                                     }
 
                                     if ($kirby->multilang()) {
-                                        $url['links'] = $kirby->languages()->map(fn ($language) => [
+                                        $url['links'] = $translatedLanguages->map(fn ($language) => [
                                             // Support ISO 3166-1 Alpha 2 and ISO 639-1.
                                             'lang' => Str::slug(preg_replace(
                                                 '/[.@].*$/',

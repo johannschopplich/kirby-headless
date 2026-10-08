@@ -80,7 +80,16 @@ final class EndpointCacheTest extends TestCase
                     ['code' => 'en', 'content' => ['title' => 'Headless']],
                     ['code' => 'de', 'content' => ['title' => 'Kopflos']]
                 ],
-                'children' => [['slug' => 'about']]
+                'children' => [
+                    [
+                        'slug' => 'about',
+                        // The sitemap lists a page only in the languages it is translated into.
+                        'translations' => [
+                            ['code' => 'en', 'content' => ['title' => 'About']],
+                            ['code' => 'de', 'content' => ['title' => 'Über uns']]
+                        ]
+                    ]
+                ]
             ]
         ]);
     }
