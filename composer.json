@@ -1,14 +1,20 @@
 {
   "name": "johannschopplich/kirby-headless",
-  "description": "KQL, JSON templates, and API routes for Kirby CMS",
+  "description": "JSON pages and KQL queries, served behind one bearer token",
   "type": "kirby-plugin",
   "version": "8.2.0",
   "keywords": [
     "kirby",
-    "headless"
+    "kirby-cms",
+    "kirby-plugin",
+    "headless",
+    "headless-cms",
+    "kql",
+    "api",
+    "json"
   ],
   "license": "MIT",
-  "homepage": "https://kirby.tools/docs/headless",
+  "homepage": "https://kirby.tools/headless",
   "authors": [
     {
       "name": "Johann Schopplich",
