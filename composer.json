@@ -9,9 +9,7 @@
     "kirby-plugin",
     "headless",
     "headless-cms",
-    "kql",
-    "api",
-    "json"
+    "kql"
   ],
   "license": "MIT",
   "homepage": "https://kirby.tools/headless",
