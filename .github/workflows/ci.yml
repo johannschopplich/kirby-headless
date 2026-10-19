@@ -29,7 +29,7 @@ jobs:
       - uses: actions/checkout@v6
       - uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.4'
+          php-version: "8.4"
           coverage: none
       - run: composer install --working-dir=tools/phpcs
       - run: composer csfix -- --dry-run --diff
@@ -40,7 +40,7 @@ jobs:
       - uses: actions/checkout@v6
       - uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.4'
+          php-version: "8.4"
           coverage: none
       - uses: ramsey/composer-install@v3
       - run: composer test
