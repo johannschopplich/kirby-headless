@@ -2,16 +2,18 @@
   "type": "module",
   "version": "8.2.0",
   "private": true,
-  "packageManager": "pnpm@11.18.0",
+  "packageManager": "pnpm@11.25.0",
   "scripts": {
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
+    "format": "prettier \"scripts/**\" --write",
     "release": "bumpp --all --execute \"npx zx scripts/pre-release.mjs\""
   },
   "devDependencies": {
-    "@antfu/eslint-config": "^9.2.0",
-    "bumpp": "^12.1.1",
-    "eslint": "^10.8.0",
+    "@antfu/eslint-config": "^9.5.1",
+    "bumpp": "^12.3.0",
+    "eslint": "^10.10.0",
+    "prettier": "^3.9.6",
     "zx": "^8.8.5"
   }
 }
