@@ -44,6 +44,8 @@ composer require johannschopplich/kirby-headless
 
 Download and copy this repository to `/site/plugins/kirby-headless`.
 
+The `/api/kql` endpoint needs Kirby's official KQL plugin: `composer require getkirby/kql`.
+
 ## Documentation
 
 For installation, configuration, and usage, see the [Kirby Headless documentation](https://kirby.tools/docs/headless).
