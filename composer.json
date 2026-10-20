@@ -32,7 +32,7 @@
   "scripts": {
     "csfix": "@php tools/phpcs/vendor/bin/php-cs-fixer fix",
     "test": "phpunit",
-    "dist": "composer install --no-dev --optimize-autoloader"
+    "dist": "composer install --no-dev"
   },
   "config": {
     "optimize-autoloader": true,

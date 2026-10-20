@@ -22,7 +22,6 @@ return (new PhpCsFixer\Config())
 		'concat_space' => ['spacing' => 'one'],
 		'declare_equal_normalize' => ['space' => 'single'],
 		'dir_constant' => true,
-		'function_typehint_space' => true,
 		'include' => true,
 		'logical_operators' => true,
 		'magic_constant_casing' => true,
@@ -31,8 +30,7 @@ return (new PhpCsFixer\Config())
 		'modernize_types_casting' => true,
 		'multiline_comment_opening_closing' => true,
 		'native_function_casing' => true,
-		'native_function_type_declaration_casing' => true,
-		'new_with_braces' => true,
+		'native_type_declaration_casing' => true,
 		'no_blank_lines_after_phpdoc' => true,
 		'no_empty_comment' => true,
 		'no_empty_phpdoc' => true,
@@ -69,6 +67,7 @@ return (new PhpCsFixer\Config())
 		'statement_indentation' => ['stick_comment_to_next_continuous_control_statement' => true],
 		'ternary_to_null_coalescing' => true,
 		'trim_array_spaces' => true,
+		'type_declaration_spaces' => true,
 		'whitespace_after_comma_in_array' => true
 	])
 	->setRiskyAllowed(true)

@@ -12,13 +12,10 @@
 /eslint.config.ts export-ignore
 /kirbyup.config.js export-ignore
 /tsconfig.json export-ignore
-/uno.config.mjs export-ignore
 /uno.config.ts export-ignore
-/vitest.config.mjs export-ignore
 /vitest.config.ts export-ignore
 
 # Node.js
-/index.dev.mjs export-ignore
 /package.json export-ignore
 /pnpm-lock.yaml export-ignore
 /pnpm-workspace.yaml export-ignore
@@ -35,15 +32,9 @@
 /docs/ export-ignore
 /mprocs.yaml export-ignore
 /playground/ export-ignore
-/readme/ export-ignore
-/templates/ export-ignore
 /tools/ export-ignore
 
 # Quality assurance
-/.codecov.yml export-ignore
-/.composer-require-checker.json export-ignore
 /.php-cs-fixer.dist.php export-ignore
-/phpmd.xml.dist export-ignore
 /phpunit.xml.dist export-ignore
-/psalm.xml.dist export-ignore
 /tests/ export-ignore

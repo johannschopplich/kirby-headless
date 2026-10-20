@@ -12,7 +12,6 @@
 	displayDetailsOnTestsThatTriggerWarnings="true"
 	stderr="true"
 	cacheDirectory=".phpunit.cache"
-	requireCoverageMetadata="false"
 >
   <testsuites>
     <testsuite name="Plugin">

@@ -9,12 +9,9 @@
 /vendor
 
 # Cache and temporary files
-/.cache
 /.php-cs-fixer.cache
 /.phpunit.*
 /index.dev.mjs
 /phpunit.xml
-/tests/coverage
 /tests/site
-/tests/*/tmp
 /tools/**/vendor
