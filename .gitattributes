@@ -21,7 +21,6 @@
 /pnpm-workspace.yaml export-ignore
 
 # Development
-/.claude/ export-ignore
 /.editorconfig export-ignore
 /.env.example export-ignore
 /.vscode/ export-ignore
