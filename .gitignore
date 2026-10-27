@@ -11,7 +11,7 @@
 # Cache and temporary files
 /.php-cs-fixer.cache
 /.phpunit.*
-/index.dev.mjs
+/index.dev.*
 /phpunit.xml
 /tests/site
 /tools/**/vendor
