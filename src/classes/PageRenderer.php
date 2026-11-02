@@ -127,9 +127,7 @@ final readonly class PageRenderer
         $kirby = App::instance();
 
         if (!$template->exists()) {
-            throw new NotFoundException([
-                'key' => 'template.default.notFound'
-            ]);
+            throw new NotFoundException(key: 'template.default.notFound');
         }
 
         $kirby->data = $kirby->apply('page.render:before', [

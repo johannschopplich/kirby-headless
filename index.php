@@ -1,7 +1,12 @@
 <?php
 
 use Kirby\Cms\App;
+use Kirby\Exception\LogicException;
 use Kirby\Filesystem\F;
+
+if (version_compare(App::version() ?? '0', '6.0.0-beta', '<')) {
+    throw new LogicException('Kirby Headless requires Kirby 6');
+}
 
 F::loadClasses([
     'JohannSchopplich\\Headless\\Api\\Api' => 'src/classes/Api/Api.php',

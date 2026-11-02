@@ -32,7 +32,7 @@ final class ResolvePermalinksFieldMethodTest extends TestCase
                         'slug' => 'home',
                         'content' => [
                             'uuid' => 'home-uuid',
-                            'text' => '<p><a href="page://about-uuid">About</a></p>'
+                            'text' => '<p><a href="/@/page/about-uuid">About</a></p>'
                         ]
                     ]
                 ]
@@ -47,7 +47,7 @@ final class ResolvePermalinksFieldMethodTest extends TestCase
 
         $resolved = $kirby->page('home')->text()->resolvePermalinks()->value();
 
-        $this->assertStringNotContainsString('page://about-uuid', $resolved);
+        $this->assertStringNotContainsString('/@/page/about-uuid', $resolved);
         $this->assertStringContainsString($kirby->page('about')->url(), $resolved);
     }
 

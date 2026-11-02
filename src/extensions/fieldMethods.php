@@ -11,11 +11,11 @@ use Kirby\Content\Field;
 use Kirby\Exception\InvalidArgumentException;
 use Kirby\Toolkit\A;
 use Kirby\Toolkit\Dom;
-use Kirby\Uuid\Uuid;
+use Kirby\Uuid\Permalink;
 
 return [
     /**
-     * Resolves `page://` and `file://` permalinks in `href` and `src` attributes.
+     * Resolves page and file permalinks (`/@/page/…`) in `href` and `src` attributes.
      *
      * The `permalinksResolver.urlParser` option rewrites every resolved URL.
      *
@@ -32,9 +32,9 @@ return [
 
             foreach ($elements as $element) {
                 foreach ($attributes as $attribute) {
-                    if ($element->hasAttribute($attribute) && $uuid = $element->getAttribute($attribute)) {
+                    if ($element->hasAttribute($attribute) && $value = $element->getAttribute($attribute)) {
                         try {
-                            if ($url = Uuid::for($uuid)?->model()?->url()) {
+                            if ($url = Permalink::from($value)?->model()?->url()) {
                                 if (is_callable($urlParser)) {
                                     $url = $urlParser($url, $kirby);
                                 }

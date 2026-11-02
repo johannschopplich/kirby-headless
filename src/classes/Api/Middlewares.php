@@ -11,7 +11,6 @@ use Kirby\Cms\Page;
 use Kirby\Cms\Responder;
 use Kirby\Filesystem\F;
 use Kirby\Http\Response;
-use Kirby\Panel\Panel;
 use Kirby\Toolkit\Str;
 
 final readonly class Middlewares
@@ -166,7 +165,7 @@ final readonly class Middlewares
             ($accept !== null && $accept !== '') &&
             !$kirby->visitor()->prefersJson()
         ) {
-            return Response::redirect(Panel::url('site'), 302);
+            return Response::redirect($kirby->panel()->url('site'), 302);
         }
 
         // An absent token opts out of authentication, but a blank one is a
