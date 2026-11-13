@@ -62,6 +62,14 @@ final class TemplateEndpointTest extends TestCase
     }
 
     #[Test]
+    public function names_the_missing_template_in_the_error_message(): void
+    {
+        $body = $this->app()->router()->call('api/__template__/missing', 'GET')->body();
+
+        $this->assertSame('The template "missing" does not exist', Json::decode($body)['message']);
+    }
+
+    #[Test]
     public function answers_with_the_status_code_the_template_sets(): void
     {
         $this->writeTemplate('<?php $kirby->response()->code(418); echo "{}";');

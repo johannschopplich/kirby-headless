@@ -228,7 +228,7 @@ return [
                             $template = $kirby->template($templateName);
 
                             if (!$template->exists()) {
-                                throw new NotFoundException(key: 'template.default.notFound');
+                                throw new NotFoundException(message: 'The template "' . $templateName . '" does not exist');
                             }
 
                             $response->body($template->render([
