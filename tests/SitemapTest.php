@@ -83,6 +83,31 @@ final class SitemapTest extends TestCase
         $this->assertSame(['/', '/de', '/'], array_column($sitemap['/']['links'], 'url'));
     }
 
+    #[Test]
+    public function excludes_pages_by_a_pattern_containing_an_exclamation_mark(): void
+    {
+        $kirby = new App([
+            'urls' => [
+                'index' => 'https://example.com'
+            ],
+            'roots' => [
+                'index' => $this->root
+            ],
+            'options' => [
+                'headless.sitemap.exclude.pages' => ['blog/(?!keep).*']
+            ],
+            'site' => [
+                'children' => [
+                    ['slug' => 'blog', 'children' => [['slug' => 'keep'], ['slug' => 'drop']]]
+                ]
+            ]
+        ]);
+
+        $entries = Json::decode($kirby->router()->call('api/__sitemap__', 'GET')->body())['result'];
+
+        $this->assertSame(['/blog', '/blog/keep'], array_column($entries, 'url'));
+    }
+
     /**
      * @param array<int, array<string, mixed>> $children
      * @return array<string, array<string, mixed>>
