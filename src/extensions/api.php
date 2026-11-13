@@ -65,9 +65,13 @@ return [
                             // Kirby's API resolved the language before this action ran, so the
                             // key follows the language the answer actually holds.
                             $languageSuffix = $kirby->multilang() ? '-' . $kirby->languageCode() : '';
+                            // A query can read the user it runs as (`kirby.user`). Kirby flushes the
+                            // pages cache on every user update, so the id also covers the role.
+                            $user = $kirby->user();
+                            $userSuffix = $user !== null ? '-' . $user->id() : '';
                             $hash = sha1(Json::encode($input));
                             $cache = $kirby->cache('pages');
-                            $cacheKey = 'query-' . $hash . $languageSuffix . '.json';
+                            $cacheKey = 'query-' . $hash . $languageSuffix . $userSuffix . '.json';
 
                             if ($isCacheable) {
                                 $data = $cache->get($cacheKey);

@@ -3,6 +3,7 @@
 declare(strict_types = 1);
 
 use Kirby\Cms\App;
+use Kirby\Cms\User;
 use Kirby\Data\Json;
 use Kirby\Filesystem\Dir;
 use Kirby\Toolkit\I18n;
@@ -20,7 +21,7 @@ final class EndpointCacheTest extends TestCase
     protected function tearDown(): void
     {
         $_GET = [];
-        unset($_SERVER['HTTP_X_CACHEABLE'], $_SERVER['HTTP_X_LANGUAGE']);
+        unset($_SERVER['HTTP_X_CACHEABLE'], $_SERVER['HTTP_X_LANGUAGE'], $_SERVER['HTTP_AUTHORIZATION']);
         App::destroy();
         Dir::remove($this->root);
     }
@@ -198,6 +199,35 @@ final class EndpointCacheTest extends TestCase
 
         $this->assertSame('Headless', Json::decode($english)['result']);
         $this->assertSame('Kopflos', Json::decode($german)['result']);
+    }
+
+    #[Test]
+    public function keeps_one_users_cached_kql_answer_from_another_user(): void
+    {
+        $_GET = ['query' => 'kirby.user.email'];
+        $kirby = fn () => new App([
+            'roots' => [
+                'index' => $this->root,
+                'cache' => $this->root . '/cache',
+                'plugins' => dirname(__DIR__) . '/vendor/kirby-plugins'
+            ],
+            'options' => [
+                'api' => ['basicAuth' => true, 'allowInsecure' => true],
+                'cache' => ['pages' => ['active' => true]]
+            ],
+            'users' => [
+                ['email' => 'alice@example.com', 'role' => 'admin', 'password' => User::hashPassword('secret12')],
+                ['email' => 'bob@example.com', 'role' => 'admin', 'password' => User::hashPassword('secret12')]
+            ]
+        ]);
+
+        $_SERVER['HTTP_AUTHORIZATION'] = 'Basic ' . base64_encode('alice@example.com:secret12');
+        $kirby()->router()->call('api/kql', 'GET');
+
+        $_SERVER['HTTP_AUTHORIZATION'] = 'Basic ' . base64_encode('bob@example.com:secret12');
+        $body = $kirby()->router()->call('api/kql', 'GET')->body();
+
+        $this->assertSame('bob@example.com', Json::decode($body)['result']);
     }
 
     #[Test]
