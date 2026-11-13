@@ -5,7 +5,6 @@ declare(strict_types = 1);
 namespace JohannSchopplich\Headless;
 
 use Kirby\Cms\App;
-use Kirby\Toolkit\Str;
 
 final readonly class FrontendUrl
 {
@@ -21,6 +20,12 @@ final readonly class FrontendUrl
             return null;
         }
 
-        return Str::replace($url, $kirby->url(), $frontendUrl);
+        $baseUrl = rtrim($kirby->url(), '/');
+
+        if (!str_starts_with($url, $baseUrl)) {
+            return $url;
+        }
+
+        return rtrim($frontendUrl, '/') . substr($url, strlen($baseUrl));
     }
 }
