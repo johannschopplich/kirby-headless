@@ -114,7 +114,8 @@ return [
                         $data = Api::getOrSet(
                             'sitemap' . $languageSuffix . '.headless.json',
                             function () use ($kirby) {
-                                $withoutBase = fn (string $url) => Url::path($url, true);
+                                // The home page has an empty path.
+                                $withoutBase = fn (string $url) => Url::path($url, true) ?: '/';
                                 $isIndexable = $kirby->option('headless.sitemap.isIndexable');
                                 $excludeTemplates = $kirby->option('headless.sitemap.exclude.templates', []);
                                 $excludePages = $kirby->option('headless.sitemap.exclude.pages', []);

@@ -74,6 +74,15 @@ final class SitemapTest extends TestCase
         $this->assertSame(['de'], array_column($links, 'lang'));
     }
 
+    #[Test]
+    public function lists_the_home_page_under_the_root_path(): void
+    {
+        $sitemap = $this->sitemap([['slug' => 'home']]);
+
+        $this->assertArrayHasKey('/', $sitemap);
+        $this->assertSame(['/', '/de', '/'], array_column($sitemap['/']['links'], 'url'));
+    }
+
     /**
      * @param array<int, array<string, mixed>> $children
      * @return array<string, array<string, mixed>>
