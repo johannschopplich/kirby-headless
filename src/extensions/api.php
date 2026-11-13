@@ -3,6 +3,7 @@
 use JohannSchopplich\Headless\Api\Api;
 use JohannSchopplich\Headless\Api\Middlewares;
 use JohannSchopplich\Headless\PageLanguages;
+use JohannSchopplich\Headless\ResponseCache;
 use Kirby\Cms\App;
 use Kirby\Data\Json;
 use Kirby\Exception\Exception;
@@ -217,25 +218,35 @@ return [
                         // The template renders in the request's language too, and its name alone cannot tell two languages apart.
                         $languageSuffix = $kirby->multilang() ? '-' . $kirby->languageCode() : '';
 
-                        $data = Api::getOrSet(
-                            'template-' . $templateName . $languageSuffix . '.headless.json',
-                            function () use ($kirby, $templateName) {
-                                $template = $kirby->template($templateName);
+                        $cacheKey = 'template-' . $templateName . $languageSuffix . '.headless.json';
+                        $isCacheable = Api::isCacheable();
+                        $response = $kirby->response();
 
-                                if (!$template->exists()) {
-                                    throw new NotFoundException(key: 'template.default.notFound');
-                                }
+                        $body = $isCacheable ? ResponseCache::replay($cacheKey, $response) : null;
 
-                                return $template->render([
-                                    'kirby' => $kirby,
-                                    'site' => $kirby->site()
-                                ]);
+                        if ($body === null) {
+                            $template = $kirby->template($templateName);
+
+                            if (!$template->exists()) {
+                                throw new NotFoundException(key: 'template.default.notFound');
                             }
-                        );
+
+                            $response->body($template->render([
+                                'kirby' => $kirby,
+                                'site' => $kirby->site()
+                            ]));
+
+                            // A template that answers with another code usually does so for
+                            // this request alone.
+                            if ($isCacheable && ($response->code() ?? 200) === 200) {
+                                ResponseCache::store($cacheKey, $response);
+                            }
+                        }
 
                         return Api::createResponse(
-                            200,
-                            Json::decode($data)
+                            $response->code() ?? 200,
+                            Json::decode($response->body()),
+                            $response->headers()
                         );
                     }
                 )

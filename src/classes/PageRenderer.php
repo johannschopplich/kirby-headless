@@ -17,10 +17,6 @@ final readonly class PageRenderer
     /**
      * Renders the page and hands back the response Kirby would send.
      *
-     * Mirrors `Page::render()`: the response configuration travels with the
-     * body, so headers and status codes a template sets apply to every visitor
-     * and not just the one whose request filled the cache.
-     *
      * @param string $extension The extension the request asked for, empty for none
      * @throws \Kirby\Exception\NotFoundException If the template does not exist
      */
@@ -32,12 +28,11 @@ final readonly class PageRenderer
         $template = $representation ?? $page->template();
         $contentType = $representation !== null ? $extension : 'html';
         $versionId = self::renderVersion($page);
-        $cache = $cacheKey = $body = null;
+        $cacheKey = $body = null;
 
         if (Api::clientAllowsCache() && $page->isCacheable($versionId)) {
-            $cache = $kirby->cache('pages');
             $cacheKey = self::cacheKey($page, $contentType, $versionId);
-            $body = self::replayCachedResponse($cache->get($cacheKey), $response);
+            $body = ResponseCache::replay($cacheKey, $response);
         }
 
         if ($body === null) {
@@ -48,12 +43,8 @@ final readonly class PageRenderer
                 fn () => self::render($page, $template, $contentType)
             ));
 
-            if ($cache !== null && $response->cache() === true) {
-                $cache->set($cacheKey, [
-                    'response' => $response->toCacheArray(),
-                    'usesAuth' => $response->usesAuth(),
-                    'usesCookies' => $response->usesCookies()
-                ], $response->expires() ?? 0);
+            if ($cacheKey !== null) {
+                ResponseCache::store($cacheKey, $response);
             }
         }
 
@@ -78,32 +69,6 @@ final readonly class PageRenderer
         $template = App::instance()->template($page->template()->name(), $contentType);
 
         return $template->exists() ? $template : null;
-    }
-
-    /**
-     * Restores a cached response and returns its body.
-     */
-    private static function replayCachedResponse(mixed $cachedEntry, Responder $response): string|null
-    {
-        if (!is_array($cachedEntry)) {
-            return null;
-        }
-
-        // Read the body before touching the response, so an entry that turns
-        // out to be unusable cannot color the one we render in its place.
-        $body = $cachedEntry['response']['body'] ?? null;
-
-        if ($body === null) {
-            return null;
-        }
-
-        if (Responder::isPrivate($cachedEntry['usesAuth'] ?? false, $cachedEntry['usesCookies'] ?? [])) {
-            return null;
-        }
-
-        $response->fromArray($cachedEntry['response']);
-
-        return $body;
     }
 
     /**

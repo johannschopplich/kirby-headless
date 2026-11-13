@@ -89,9 +89,10 @@ final class EndpointCacheTest extends TestCase
     #[Test]
     public function serves_a_rendered_template_from_the_cache(): void
     {
-        $kirby = $this->app('template-probe.headless.json', '{"value":"stale"}');
+        $kirby = $this->app('template-probe.headless.json', ['response' => ['body' => '{"value":"stale"}']]);
+        $body = $kirby->router()->call('api/__template__/probe', 'GET')->body();
 
-        $this->assertStringContainsString('stale', $kirby->router()->call('api/__template__/probe', 'GET')->body());
+        $this->assertSame(['value' => 'stale'], Json::decode($body)['result']);
     }
 
     #[Test]
@@ -103,6 +104,19 @@ final class EndpointCacheTest extends TestCase
     }
 
     /**
+     * Headless 8 cached the body alone under the same key, so an upgraded
+     * site still holds entries that carry no response configuration.
+     */
+    #[Test]
+    public function renders_a_template_again_over_a_body_cached_by_headless_8(): void
+    {
+        $kirby = $this->app('template-probe.headless.json', '{"value":"stale"}');
+        $body = $kirby->router()->call('api/__template__/probe', 'GET')->body();
+
+        $this->assertSame('fresh', Json::decode($body)['result']['value']);
+    }
+
+    /**
      * The cache key is the template name alone, so it cannot stand in for a
      * request that carries data – Kirby draws the same line in `isCacheable()`.
      */
@@ -110,7 +124,7 @@ final class EndpointCacheTest extends TestCase
     public function renders_a_template_again_when_the_request_carries_data(): void
     {
         $_GET = ['preview' => '1'];
-        $kirby = $this->app('template-probe.headless.json', '{"value":"stale"}');
+        $kirby = $this->app('template-probe.headless.json', ['response' => ['body' => '{"value":"stale"}']]);
 
         $this->assertStringContainsString('fresh', $kirby->router()->call('api/__template__/probe', 'GET')->body());
     }

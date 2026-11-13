@@ -18,7 +18,8 @@ F::loadClasses([
     'JohannSchopplich\\Headless\\BlocksResolver\\ReferenceFieldResolver' => 'src/classes/BlocksResolver/ReferenceFieldResolver.php',
     'JohannSchopplich\\Headless\\FrontendUrl' => 'src/classes/FrontendUrl.php',
     'JohannSchopplich\\Headless\\PageLanguages' => 'src/classes/PageLanguages.php',
-    'JohannSchopplich\\Headless\\PageRenderer' => 'src/classes/PageRenderer.php'
+    'JohannSchopplich\\Headless\\PageRenderer' => 'src/classes/PageRenderer.php',
+    'JohannSchopplich\\Headless\\ResponseCache' => 'src/classes/ResponseCache.php'
 ], __DIR__);
 
 App::plugin('johannschopplich/headless', [
