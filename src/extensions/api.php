@@ -7,6 +7,7 @@ use JohannSchopplich\Headless\ResponseCache;
 use Kirby\Cms\App;
 use Kirby\Data\Json;
 use Kirby\Exception\Exception;
+use Kirby\Exception\InvalidArgumentException;
 use Kirby\Exception\NotFoundException;
 use Kirby\Http\Url;
 use Kirby\Toolkit\Str;
@@ -223,29 +224,39 @@ return [
                         $response = $kirby->response();
 
                         $body = $isCacheable ? ResponseCache::replay($cacheKey, $response) : null;
+                        $isFreshRender = $body === null;
 
-                        if ($body === null) {
+                        if ($isFreshRender) {
                             $template = $kirby->template($templateName);
 
                             if (!$template->exists()) {
                                 throw new NotFoundException(message: 'The template "' . $templateName . '" does not exist');
                             }
 
-                            $response->body($template->render([
+                            $body = $template->render([
                                 'kirby' => $kirby,
                                 'site' => $kirby->site()
-                            ]));
+                            ]);
+                            $response->body($body);
+                        }
 
-                            // A template that answers with another code usually does so for
-                            // this request alone.
-                            if ($isCacheable && ($response->code() ?? 200) === 200) {
-                                ResponseCache::store($cacheKey, $response);
-                            }
+                        // `Json::decode()` throws a 400, which would blame the client
+                        // for a page template that renders HTML.
+                        try {
+                            $data = Json::decode($body);
+                        } catch (InvalidArgumentException) {
+                            throw new Exception(message: 'The template "' . $templateName . '" did not render a JSON object or array');
+                        }
+
+                        // A template that answers with another code usually does so for
+                        // this request alone.
+                        if ($isFreshRender && $isCacheable && ($response->code() ?? 200) === 200) {
+                            ResponseCache::store($cacheKey, $response);
                         }
 
                         return Api::createResponse(
                             $response->code() ?? 200,
-                            Json::decode($response->body()),
+                            $data,
                             $response->headers()
                         );
                     }

@@ -70,6 +70,29 @@ final class TemplateEndpointTest extends TestCase
     }
 
     #[Test]
+    public function answers_with_a_500_naming_a_template_that_renders_no_json(): void
+    {
+        $this->writeTemplate('<h1>Probe</h1>');
+
+        $response = $this->app()->router()->call('api/__template__/probe', 'GET');
+
+        $this->assertSame(500, $response->code());
+        $this->assertSame('The template "probe" did not render a JSON object or array', Json::decode($response->body())['message']);
+    }
+
+    #[Test]
+    public function leaves_a_render_that_is_no_json_out_of_the_cache(): void
+    {
+        $this->writeTemplate('<h1>Probe</h1>');
+        $this->app()->router()->call('api/__template__/probe', 'GET');
+
+        $this->writeTemplate('<?php echo \'{"value":"second"}\';');
+        $body = $this->app()->router()->call('api/__template__/probe', 'GET')->body();
+
+        $this->assertSame(['value' => 'second'], Json::decode($body)['result']);
+    }
+
+    #[Test]
     public function answers_with_the_status_code_the_template_sets(): void
     {
         $this->writeTemplate('<?php $kirby->response()->code(418); echo "{}";');
