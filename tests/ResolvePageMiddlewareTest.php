@@ -86,7 +86,7 @@ final class ResolvePageMiddlewareTest extends TestCase
         $response = Middlewares::tryResolvePage([], ['about.xml']);
 
         $this->assertSame('<xml>about</xml>', $response->body());
-        $this->assertSame('text/xml', $response->type());
+        $this->assertSame('application/xml', $response->type());
     }
 
     /**

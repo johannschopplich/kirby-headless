@@ -107,4 +107,34 @@ final class PageMethodsTest extends TestCase
 
         $this->assertSame('https://frontend.test/about', $kirby->page('about')->frontendUrl());
     }
+
+    #[Test]
+    public function frontend_url_joins_a_configured_url_with_a_trailing_slash_by_one_slash(): void
+    {
+        $kirby = new App([
+            'roots' => ['index' => __DIR__],
+            'urls' => ['index' => 'https://example.com'],
+            'options' => ['headless.panel.frontendUrl' => 'https://frontend.test/'],
+            'site' => [
+                'children' => [['slug' => 'about']]
+            ]
+        ]);
+
+        $this->assertSame('https://frontend.test/about', $kirby->page('about')->frontendUrl());
+    }
+
+    #[Test]
+    public function frontend_url_replaces_only_the_prefix_of_a_root_relative_base_url(): void
+    {
+        $kirby = new App([
+            'roots' => ['index' => __DIR__],
+            'urls' => ['index' => '/'],
+            'options' => ['headless.panel.frontendUrl' => 'https://frontend.test'],
+            'site' => [
+                'children' => [['slug' => 'about', 'children' => [['slug' => 'team']]]]
+            ]
+        ]);
+
+        $this->assertSame('https://frontend.test/about/team', $kirby->page('about/team')->frontendUrl());
+    }
 }

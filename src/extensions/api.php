@@ -3,9 +3,11 @@
 use JohannSchopplich\Headless\Api\Api;
 use JohannSchopplich\Headless\Api\Middlewares;
 use JohannSchopplich\Headless\PageLanguages;
+use JohannSchopplich\Headless\ResponseCache;
 use Kirby\Cms\App;
 use Kirby\Data\Json;
 use Kirby\Exception\Exception;
+use Kirby\Exception\InvalidArgumentException;
 use Kirby\Exception\NotFoundException;
 use Kirby\Http\Url;
 use Kirby\Toolkit\Str;
@@ -114,7 +116,8 @@ return [
                         $data = Api::getOrSet(
                             'sitemap' . $languageSuffix . '.headless.json',
                             function () use ($kirby) {
-                                $withoutBase = fn (string $url) => Url::path($url, true);
+                                // The home page has an empty path.
+                                $withoutBase = fn (string $url) => Url::path($url, true) ?: '/';
                                 $isIndexable = $kirby->option('headless.sitemap.isIndexable');
                                 $excludeTemplates = $kirby->option('headless.sitemap.exclude.templates', []);
                                 $excludePages = $kirby->option('headless.sitemap.exclude.pages', []);
@@ -133,7 +136,7 @@ return [
                                         continue;
                                     }
 
-                                    if ($excludePages !== [] && preg_match('!^(?:' . implode('|', $excludePages) . ')$!i', $page->id())) {
+                                    if ($excludePages !== [] && preg_match('#^(?:' . implode('|', $excludePages) . ')$#i', $page->id())) {
                                         continue;
                                     }
 
@@ -216,27 +219,45 @@ return [
                         // The template renders in the request's language too, and its name alone cannot tell two languages apart.
                         $languageSuffix = $kirby->multilang() ? '-' . $kirby->languageCode() : '';
 
-                        $data = Api::getOrSet(
-                            'template-' . $templateName . $languageSuffix . '.headless.json',
-                            function () use ($kirby, $templateName) {
-                                $template = $kirby->template($templateName);
+                        $cacheKey = 'template-' . $templateName . $languageSuffix . '.headless.json';
+                        $isCacheable = Api::isCacheable();
+                        $response = $kirby->response();
 
-                                if (!$template->exists()) {
-                                    throw new NotFoundException([
-                                        'key' => 'template.default.notFound'
-                                    ]);
-                                }
+                        $body = $isCacheable ? ResponseCache::replay($cacheKey, $response) : null;
+                        $isFreshRender = $body === null;
 
-                                return $template->render([
-                                    'kirby' => $kirby,
-                                    'site' => $kirby->site()
-                                ]);
+                        if ($isFreshRender) {
+                            $template = $kirby->template($templateName);
+
+                            if (!$template->exists()) {
+                                throw new NotFoundException(message: 'The template "' . $templateName . '" does not exist');
                             }
-                        );
+
+                            $body = $template->render([
+                                'kirby' => $kirby,
+                                'site' => $kirby->site()
+                            ]);
+                            $response->body($body);
+                        }
+
+                        // `Json::decode()` throws a 400, which would blame the client
+                        // for a page template that renders HTML.
+                        try {
+                            $data = Json::decode($body);
+                        } catch (InvalidArgumentException) {
+                            throw new Exception(message: 'The template "' . $templateName . '" did not render a JSON object or array');
+                        }
+
+                        // A template that answers with another code usually does so for
+                        // this request alone.
+                        if ($isFreshRender && $isCacheable && ($response->code() ?? 200) === 200) {
+                            ResponseCache::store($cacheKey, $response);
+                        }
 
                         return Api::createResponse(
-                            200,
-                            Json::decode($data)
+                            $response->code() ?? 200,
+                            $data,
+                            $response->headers()
                         );
                     }
                 )

@@ -27,10 +27,10 @@ Kirby Headless is a plugin for [Kirby CMS](https://getkirby.com): JSON pages and
 
 ## Requirements
 
-- Kirby 5
+- Kirby 6
 
 > [!NOTE]
-> Using Kirby 4? Install the [`v4` release](https://github.com/johannschopplich/kirby-headless/releases/tag/v4.0.2).
+> Using Kirby 5? Install [Kirby Headless 8](https://github.com/johannschopplich/kirby-headless/tree/v8).
 
 ## Installation
 
@@ -42,7 +42,7 @@ composer require johannschopplich/kirby-headless
 
 ### Manual Installation
 
-Download and copy this repository to `/site/plugins/kirby-headless`.
+Download a [release](https://github.com/johannschopplich/kirby-headless/releases) and extract it to `/site/plugins/kirby-headless`.
 
 The `/api/kql` endpoint needs Kirby's official KQL plugin: `composer require getkirby/kql`.
 
