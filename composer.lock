@@ -440,16 +440,16 @@
         },
         {
             "name": "getkirby/cms",
-            "version": "6.0.0-beta.4",
+            "version": "6.0.0-rc.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/getkirby/kirby.git",
-                "reference": "84da75be13aaee97dc11c6b5bc1b144b2a902e0d"
+                "reference": "1695b6515af9b441267136bcb4ccc416572e768e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/getkirby/kirby/zipball/84da75be13aaee97dc11c6b5bc1b144b2a902e0d",
-                "reference": "84da75be13aaee97dc11c6b5bc1b144b2a902e0d",
+                "url": "https://api.github.com/repos/getkirby/kirby/zipball/1695b6515af9b441267136bcb4ccc416572e768e",
+                "reference": "1695b6515af9b441267136bcb4ccc416572e768e",
                 "shasum": ""
             },
             "require": {
@@ -536,8 +536,8 @@
                     "type": "custom"
                 }
             ],
-            "time": "2026-11-12T11:14:26+00:00",
-            "published-time": "2026-11-12T11:35:13+00:00"
+            "time": "2026-11-18T09:02:03+00:00",
+            "published-time": "2026-11-18T09:19:06+00:00"
         },
         {
             "name": "getkirby/kql",
