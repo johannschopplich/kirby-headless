@@ -12,10 +12,12 @@ use Kirby\Exception\InvalidArgumentException;
 use Kirby\Toolkit\A;
 use Kirby\Toolkit\Dom;
 use Kirby\Uuid\Permalink;
+use Kirby\Uuid\Uuid;
 
 return [
     /**
-     * Resolves page and file permalinks (`/@/page/…`) in `href` and `src` attributes.
+     * Resolves permalinks (`/@/page/…`) and page, file and site UUIDs (`page://…`)
+     * in `href` and `src` attributes.
      *
      * The `permalinksResolver.urlParser` option rewrites every resolved URL.
      *
@@ -34,14 +36,18 @@ return [
                 foreach ($attributes as $attribute) {
                     if ($element->hasAttribute($attribute) && $value = $element->getAttribute($attribute)) {
                         try {
-                            if ($url = Permalink::from($value)?->model()?->url()) {
+                            $model =
+                                Permalink::from($value)?->model() ??
+                                Uuid::from($value, ['page', 'file', 'site'])?->model();
+
+                            if ($url = $model?->url()) {
                                 if (is_callable($urlParser)) {
                                     $url = $urlParser($url, $kirby);
                                 }
                                 $element->setAttribute($attribute, $url);
                             }
                         } catch (InvalidArgumentException) {
-                            // An attribute that is not a permalink is left as it is.
+                            // A malformed permalink or UUID is left as it is.
                         }
                     }
                 }

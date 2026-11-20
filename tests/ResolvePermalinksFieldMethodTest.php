@@ -52,6 +52,42 @@ final class ResolvePermalinksFieldMethodTest extends TestCase
     }
 
     #[Test]
+    public function rewrites_page_file_and_site_uuids_to_urls(): void
+    {
+        $kirby = new App([
+            'roots' => ['index' => __DIR__],
+            'users' => [
+                ['id' => 'editor', 'email' => 'editor@example.com']
+            ],
+            'site' => [
+                'children' => [
+                    [
+                        'slug' => 'about',
+                        'content' => ['uuid' => 'about-uuid'],
+                        'files' => [
+                            [
+                                'filename' => 'photo.jpg',
+                                'content' => ['uuid' => 'photo-uuid']
+                            ]
+                        ]
+                    ],
+                    [
+                        'slug' => 'home',
+                        'content' => [
+                            'text' => '<p><a href="page://about-uuid">About</a><img src="file://photo-uuid"><a href="site://">Site</a><a href="page://missing">Missing</a><a href="user://editor">User</a></p>'
+                        ]
+                    ]
+                ]
+            ]
+        ]);
+
+        $this->assertSame(
+            '<p><a href="/about">About</a><img src="/media/pages/about/' . $kirby->file('about/photo.jpg')->mediaHash() . '/photo.jpg"><a href="/">Site</a><a href="page://missing">Missing</a><a href="user://editor">User</a></p>',
+            $kirby->page('home')->text()->resolvePermalinks()->value()
+        );
+    }
+
+    #[Test]
     public function applies_custom_url_parser_when_configured(): void
     {
         $kirby = $this->app([
