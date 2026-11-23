@@ -10,6 +10,8 @@
   displayDetailsOnTestsThatTriggerErrors="true"
   displayDetailsOnTestsThatTriggerNotices="true"
   displayDetailsOnTestsThatTriggerWarnings="true"
+  failOnNotice="true"
+  failOnWarning="true"
   stderr="true"
   cacheDirectory=".phpunit.cache"
 >
