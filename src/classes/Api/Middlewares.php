@@ -165,6 +165,7 @@ final readonly class Middlewares
             ($accept !== null && $accept !== '') &&
             !$kirby->visitor()->prefersJson()
         ) {
+            // TODO: Use `$kirby->panel()->url('site')` once Kirby 5 support is dropped
             return Response::redirect($kirby->url('panel') . '/site', 302);
         }
 
