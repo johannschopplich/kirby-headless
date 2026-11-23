@@ -74,7 +74,7 @@ final class ResolvePermalinksFieldMethodTest extends TestCase
                     [
                         'slug' => 'home',
                         'content' => [
-                            'text' => '<p><a href="page://about-uuid">About</a><img src="file://photo-uuid"><a href="site://">Site</a><a href="page://missing">Missing</a><a href="user://editor">User</a></p>'
+                            'text' => '<p><a href="page://about-uuid">About</a><img src="file://photo-uuid"><a href="site://">Site</a><a href="page://missing">Missing</a><a href="user://editor">User</a><a href="page://about-uuid/@/page/missing">Suffixed</a></p>'
                         ]
                     ]
                 ]
@@ -82,7 +82,37 @@ final class ResolvePermalinksFieldMethodTest extends TestCase
         ]);
 
         $this->assertSame(
-            '<p><a href="/about">About</a><img src="/media/pages/about/' . $kirby->file('about/photo.jpg')->mediaHash() . '/photo.jpg"><a href="/">Site</a><a href="page://missing">Missing</a><a href="user://editor">User</a></p>',
+            '<p><a href="/about">About</a><img src="/media/pages/about/' . $kirby->file('about/photo.jpg')->mediaHash() . '/photo.jpg"><a href="/">Site</a><a href="page://missing">Missing</a><a href="user://editor">User</a><a href="/about">Suffixed</a></p>',
+            $kirby->page('home')->text()->resolvePermalinks()->value()
+        );
+    }
+
+    #[Test]
+    public function rewrites_absolute_page_permalinks_and_leaves_user_and_site_permalinks_untouched(): void
+    {
+        $kirby = new App([
+            'roots' => ['index' => __DIR__],
+            'users' => [
+                ['id' => 'editor', 'email' => 'editor@example.com']
+            ],
+            'site' => [
+                'children' => [
+                    [
+                        'slug' => 'about',
+                        'content' => ['uuid' => 'about-uuid']
+                    ],
+                    [
+                        'slug' => 'home',
+                        'content' => [
+                            'text' => '<p><a href="https://example.com/@/page/about-uuid">About</a><a href="/@/user/editor">User</a><a href="/@/site/">Site</a></p>'
+                        ]
+                    ]
+                ]
+            ]
+        ]);
+
+        $this->assertSame(
+            '<p><a href="/about">About</a><a href="/@/user/editor">User</a><a href="/@/site/">Site</a></p>',
             $kirby->page('home')->text()->resolvePermalinks()->value()
         );
     }

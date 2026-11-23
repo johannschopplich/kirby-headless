@@ -11,6 +11,7 @@ use Kirby\Content\Field;
 use Kirby\Exception\InvalidArgumentException;
 use Kirby\Toolkit\A;
 use Kirby\Toolkit\Dom;
+use Kirby\Toolkit\Str;
 use Kirby\Uuid\Permalink;
 use Kirby\Uuid\Uuid;
 
@@ -36,9 +37,22 @@ return [
                 foreach ($attributes as $attribute) {
                     if ($element->hasAttribute($attribute) && $value = $element->getAttribute($attribute)) {
                         try {
-                            $model =
-                                Permalink::from($value)?->model() ??
-                                Uuid::from($value, ['page', 'file', 'site'])?->model();
+                            if (class_exists(Permalink::class)) {
+                                $model =
+                                    Permalink::from($value)?->model() ??
+                                    Uuid::from($value, ['page', 'file', 'site'])?->model();
+                            } else {
+                                // Kirby 5 lacks `Permalink` and `Uuid::from()`: this mirrors both.
+                                $model = null;
+
+                                if ($path = Str::after($value, '/@/')) {
+                                    $path = explode('/', $path);
+                                    $uuid = $path[0] . '://' . ($path[1] ?? '');
+                                    $model = Uuid::is($uuid, ['page', 'file']) ? Uuid::for($uuid)?->model() : null;
+                                }
+
+                                $model ??= Uuid::is($value, ['page', 'file', 'site']) ? Uuid::for($value)?->model() : null;
+                            }
 
                             if ($url = $model?->url()) {
                                 if (is_callable($urlParser)) {

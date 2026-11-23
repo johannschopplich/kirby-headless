@@ -15,7 +15,12 @@ permissions:
 
 jobs:
   php:
+    name: php (Kirby ${{ matrix.kirby }})
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        kirby: ["5", "6"]
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -25,7 +30,13 @@ jobs:
           php-version: "8.4"
           coverage: none
 
-      - run: composer install --no-interaction --no-progress
+      - if: matrix.kirby == '5'
+        run: composer install --no-interaction --no-progress
+      # KQL for Kirby 6 is only a branch so far.
+      - if: matrix.kirby == '6'
+        run: |
+          composer require --dev --no-update "getkirby/kql:v6.x-dev"
+          composer update getkirby/cms getkirby/kql --with "getkirby/cms:^6.0@beta" --with-all-dependencies --no-interaction --no-progress
       - run: vendor/bin/phpunit
 
   lint:

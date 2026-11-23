@@ -165,7 +165,7 @@ final readonly class Middlewares
             ($accept !== null && $accept !== '') &&
             !$kirby->visitor()->prefersJson()
         ) {
-            return Response::redirect($kirby->panel()->url('site'), 302);
+            return Response::redirect($kirby->url('panel') . '/site', 302);
         }
 
         // An absent token opts out of authentication, but a blank one is a

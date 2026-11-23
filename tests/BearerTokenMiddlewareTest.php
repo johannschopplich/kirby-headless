@@ -105,7 +105,10 @@ final class BearerTokenMiddlewareTest extends TestCase
             ]
         ]);
 
-        $this->assertSame(302, Middlewares::validateBearerToken(true)?->code());
+        $response = Middlewares::validateBearerToken(true);
+
+        $this->assertSame(302, $response?->code());
+        $this->assertSame('/panel/site', $response?->header('Location'));
     }
 
     /**

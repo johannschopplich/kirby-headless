@@ -86,7 +86,8 @@ final class ResolvePageMiddlewareTest extends TestCase
         $response = Middlewares::tryResolvePage([], ['about.xml']);
 
         $this->assertSame('<xml>about</xml>', $response->body());
-        $this->assertSame('application/xml', $response->type());
+        // Kirby 5 answers `text/xml`, Kirby 6 `application/xml`.
+        $this->assertContains($response->type(), ['text/xml', 'application/xml']);
     }
 
     /**
