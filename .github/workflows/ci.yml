@@ -36,7 +36,7 @@ jobs:
       - if: matrix.kirby == '6'
         run: |
           composer require --dev --no-update "getkirby/kql:v6.x-dev"
-          composer update getkirby/cms getkirby/kql --with "getkirby/cms:^6.0@beta" --with-all-dependencies --no-interaction --no-progress
+          composer update getkirby/cms getkirby/kql --with "getkirby/cms:^6.0" --with-all-dependencies --no-interaction --no-progress
       - run: vendor/bin/phpunit
 
   lint:
