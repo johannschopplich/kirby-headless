@@ -27,7 +27,7 @@
   "require-dev": {
     "getkirby/cms": "^5 || ^6",
     "getkirby/kql": "^3",
-    "phpunit/phpunit": "^12"
+    "phpunit/phpunit": "^13"
   },
   "scripts": {
     "csfix": "@php tools/phpcs/vendor/bin/php-cs-fixer fix",
